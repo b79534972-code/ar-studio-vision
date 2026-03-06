@@ -155,4 +155,8 @@
   .shadow-pro {
     box-shadow: var(--pro-glow);
   }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }

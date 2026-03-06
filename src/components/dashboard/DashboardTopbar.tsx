@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Upload, Plus, PanelLeftClose, PanelLeft, ChevronRight } from "lucide-react";
 import type { User } from "@/types/subscription";
 import ProfileDropdown from "./ProfileDropdown";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DashboardTopbarProps {
   user: User;
@@ -33,23 +34,32 @@ const DashboardTopbar = ({
 }: DashboardTopbarProps) => {
   const location = useLocation();
   const currentLabel = routeLabels[location.pathname] || "Dashboard";
+  const isMobile = useIsMobile();
 
   return (
-    <header className="h-14 border-b border-border/30 bg-card/60 backdrop-blur-xl flex items-center justify-between px-4 sticky top-0 z-20">
+    <header className="h-14 border-b border-border/30 bg-card/60 backdrop-blur-xl flex items-center justify-between px-3 md:px-4 sticky top-0 z-20">
       {/* Left: toggle + breadcrumb */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onToggleSidebar}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
-        >
-          {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-        </button>
+      <div className="flex items-center gap-2 md:gap-3">
+        {!isMobile && (
+          <button
+            onClick={onToggleSidebar}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          >
+            {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+          </button>
+        )}
         <div className="flex items-center gap-1.5 text-sm">
-          <span className="text-muted-foreground">Dashboard</span>
-          {currentLabel !== "Overview" && (
+          {isMobile ? (
+            <span className="font-display font-bold text-foreground">SpaceAR<span className="text-primary">.</span></span>
+          ) : (
             <>
-              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
-              <span className="text-foreground font-medium">{currentLabel}</span>
+              <span className="text-muted-foreground">Dashboard</span>
+              {currentLabel !== "Overview" && (
+                <>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
+                  <span className="text-foreground font-medium">{currentLabel}</span>
+                </>
+              )}
             </>
           )}
         </div>
