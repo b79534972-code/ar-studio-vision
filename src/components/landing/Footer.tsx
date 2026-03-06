@@ -1,7 +1,7 @@
 const Footer = () => {
   return (
     <footer className="py-6 md:py-8 bg-background border-t border-border">
-      <div className="container mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32 mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-2 font-display text-sm font-semibold text-foreground tracking-tight">
           <img src="/logo.png" alt="SpaceAR logo" className="w-5 h-5 object-contain" />
           <span>SpaceAR<span className="text-primary">.</span></span>
