@@ -10,9 +10,9 @@ const problems = [
 
 const ProblemSection = () => {
   return (
-    <section className="py-20 md:py-28 bg-background">
-      <div className="container mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+    <section className="py-12 md:py-28 bg-background">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -35,17 +35,17 @@ const ProblemSection = () => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.15 }}
           >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-6 tracking-tight">
+            <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-4 md:mb-6 tracking-tight">
               Living in a Small Apartment?
             </h2>
-            <p className="text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8 leading-relaxed">
               Studio apartments demand precision. One wrong furniture choice can make your space feel cramped and unusable.
             </p>
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {problems.map((problem, i) => (
-                <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-secondary border border-border/50">
-                  <AlertTriangle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                  <span className="text-sm text-foreground font-medium">{problem}</span>
+                <div key={i} className="flex items-start gap-3 p-3 md:p-4 rounded-xl bg-secondary border border-border/50">
+                  <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 shrink-0" />
+                  <span className="text-xs md:text-sm text-foreground font-medium">{problem}</span>
                 </div>
               ))}
             </div>

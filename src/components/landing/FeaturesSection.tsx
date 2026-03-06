@@ -26,24 +26,24 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="py-20 md:py-28 bg-background">
-      <div className="container mx-auto px-6">
+    <section className="py-12 md:py-28 bg-background">
+      <div className="container mx-auto px-4 md:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center mb-10 md:mb-16"
         >
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4 tracking-tight">
+          <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-3 md:mb-4 tracking-tight">
             Key Features
           </h2>
-          <p className="text-muted-foreground max-w-md mx-auto">
+          <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto">
             Built on research-driven design principles for studio apartment optimization.
           </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
           {features.map((f, i) => (
             <motion.div
               key={i}
@@ -51,15 +51,15 @@ const FeaturesSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="p-6 rounded-2xl bg-card border border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group"
+              className="p-4 md:p-6 rounded-2xl bg-card border border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group"
             >
-              <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                <f.icon className="w-5 h-5 text-primary-foreground" />
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl gradient-primary flex items-center justify-center mb-3 md:mb-4 group-hover:scale-110 transition-transform duration-300">
+                <f.icon className="w-4 h-4 md:w-5 md:h-5 text-primary-foreground" />
               </div>
-              <h3 className="font-display text-base font-semibold text-foreground mb-2">
+              <h3 className="font-display text-sm md:text-base font-semibold text-foreground mb-1 md:mb-2">
                 {f.title}
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+              <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
             </motion.div>
           ))}
         </div>
