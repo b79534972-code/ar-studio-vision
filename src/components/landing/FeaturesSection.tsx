@@ -27,7 +27,7 @@ const features = [
 const FeaturesSection = () => {
   return (
     <section className="py-12 md:py-28 bg-background">
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32 mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

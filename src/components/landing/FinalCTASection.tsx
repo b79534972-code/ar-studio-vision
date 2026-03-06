@@ -7,7 +7,7 @@ const FinalCTASection = () => {
   const navigate = useNavigate();
   return (
     <section className="py-14 md:py-28 gradient-subtle">
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32 mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -7,9 +7,9 @@ import heroImage from "@/assets/hero-ar-demo.jpg";
 const HeroSection = () => {
   const navigate = useNavigate();
   return (
-    <section id="home" className="relative pt-20 pb-12 md:pt-32 md:pb-28 overflow-hidden">
+    <section id="home" className="relative pt-20 pb-12 md:pt-0 md:pb-0 lg:min-h-screen overflow-hidden lg:flex lg:items-center">
       <div className="absolute inset-0 gradient-subtle" />
-      <div className="container mx-auto px-4 md:px-6 relative">
+      <div className="w-full px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32 relative mx-auto max-w-[100vw]">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

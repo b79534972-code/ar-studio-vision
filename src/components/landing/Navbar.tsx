@@ -31,7 +31,7 @@ const Navbar = () => {
           scrolled || mobileOpen ? "bg-card/95 backdrop-blur-xl shadow-soft" : "bg-transparent"
         }`}
       >
-        <div className="container mx-auto flex items-center justify-between h-14 md:h-16 px-4 md:px-6">
+        <div className="w-full flex items-center justify-between h-14 md:h-16 px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32">
           <a
             href="#home"
             className="flex items-center gap-2 font-display text-lg md:text-xl font-bold text-foreground tracking-tight"
