@@ -1,0 +1,99 @@
+✅ BƯỚC 1: Login ngrok (làm 1 lần duy nhất)
+
+Vào trang:
+👉 https://dashboard.ngrok.com/get-started/your-authtoken
+
+Copy Authtoken
+
+Sau đó trong CMD gõ:
+
+ngrok config add-authtoken YOUR_TOKEN
+
+Nếu báo success là ok.
+
+✅ BƯỚC 2: Chạy project Vite của bạn
+
+Vào thư mục project (nơi có package.json):
+
+npm run dev -- --host
+
+Bạn sẽ thấy:
+
+Local:   http://localhost:5173
+Network: http://192.168.x.x:5173
+
+👉 Port là 5173
+
+✅ BƯỚC 3: Mở tunnel ngrok
+
+Mở CMD mới (đừng tắt Vite)
+
+Gõ:
+
+ngrok http 5173
+✅ BƯỚC 4: Lấy link public
+
+Nó sẽ hiện kiểu:
+
+Forwarding  https://abc123.ngrok-free.app -> http://localhost:5173
+
+👉 Copy link https đó
+👉 Mở trên điện thoại là xong
+
+
+
+
+cd project
+
+docker run -it --rm -p 8080:8080 -v ${PWD}:/app -w /app node:20 bash
+
+npm run dev -- --host
+
+
+(Run in backend)
+
+backend
+cd backend
+
+redis:
+docker run -d -p 6379:6379 --name redis redis
+docker start redis
+
+postgres:
+docker run -d --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=mydb -p 5432:5432 postgres
+
+
+docker run -it --rm -p 5000:5000 -v ${PWD}:/app -w /app node:20 bash
+
+npm install &&
+npx prisma generate && npx prisma migrate dev
+npm run start:dev
+
+
+(Log back in running container)
+docker exec -it [name container] bash
+
+
+
+
+docker network create mynetwork
+
+docker run -d --name redis --network mynetwork redis
+docker run -d --name postgres --network mynetwork -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=mydb postgres
+
+docker run -it --rm --network mynetwork -p 5000:5000 -v ${PWD}:/app -w /app node:20 bash
+docker run -it --rm --network mynetwork --env-file .env -p 5000:5000 -v ${PWD}:/app -w /app node:20 bash
+
+
+use docker compose
+
+docker compose up --build
+
+
+
+2️⃣ Xoá cache build cũ
+docker compose down -v
+docker builder prune -a -f
+3️⃣ Build lại
+docker compose build --no-cache
+docker compose up
