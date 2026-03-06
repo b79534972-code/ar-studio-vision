@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 98%;
+    --foreground: 224 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 224 30% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 30% 12%;
+
+    --primary: 230 65% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 20% 95%;
+    --secondary-foreground: 224 30% 12%;
+
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 220 60% 96%;
+    --accent-foreground: 230 65% 48%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 220 15% 90%;
+    --input: 220 15% 90%;
+    --ring: 230 65% 48%;
+
+    --radius: 0.75rem;
+
+    --gradient-primary: linear-gradient(135deg, hsl(230 65% 48%), hsl(250 60% 58%));
+    --gradient-cta: linear-gradient(135deg, hsl(230 70% 52%), hsl(260 65% 60%));
+    --gradient-subtle: linear-gradient(180deg, hsl(220 20% 98%), hsl(220 25% 95%));
+    --shadow-soft: 0 2px 20px -4px hsl(230 65% 48% / 0.12);
+    --shadow-card: 0 4px 30px -8px hsl(230 65% 48% / 0.08);
+    --shadow-elevated: 0 12px 40px -12px hsl(230 65% 48% / 0.15);
+
+    /* Pro glow — only active via data-plan="pro" */
+    --pro-glow: none;
+    --pro-gradient: var(--gradient-primary);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 224 30% 6%;
+    --foreground: 220 20% 95%;
+    --card: 224 25% 10%;
+    --card-foreground: 220 20% 95%;
+    --popover: 224 25% 10%;
+    --popover-foreground: 220 20% 95%;
+    --primary: 230 65% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 224 20% 15%;
+    --secondary-foreground: 220 20% 95%;
+    --muted: 224 15% 18%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 230 30% 18%;
+    --accent-foreground: 230 65% 70%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --border: 224 15% 18%;
+    --input: 224 15% 18%;
+    --ring: 230 65% 60%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  /* Pro plan visual differentiation — applied via data attribute */
+  [data-plan="pro"] {
+    --pro-glow: 0 0 20px hsl(263 70% 58% / 0.6);
+    --pro-gradient: linear-gradient(135deg, hsl(250 65% 55%), hsl(280 70% 60%), hsl(230 65% 55%));
+  }
+
+  [data-plan="pro"].dark {
+    --pro-glow: 0 0 24px hsl(263 70% 58% / 0.5);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-cta {
+    background: var(--gradient-cta);
+  }
+
+  .gradient-subtle {
+    background: var(--gradient-subtle);
+  }
+
+  .gradient-pro {
+    background: var(--pro-gradient);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .shadow-pro {
+    box-shadow: var(--pro-glow);
+  }
+}

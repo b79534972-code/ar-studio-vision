@@ -1,0 +1,75 @@
+import { Button } from "@/components/ui/button";
+import { useLocation } from "react-router-dom";
+import { Upload, Plus, PanelLeftClose, PanelLeft, ChevronRight } from "lucide-react";
+import type { User } from "@/types/subscription";
+import ProfileDropdown from "./ProfileDropdown";
+
+interface DashboardTopbarProps {
+  user: User;
+  collapsed: boolean;
+  onToggleSidebar: () => void;
+  onUploadModel: () => void;
+  onCreateRoom: () => void;
+  onLogout: () => void;
+}
+
+const routeLabels: Record<string, string> = {
+  "/dashboard": "Overview",
+  "/dashboard/models": "My Models",
+  "/dashboard/rooms": "My Rooms",
+  "/dashboard/layouts": "Saved Layouts",
+  "/dashboard/profile": "Profile",
+  "/dashboard/billing": "Billing",
+  "/dashboard/settings": "Settings",
+};
+
+const DashboardTopbar = ({
+  user,
+  collapsed,
+  onToggleSidebar,
+  onUploadModel,
+  onCreateRoom,
+  onLogout,
+}: DashboardTopbarProps) => {
+  const location = useLocation();
+  const currentLabel = routeLabels[location.pathname] || "Dashboard";
+
+  return (
+    <header className="h-14 border-b border-border/30 bg-card/60 backdrop-blur-xl flex items-center justify-between px-4 sticky top-0 z-20">
+      {/* Left: toggle + breadcrumb */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onToggleSidebar}
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+        >
+          {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+        </button>
+        <div className="flex items-center gap-1.5 text-sm">
+          <span className="text-muted-foreground">Dashboard</span>
+          {currentLabel !== "Overview" && (
+            <>
+              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
+              <span className="text-foreground font-medium">{currentLabel}</span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Right: actions */}
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" className="hidden sm:flex gap-1.5" onClick={onUploadModel}>
+          <Upload className="w-3.5 h-3.5" />
+          Upload Model
+        </Button>
+        <Button variant="outline" size="sm" className="hidden sm:flex gap-1.5" onClick={onCreateRoom}>
+          <Plus className="w-3.5 h-3.5" />
+          Create Room
+        </Button>
+        <div className="w-px h-6 bg-border/50 mx-1 hidden sm:block" />
+        <ProfileDropdown user={user} onLogout={onLogout} />
+      </div>
+    </header>
+  );
+};
+
+export default DashboardTopbar;
