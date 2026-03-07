@@ -3,7 +3,7 @@
  *
  * All AI calls go through this service.
  * The service checks feature gates before executing.
- * This is a stub — backend integration will be added with Lovable Cloud.
+ * This is a stub — backend integration will be added with Azure Cloud.
  */
 
 import { FeatureService } from "./FeatureService";

@@ -34,10 +34,14 @@ const Navbar = () => {
         <div className="w-full flex items-center justify-between h-14 md:h-16 px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32">
           <a
             href="#home"
-            className="flex items-center gap-2 font-display text-lg md:text-xl font-bold text-foreground tracking-tight"
+            className="flex items-center gap-1 font-display text-lg md:text-xl font-bold text-foreground tracking-tight"
           >
-            <img src="/logo.png" alt="SpaceAR logo" className="h-5 w-5 md:h-6 md:w-6 object-contain" />
-            SpaceAR<span className="text-primary">.</span>
+            <img
+              src="/logo.png"
+              alt="InteriorAR logo"
+              className="h-7 w-7 md:h-7 md:w-7 object-contain relative top-[1px]"
+            />
+            InteriorAR<span className="text-primary">.</span>
           </a>
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (

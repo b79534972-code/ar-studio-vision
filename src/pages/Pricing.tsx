@@ -24,7 +24,7 @@ const Pricing = () => {
       <nav className="border-b border-border/30 bg-card/60 backdrop-blur-xl">
         <div className="container mx-auto flex items-center justify-between h-14 px-6">
           <button onClick={() => navigate("/")} className="font-display text-lg font-bold text-foreground tracking-tight">
-            SpaceAR<span className="text-primary">.</span>
+            InteriorAR<span className="text-primary">.</span>
           </button>
           <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4 mr-1" /> Back

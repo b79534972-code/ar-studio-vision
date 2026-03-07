@@ -20,11 +20,11 @@ const DashboardLayout = () => {
 
   const handleUploadModel = () => {
     if (!featureGate.canUploadModel()) return;
-    toast({ title: "Upload Model", description: "Model upload will be available with Lovable Cloud." });
+    toast({ title: "Upload Model", description: "Model upload will be available with Azure Cloud." });
   };
 
   const handleCreateRoom = () => {
-    toast({ title: "Create Room", description: "Room creation will be available with Lovable Cloud." });
+    toast({ title: "Create Room", description: "Room creation will be available with Azure Cloud." });
   };
 
   const handleLogout = () => {

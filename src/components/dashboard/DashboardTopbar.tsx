@@ -50,7 +50,7 @@ const DashboardTopbar = ({
         )}
         <div className="flex items-center gap-1.5 text-sm">
           {isMobile ? (
-            <span className="font-display font-bold text-foreground">SpaceAR<span className="text-primary">.</span></span>
+            <span className="font-display font-bold text-foreground">InteriorAR<span className="text-primary">.</span></span>
           ) : (
             <>
               <span className="text-muted-foreground">Dashboard</span>

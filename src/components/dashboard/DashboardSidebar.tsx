@@ -53,7 +53,7 @@ const DashboardSidebar = ({ user, collapsed }: DashboardSidebarProps) => {
       {/* Logo */}
       <div className="h-14 flex items-center px-5 border-b border-border/30">
         <NavLink to="/dashboard" className="font-display text-lg font-bold text-foreground tracking-tight">
-          {collapsed ? "S" : <>SpaceAR<span className="text-primary">.</span></>}
+          {collapsed ? "S" : <>InteriorAR<span className="text-primary">.</span></>}
         </NavLink>
       </div>
 

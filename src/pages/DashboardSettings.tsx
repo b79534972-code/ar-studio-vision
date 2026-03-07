@@ -16,7 +16,7 @@ const DashboardSettings = () => {
       >
         <SettingsIcon className="w-10 h-10 text-muted-foreground/30 mx-auto mb-4" />
         <p className="text-muted-foreground text-sm">
-          Settings will be available when Lovable Cloud is connected.
+          Settings will be available when Azure Cloud is connected.
         </p>
       </motion.div>
     </div>

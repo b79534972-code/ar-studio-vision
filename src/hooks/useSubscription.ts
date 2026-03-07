@@ -1,7 +1,7 @@
 /**
  * useSubscription — Mock subscription state
  *
- * When Lovable Cloud is enabled, this will be replaced with
+ * When Azure Cloud is enabled, this will be replaced with
  * real auth + DB queries. For now, provides mock data.
  */
 
@@ -11,7 +11,7 @@ import type { User, UserUsage, SubscriptionPlan, Currency } from "@/types/subscr
 const MOCK_USER: User = {
   id: "usr_demo_001",
   name: "Alex Designer",
-  email: "alex@spacear.io",
+  email: "alex@InteriorAR.io",
   avatar: undefined,
   role: "user",
   subscriptionPlan: "free",
