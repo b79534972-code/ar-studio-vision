@@ -10,7 +10,7 @@ const mockRooms = [
 
 const MyRooms = () => {
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-xl font-bold text-foreground">My Rooms</h1>
@@ -29,7 +29,7 @@ const MyRooms = () => {
         />
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 xl:gap-6">
         {mockRooms.map((room, i) => (
           <motion.div
             key={room.id}

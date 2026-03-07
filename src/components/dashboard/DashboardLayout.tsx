@@ -50,7 +50,7 @@ const DashboardLayout = () => {
           onCreateRoom={handleCreateRoom}
           onLogout={handleLogout}
         />
-        <main className={cn("p-4 md:p-6", isMobile && "pb-20")}>
+        <main className={cn("p-4 md:p-6 lg:p-8 xl:p-10 2xl:p-12", isMobile && "pb-20")}>
           <Outlet
             context={{
               ...subscription,
