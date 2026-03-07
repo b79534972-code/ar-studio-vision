@@ -12,9 +12,10 @@ const HeroSection = () => {
       <div className="w-full px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32 relative mx-auto max-w-[100vw]">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
             className="text-center lg:text-left"
           >
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-medium mb-4 md:mb-6 border border-border">
@@ -43,8 +44,9 @@ const HeroSection = () => {
 
           <motion.div
             initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
             className="relative mt-4 lg:mt-0"
           >
             <div className="rounded-2xl overflow-hidden shadow-elevated border border-border/50">
