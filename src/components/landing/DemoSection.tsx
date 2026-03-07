@@ -7,10 +7,10 @@ const DemoSection = () => {
     <section id="demo" className="py-12 md:py-28 gradient-subtle">
       <div className="px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32 mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center mb-8 md:mb-12"
         >
           <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-3 md:mb-4 tracking-tight">
@@ -22,10 +22,10 @@ const DemoSection = () => {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
           className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-elevated border border-border/50 group cursor-pointer"
         >
           <img

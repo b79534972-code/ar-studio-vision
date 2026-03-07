@@ -15,10 +15,10 @@ const SolutionSection = () => {
       <div className="px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32 mx-auto">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-3 md:mb-4 tracking-tight">
               The Smart Way to Design{" "}
@@ -33,8 +33,8 @@ const SolutionSection = () => {
                   key={i}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  viewport={{ once: false, amount: 0.3 }}
+                  transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.1 }}
                   className="flex items-center gap-3 p-2.5 md:p-3 rounded-lg hover:bg-accent/50 transition-colors"
                 >
                   <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg gradient-primary flex items-center justify-center shrink-0">
@@ -49,8 +49,8 @@ const SolutionSection = () => {
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, delay: 0.15 }}
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
           >
             <div className="rounded-2xl overflow-hidden shadow-card border border-border/50">
               <img
