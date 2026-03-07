@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Box, Upload, Search, MoreHorizontal } from "lucide-react";
+import { Box, Search, MoreHorizontal, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOutletContext } from "react-router-dom";
 import type { User, UserUsage } from "@/types/subscription";
+import AddFurnitureModal from "@/components/dashboard/AddFurnitureModal";
 
 interface DashboardContext {
   user: User;
@@ -18,16 +20,17 @@ const mockModels = [
 
 const MyModels = () => {
   const { featureGate } = useOutletContext<DashboardContext>();
+  const [showAdd, setShowAdd] = useState(false);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-xl font-bold text-foreground">My Models</h1>
-          <p className="text-sm text-muted-foreground">Manage your 3D furniture models</p>
+          <h1 className="font-display text-xl font-bold text-foreground">My Furniture</h1>
+          <p className="text-sm text-muted-foreground">Upload images to generate 3D furniture objects</p>
         </div>
-        <Button variant="hero" size="sm" className="gap-1.5" onClick={() => featureGate.canUploadModel()}>
-          <Upload className="w-3.5 h-3.5" /> Upload Model
+        <Button variant="hero" size="sm" className="gap-1.5" onClick={() => setShowAdd(true)}>
+          <ImagePlus className="w-3.5 h-3.5" /> Add Furniture
         </Button>
       </div>
 
@@ -35,7 +38,7 @@ const MyModels = () => {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
-          placeholder="Search models…"
+          placeholder="Search furniture…"
           className="w-full pl-10 pr-4 py-2.5 bg-card border border-border/50 rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
       </div>
@@ -70,6 +73,8 @@ const MyModels = () => {
           </motion.div>
         ))}
       </div>
+
+      <AddFurnitureModal open={showAdd} onClose={() => setShowAdd(false)} />
     </div>
   );
 };
