@@ -23,6 +23,10 @@ const ARDemo = () => {
   const [sessionStarted, setSessionStarted] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+
+  // Build mobile AR URL for QR code
+  const mobileARUrl = `${window.location.origin}/ar-demo`;
 
   const {
     platform,
