@@ -85,7 +85,7 @@ const FurnitureLibrary = () => {
           <Select value={style} onValueChange={setStyle}>
             <SelectTrigger className="w-[140px] h-9 text-xs">
               <ArrowUpDown className="w-3 h-3 mr-1" />
-              <SelectValue placeholder="Style" />
+              <SelectValue placeholder={t("furnitureLib.style")} />
             </SelectTrigger>
             <SelectContent>
               {STYLES.map((s) => (
