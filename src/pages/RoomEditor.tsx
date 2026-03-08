@@ -8,7 +8,9 @@ import EditorPropertiesPanel from "@/components/editor/EditorPropertiesPanel";
 import EditorToolbar from "@/components/editor/EditorToolbar";
 import RoomCanvas3D from "@/components/editor/RoomCanvas3D";
 import ARPreviewModal from "@/components/editor/ARPreviewModal";
+import AIOptimizePanel from "@/components/editor/AIOptimizePanel";
 import { roomStore } from "@/stores/roomStore";
+import { useSubscription } from "@/hooks/useSubscription";
 import type { PlacedObject, RoomConfig, FurnitureItem } from "@/types/editor";
 
 const DEFAULT_ROOM: RoomConfig = {
@@ -30,7 +32,8 @@ const RoomEditor = () => {
   const [roomConfig, setRoomConfig] = useState<RoomConfig>(DEFAULT_ROOM);
   const [viewMode, setViewMode] = useState<"3d" | "top">("3d");
   const [showARModal, setShowARModal] = useState(false);
-
+  const [showAIPanel, setShowAIPanel] = useState(false);
+  const { usage, useCredit } = useSubscription();
   // Room/layout context
   const roomId = searchParams.get("roomId");
   const layoutId = searchParams.get("layoutId");
@@ -261,7 +264,7 @@ const RoomEditor = () => {
         canUndo={canUndo}
         canRedo={canRedo}
         onARPreview={() => setShowARModal(true)}
-        onAISuggest={() => toast({ title: "AI Suggest", description: "Analyzing room layout…" })}
+        onAISuggest={() => setShowAIPanel(true)}
         objectCount={objects.length}
       />
 
@@ -289,6 +292,21 @@ const RoomEditor = () => {
           onDeleteObject={handleDeleteObject}
           onDuplicateObject={handleDuplicateObject}
           onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
+        />
+
+        {/* AI Optimize Panel */}
+        <AIOptimizePanel
+          open={showAIPanel}
+          onClose={() => setShowAIPanel(false)}
+          objects={objects}
+          roomConfig={roomConfig}
+          creditsRemaining={usage.aiCreditsTotal - usage.aiCreditsUsed}
+          useCredit={useCredit}
+          onApplySuggestion={(updated) => {
+            setObjects(updated);
+            pushHistory(updated);
+            toast({ title: "AI Applied", description: "Suggestion applied to layout" });
+          }}
         />
       </div>
 
