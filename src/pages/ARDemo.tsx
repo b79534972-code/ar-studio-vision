@@ -8,9 +8,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Smartphone, Monitor, Loader2 } from "lucide-react";
+import { ArrowLeft, Smartphone, Monitor, Loader2, QrCode, X } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { useAREngine } from "@/ar";
 import ARSessionHUD from "@/components/ar/ARSessionHUD";
 import ARToolbar from "@/components/ar/ARToolbar";
