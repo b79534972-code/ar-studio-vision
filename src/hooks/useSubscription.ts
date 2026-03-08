@@ -70,5 +70,6 @@ export function useSubscription() {
     logout,
     setUser,
     setUsage,
+    useCredit,
   };
 }
