@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Upload,
   Camera,
@@ -59,6 +60,7 @@ function mockAnalyzeRoom(): Promise<DetectedRoom> {
 
 const RoomScan = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState<ScanPhase>("upload");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -129,8 +131,8 @@ const RoomScan = () => {
               <ScanLine className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h1 className="font-display text-2xl font-bold text-foreground">Room Scan AI</h1>
-              <p className="text-sm text-muted-foreground">Upload a photo to auto-detect room structure</p>
+              <h1 className="font-display text-2xl font-bold text-foreground">{t("roomScan.title")}</h1>
+              <p className="text-sm text-muted-foreground">{t("roomScan.subtitle")}</p>
             </div>
           </div>
         </div>
@@ -155,16 +157,16 @@ const RoomScan = () => {
                   group-hover:bg-primary/15 transition-colors">
                   <Upload className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="font-display font-semibold text-lg text-foreground mb-2">Upload Room Photo</h3>
+                <h3 className="font-display font-semibold text-lg text-foreground mb-2">{t("roomScan.uploadTitle")}</h3>
                 <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
-                  Take a photo of your room or drag and drop an image here. AI will detect walls, floor, and room boundaries.
+                  {t("roomScan.uploadDesc")}
                 </p>
                 <div className="flex items-center justify-center gap-3">
                   <Button variant="default" className="gap-2">
-                    <Camera className="w-4 h-4" /> Choose Photo
+                    <Camera className="w-4 h-4" /> {t("roomScan.choosePhoto")}
                   </Button>
                 </div>
-                <p className="text-[11px] text-muted-foreground/60 mt-4">Supports JPG, PNG, WEBP • Max 20MB</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-4">{t("roomScan.fileHint")}</p>
               </div>
               <input
                 ref={fileInputRef}
@@ -180,9 +182,9 @@ const RoomScan = () => {
               {/* Tips */}
               <div className="mt-6 grid grid-cols-3 gap-3">
                 {[
-                  { icon: Camera, title: "Wide angle", desc: "Capture the full room" },
-                  { icon: Ruler, title: "Good lighting", desc: "Ensure walls are visible" },
-                  { icon: Box, title: "Clear floor", desc: "Less clutter = better scan" },
+                  { icon: Camera, title: t("roomScan.tipWide"), desc: t("roomScan.tipWideDesc") },
+                  { icon: Ruler, title: t("roomScan.tipLight"), desc: t("roomScan.tipLightDesc") },
+                  { icon: Box, title: t("roomScan.tipClear"), desc: t("roomScan.tipClearDesc") },
                 ].map((tip, i) => (
                   <div key={i} className="bg-card rounded-xl border border-border/30 p-4 text-center">
                     <tip.icon className="w-5 h-5 text-primary mx-auto mb-2" />
@@ -220,22 +222,22 @@ const RoomScan = () => {
 
                 <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-4" />
                 <h3 className="font-display font-semibold text-lg text-foreground mb-2">
-                  Analyzing Room Structure
+                  {t("roomScan.analyzing")}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-5">
-                  Detecting walls, floor boundaries, and room dimensions…
+                  {t("roomScan.analyzingDesc")}
                 </p>
 
                 <Progress value={progress} className="h-2 mb-3" />
-                <p className="text-xs text-muted-foreground">{progress}% complete</p>
+                <p className="text-xs text-muted-foreground">{progress}% {t("roomScan.complete")}</p>
 
                 {/* Analysis steps */}
                 <div className="mt-5 space-y-2 text-left">
                   {[
-                    { label: "Detecting floor plane", done: progress > 30 },
-                    { label: "Identifying wall boundaries", done: progress > 55 },
-                    { label: "Calculating dimensions", done: progress > 80 },
-                    { label: "Generating room model", done: progress >= 100 },
+                    { label: t("roomScan.stepFloor"), done: progress > 30 },
+                    { label: t("roomScan.stepWalls"), done: progress > 55 },
+                    { label: t("roomScan.stepDimensions"), done: progress > 80 },
+                    { label: t("roomScan.stepModel"), done: progress >= 100 },
                   ].map((step, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs">
                       {step.done ? (
@@ -270,11 +272,11 @@ const RoomScan = () => {
                     <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                       <div className="flex items-center gap-2 bg-card/80 backdrop-blur-md rounded-lg px-3 py-1.5">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        <span className="text-xs font-semibold text-foreground">Room Detected</span>
+                        <span className="text-xs font-semibold text-foreground">{t("roomScan.detected")}</span>
                       </div>
                       <div className="bg-card/80 backdrop-blur-md rounded-lg px-3 py-1.5">
                         <span className="text-xs font-semibold text-foreground">
-                          {detectedRoom.confidence}% confidence
+                          {detectedRoom.confidence}% {t("roomScan.confidence")}
                         </span>
                       </div>
                     </div>
@@ -282,7 +284,7 @@ const RoomScan = () => {
                 )}
 
                 <div className="p-6">
-                  <h3 className="font-display font-bold text-lg text-foreground mb-4">Detected Room Structure</h3>
+                  <h3 className="font-display font-bold text-lg text-foreground mb-4">{t("roomScan.detectedTitle")}</h3>
 
                   {/* Room preview - top-down */}
                   <div className="bg-accent/30 rounded-xl border border-border/20 p-6 mb-5">
@@ -321,9 +323,9 @@ const RoomScan = () => {
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-3 mb-6">
                     {[
-                      { label: "Width", value: `${detectedRoom.width}m` },
-                      { label: "Depth", value: `${detectedRoom.depth}m` },
-                      { label: "Height", value: `${detectedRoom.height}m` },
+                      { label: t("roomScan.width"), value: `${detectedRoom.width}m` },
+                      { label: t("roomScan.depth"), value: `${detectedRoom.depth}m` },
+                      { label: t("roomScan.height"), value: `${detectedRoom.height}m` },
                     ].map((stat) => (
                       <div key={stat.label} className="bg-accent/40 rounded-xl px-4 py-3 text-center">
                         <p className="text-[11px] text-muted-foreground">{stat.label}</p>
@@ -335,10 +337,10 @@ const RoomScan = () => {
                   {/* Actions */}
                   <div className="flex gap-3">
                     <Button variant="outline" className="flex-1 gap-2" onClick={handleReset}>
-                      <RotateCcw className="w-4 h-4" /> Upload Another
+                      <RotateCcw className="w-4 h-4" /> {t("roomScan.uploadAnother")}
                     </Button>
                     <Button variant="default" className="flex-1 gap-2" onClick={handleUseLayout}>
-                      <ArrowRight className="w-4 h-4" /> Use This Layout
+                      <ArrowRight className="w-4 h-4" /> {t("roomScan.useLayout")}
                     </Button>
                   </div>
                 </div>

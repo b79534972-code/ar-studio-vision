@@ -25,7 +25,7 @@ const MobileSidebar = ({ user, open, onOpenChange }: MobileSidebarProps) => {
     { to: "/dashboard/editor", label: t("nav.editor"), icon: PenTool },
     { to: "/dashboard/furniture", label: t("nav.furniture"), icon: Armchair },
     { to: "/dashboard/ai-generator", label: t("nav.aiGenerator"), icon: Wand2 },
-    { to: "/dashboard/room-scan", label: "Room Scan AI", icon: ScanLine },
+    { to: "/dashboard/room-scan", label: t("nav.roomScan"), icon: ScanLine },
     { to: "/dashboard/models", label: t("nav.models"), icon: Box },
     { to: "/dashboard/rooms", label: t("nav.rooms"), icon: Home },
     { to: "/dashboard/layouts", label: t("nav.layouts"), icon: Layers },

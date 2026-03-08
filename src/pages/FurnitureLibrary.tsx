@@ -10,8 +10,10 @@ import FurnitureARModal from "@/components/ar/FurnitureARModal";
 import type { FurnitureItem } from "@/types/editor";
 import { cn } from "@/lib/utils";
 import { useCustomFurniture } from "@/hooks/useCustomFurniture";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const FurnitureLibrary = () => {
+  const { t } = useLanguage();
   const { customItems } = useCustomFurniture();
   const allFurniture = [...FURNITURE_CATALOG, ...customItems];
   const [search, setSearch] = useState("");
@@ -46,8 +48,8 @@ const FurnitureLibrary = () => {
     <div className="space-y-6">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <h1 className="font-display text-2xl font-bold text-foreground">Furniture Library</h1>
-        <p className="text-sm text-muted-foreground mt-1">Browse, search, and manage your furniture catalog</p>
+        <h1 className="font-display text-2xl font-bold text-foreground">{t("furnitureLib.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{t("furnitureLib.subtitle")}</p>
       </motion.div>
 
       {/* Filters bar */}
@@ -63,7 +65,7 @@ const FurnitureLibrary = () => {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search furniture by name, tag, or material…"
+              placeholder={t("furnitureLib.search")}
               className="pl-9 h-9 text-sm"
             />
           </div>
@@ -71,7 +73,7 @@ const FurnitureLibrary = () => {
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger className="w-[140px] h-9 text-xs">
               <Filter className="w-3 h-3 mr-1" />
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder={t("furnitureLib.category")} />
             </SelectTrigger>
             <SelectContent>
               {CATEGORIES.map((c) => (
@@ -83,7 +85,7 @@ const FurnitureLibrary = () => {
           <Select value={style} onValueChange={setStyle}>
             <SelectTrigger className="w-[140px] h-9 text-xs">
               <ArrowUpDown className="w-3 h-3 mr-1" />
-              <SelectValue placeholder="Style" />
+              <SelectValue placeholder={t("furnitureLib.style")} />
             </SelectTrigger>
             <SelectContent>
               {STYLES.map((s) => (
@@ -99,7 +101,7 @@ const FurnitureLibrary = () => {
             onClick={() => setShowFavOnly(!showFavOnly)}
           >
             <Heart className={cn("w-3.5 h-3.5", showFavOnly && "fill-current")} />
-            Favorites
+            {t("furnitureLib.favorites")}
           </Button>
 
           <div className="flex gap-1 ml-auto">
@@ -116,7 +118,7 @@ const FurnitureLibrary = () => {
       </motion.div>
 
       {/* Results count */}
-      <p className="text-xs text-muted-foreground">{filtered.length} items</p>
+      <p className="text-xs text-muted-foreground">{filtered.length} {t("furnitureLib.items")}</p>
 
       {/* Grid view */}
       {viewMode === "grid" ? (
@@ -136,7 +138,7 @@ const FurnitureLibrary = () => {
       {filtered.length === 0 && (
         <div className="text-center py-16">
           <Box className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground">No furniture found matching your filters</p>
+          <p className="text-sm text-muted-foreground">{t("furnitureLib.empty")}</p>
         </div>
       )}
 

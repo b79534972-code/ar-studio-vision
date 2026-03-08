@@ -54,16 +54,14 @@ const MyModels = () => {
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <Box className="w-12 h-12 text-muted-foreground/30 mb-3" />
           <p className="text-sm font-medium text-foreground">
-            {customItems.length === 0 ? "No custom furniture yet" : "No results found"}
+            {customItems.length === 0 ? t("models.empty") : t("models.noResults")}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            {customItems.length === 0
-              ? "Upload an image and generate a 3D model to get started."
-              : "Try a different search term."}
+            {customItems.length === 0 ? t("models.emptyDesc") : t("models.noResultsDesc")}
           </p>
           {customItems.length === 0 && (
             <Button variant="outline" size="sm" className="mt-4 gap-1.5" onClick={() => setShowAdd(true)}>
-              <ImagePlus className="w-3.5 h-3.5" /> Add Furniture
+              <ImagePlus className="w-3.5 h-3.5" /> {t("models.add")}
             </Button>
           )}
         </div>

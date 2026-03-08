@@ -32,7 +32,7 @@ const SavedLayouts = () => {
 
   const handleDelete = (id: string, name: string) => {
     removeLayout(id);
-    toast({ title: "Deleted", description: `${name} removed` });
+    toast({ title: t("rooms.deleted"), description: `${name} ${t("rooms.removed")}` });
   };
 
   return (
@@ -59,8 +59,8 @@ const SavedLayouts = () => {
           <Layers className="w-12 h-12 text-muted-foreground/30 mx-auto" />
           <p className="text-sm text-muted-foreground">
             {layouts.length === 0
-              ? "No saved layouts yet. Save a layout from the Room Editor!"
-              : "No layouts match your search"}
+              ? t("layouts.empty")
+              : t("layouts.noResults")}
           </p>
         </div>
       ) : (
@@ -94,13 +94,13 @@ const SavedLayouts = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleOpen(layout); }}>
-                          <ArrowRight className="w-3.5 h-3.5 mr-2" /> Open in Editor
+                          <ArrowRight className="w-3.5 h-3.5 mr-2" /> {t("layouts.openEditor")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={(e) => { e.stopPropagation(); handleDelete(layout.id, layout.name); }}
                         >
-                          <Trash2 className="w-3.5 h-3.5 mr-2" /> Delete
+                          <Trash2 className="w-3.5 h-3.5 mr-2" /> {t("layouts.delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
