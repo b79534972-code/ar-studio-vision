@@ -29,7 +29,7 @@ const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => 
   });
 
   return (
-    <div className="w-64 bg-card border-r border-border/40 flex flex-col h-full">
+    <div className="w-full lg:w-64 bg-card lg:border-r border-border/40 flex flex-col h-full">
       <div className="p-3 border-b border-border/30 space-y-3">
         <h3 className="font-display text-sm font-bold text-foreground">Furniture</h3>
 
