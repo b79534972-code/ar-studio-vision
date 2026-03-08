@@ -131,6 +131,7 @@ const RoomEditor = () => {
             roomConfig={roomConfig}
             selectedId={selectedId}
             onSelectObject={setSelectedId}
+            onUpdateObject={handleUpdateObject}
             viewMode={viewMode}
           />
         </div>
