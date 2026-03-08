@@ -284,8 +284,20 @@ const translations: Record<Language, Record<string, string>> = {
     "aiGen.optimal": "Optimal",
     "aiGen.layoutApplied": "Layout Applied",
 
-    // Plan
+    // Plan & Credits
     "plan.plan": "Plan",
+    "plan.credits": "AI Credits",
+    "plan.creditsRemaining": "remaining",
+    "plan.creditsUsed": "used",
+    "plan.currentPlan": "Current Plan",
+    "plan.viewPlans": "View Plans",
+    "plan.free": "Free",
+    "plan.basic": "Basic",
+    "plan.advanced": "Advanced",
+    "plan.pro": "Pro",
+    "plan.perDay": "/day",
+    "plan.noCredits": "No credits left",
+    "plan.buyMore": "Get More Credits",
 
     // Mobile nav
     "mobile.home": "Home",
