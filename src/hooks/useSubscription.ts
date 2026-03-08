@@ -5,7 +5,7 @@
  * real auth + DB queries. For now, provides mock data with localStorage persistence.
  */
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSyncExternalStore } from "react";
 import { PLAN_CONFIG, type User, type UserUsage, type SubscriptionPlan, type Currency } from "@/types/subscription";
 import { subscriptionStore } from "@/stores/subscriptionStore";
