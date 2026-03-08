@@ -285,6 +285,24 @@ const translations: Record<Language, Record<string, string>> = {
     "roomScan.uploadAnother": "Upload Another",
     "roomScan.useLayout": "Use This Layout",
 
+    // AI Credits
+    "ai.creditsLeft": "credits left",
+    "ai.noCredits": "Not enough credits",
+    "ai.noCreditsDesc": "You don't have enough AI credits. Please upgrade your plan.",
+    "ai.notEnoughCredits": "Not Enough Credits — Upgrade Plan",
+    "ai.feature.layoutSuggest": "AI Layout Suggest",
+    "ai.feature.layoutSuggestDesc": "Generate optimized furniture layouts for any room type",
+    "ai.feature.styleTransform": "AI Style Transform",
+    "ai.feature.styleTransformDesc": "Transform your room into a different design style",
+    "ai.feature.productRecommend": "AI Product Recommend",
+    "ai.feature.productRecommendDesc": "Get furniture recommendations based on your room",
+    "ai.feature.budgetOptimize": "AI Budget Optimize",
+    "ai.feature.budgetOptimizeDesc": "Optimize your interior design within your budget",
+    "ai.feature.photoRender": "AI Photorealistic Render",
+    "ai.feature.photoRenderDesc": "Generate photorealistic images of your room design",
+    "ai.feature.fullRedesign": "AI Full Room Redesign",
+    "ai.feature.fullRedesignDesc": "Complete room redesign with AI-powered suggestions",
+
     // AI Layout Generator
     "aiGen.title": "AI Layout Generator",
     "aiGen.subtitle": "Generate optimized room layouts powered by AI",
