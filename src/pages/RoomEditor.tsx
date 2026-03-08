@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +7,7 @@ import EditorFurniturePanel from "@/components/editor/EditorFurniturePanel";
 import EditorPropertiesPanel from "@/components/editor/EditorPropertiesPanel";
 import EditorToolbar from "@/components/editor/EditorToolbar";
 import RoomCanvas3D from "@/components/editor/RoomCanvas3D";
+import ARPreviewModal from "@/components/editor/ARPreviewModal";
 import type { PlacedObject, RoomConfig, FurnitureItem } from "@/types/editor";
 
 const DEFAULT_ROOM: RoomConfig = {
@@ -19,6 +20,7 @@ const DEFAULT_ROOM: RoomConfig = {
 
 const RoomEditor = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [objects, setObjects] = useState<PlacedObject[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
