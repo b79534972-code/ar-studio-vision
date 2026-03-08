@@ -17,6 +17,8 @@ const Profile = () => {
   const { user, usage, currency } = useOutletContext<DashboardContext>();
   const [activeTab, setActiveTab] = useState("account");
   const [showPassword, setShowPassword] = useState(false);
+  const [autoSave, setAutoSave] = useState(true);
+  const [emailNotif, setEmailNotif] = useState(false);
   const plan = PLAN_CONFIG[user.subscriptionPlan];
   const { t, language, setLanguage } = useLanguage();
 
