@@ -59,6 +59,7 @@ function mockAnalyzeRoom(): Promise<DetectedRoom> {
 
 const RoomScan = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState<ScanPhase>("upload");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
