@@ -16,6 +16,7 @@ interface AIOptimizePanelProps {
   creditsRemaining: number;
   useCredit: (amount?: number) => boolean;
   onApplySuggestion: (updatedObjects: PlacedObject[]) => void;
+  onOutOfCredits?: () => void;
 }
 
 interface SuggestionAction {
