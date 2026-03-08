@@ -206,13 +206,13 @@ const MyRooms = () => {
           /* ─── Rooms Grid ─── */
           <motion.div key="grid" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             {filtered.length === 0 ? (
-              <div className="text-center py-16 space-y-3">
-                <Home className="w-12 h-12 text-muted-foreground/30 mx-auto" />
-                <p className="text-sm text-muted-foreground">
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <Home className="w-12 h-12 text-muted-foreground/30 mb-3" />
+                <p className="text-sm font-medium text-foreground">
                   {rooms.length === 0 ? t("rooms.empty") : t("rooms.noResults")}
                 </p>
                 {rooms.length === 0 && (
-                  <Button variant="hero" size="sm" className="gap-1.5" onClick={() => setShowCreate(true)}>
+                  <Button variant="outline" size="sm" className="mt-4 gap-1.5" onClick={() => setShowCreate(true)}>
                     <Plus className="w-3.5 h-3.5" /> {t("rooms.create")}
                   </Button>
                 )}
