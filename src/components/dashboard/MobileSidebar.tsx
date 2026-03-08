@@ -43,19 +43,16 @@ const MobileSidebar = ({ user, open, onOpenChange }: MobileSidebarProps) => {
       <SheetContent side="left" className="w-72 p-0 flex flex-col">
         <SheetHeader className="h-16 flex flex-row items-center px-5 border-b border-border/30 shrink-0 space-y-0">
           <NavLink
-            to="/dashboard/profile"
+            to="/dashboard"
             onClick={() => onOpenChange(false)}
             className="flex items-center gap-2.5 flex-1 min-w-0"
           >
-            <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center shrink-0">
-              <span className="text-primary-foreground font-display font-bold text-sm">{user.name.charAt(0)}</span>
+            <div className="w-8 h-8 rounded-xl gradient-hero flex items-center justify-center shrink-0">
+              <span className="text-primary-foreground font-display font-bold text-sm">A</span>
             </div>
-            <div className="min-w-0">
-              <SheetTitle className="text-sm font-semibold text-foreground truncate">
-                {user.name}
-              </SheetTitle>
-              <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
-            </div>
+            <SheetTitle className="text-base font-display font-bold text-foreground tracking-tight">
+              InteriorAR
+            </SheetTitle>
           </NavLink>
         </SheetHeader>
 
