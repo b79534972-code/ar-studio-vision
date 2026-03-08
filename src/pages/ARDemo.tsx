@@ -94,8 +94,8 @@ const ARDemo = () => {
     resetPlacement,
     containerRef,
   } = useAREngine({
-    glb: "/models/sofa.glb",
-    usdz: "/models/sofa.usdz",
+    glb: modelData.modelUrl || "/models/sofa.glb",
+    usdz: modelData.usdzUrl || "/models/sofa.usdz",
   });
 
   const isDesktop = platform === "desktop";
