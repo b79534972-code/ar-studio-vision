@@ -1,13 +1,17 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ImagePlus, Upload, Box, Loader2, Check, X, Sparkles } from "lucide-react";
+import { ImagePlus, Upload, Loader2, X, Sparkles, Smartphone, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import FurniturePreview3D from "./FurniturePreview3D";
+import FurnitureARStep from "./FurnitureARStep";
+import { customFurnitureStore } from "@/stores/customFurnitureStore";
+import type { FurnitureItem } from "@/types/editor";
 
 interface AddFurnitureModalProps {
   open: boolean;
@@ -28,22 +32,30 @@ const categories = ["Chair", "Table", "Sofa", "Shelf", "Bed", "Lamp", "Desk", "C
 const shapes = ["Auto (from image)", "Box", "Cylinder", "Rounded Box"];
 const materials = ["Wood", "Metal", "Fabric", "Leather", "Glass", "Plastic", "Marble"];
 
-type Step = "upload" | "details" | "preview";
+const CATEGORY_MAP: Record<string, FurnitureItem["category"]> = {
+  Chair: "chair", Table: "table", Sofa: "sofa", Shelf: "shelf", Bed: "bed",
+  Lamp: "lamp", Desk: "table", Cabinet: "storage", Other: "chair",
+};
+
+const MATERIAL_COLORS: Record<string, string> = {
+  Wood: "#92400E", Metal: "#4B5563", Fabric: "#6B7280", Leather: "#78350F",
+  Glass: "#93C5FD", Plastic: "#9CA3AF", Marble: "#E5E7EB", "": "#6B7280",
+};
+
+type Step = "upload" | "details" | "generating" | "preview3d" | "ar";
+
+const STEPS: Step[] = ["upload", "details", "generating", "preview3d", "ar"];
 
 const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
   const [step, setStep] = useState<Step>("upload");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [generating, setGenerating] = useState(false);
+  const [generateProgress, setGenerateProgress] = useState(0);
   const [form, setForm] = useState<FurnitureForm>({
-    name: "",
-    category: "",
-    width: "",
-    height: "",
-    depth: "",
-    shape: "Auto (from image)",
-    material: "",
+    name: "", category: "", width: "", height: "", depth: "",
+    shape: "Auto (from image)", material: "",
   });
+  const [savedItem, setSavedItem] = useState<FurnitureItem | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -52,7 +64,8 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
     setStep("upload");
     setImageFile(null);
     setImagePreview(null);
-    setGenerating(false);
+    setGenerateProgress(0);
+    setSavedItem(null);
     setForm({ name: "", category: "", width: "", height: "", depth: "", shape: "Auto (from image)", material: "" });
   };
 
@@ -88,16 +101,67 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
 
   const canGenerate = form.name && form.category && form.width && form.height && form.depth;
 
-  const handleGenerate = () => {
+  const handleGenerate = useCallback(() => {
     if (!canGenerate) return;
-    setGenerating(true);
-    setTimeout(() => { setGenerating(false); setStep("preview"); }, 2200);
+    setStep("generating");
+    setGenerateProgress(0);
+
+    // Simulate phased progress
+    const phases = [
+      { target: 25, delay: 300, label: "Analyzing image…" },
+      { target: 55, delay: 800, label: "Detecting shape…" },
+      { target: 80, delay: 1400, label: "Generating mesh…" },
+      { target: 100, delay: 2000, label: "Finalizing…" },
+    ];
+    phases.forEach(({ target, delay }) => {
+      setTimeout(() => setGenerateProgress(target), delay);
+    });
+    setTimeout(() => setStep("preview3d"), 2600);
+  }, [canGenerate]);
+
+  const buildFurnitureItem = useCallback((): FurnitureItem => {
+    const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    return {
+      id,
+      name: form.name,
+      category: CATEGORY_MAP[form.category] || "chair",
+      style: "modern",
+      material: form.material || "Mixed",
+      color: MATERIAL_COLORS[form.material] || "#6B7280",
+      dimensions: {
+        width: parseFloat(form.width) / 100,
+        height: parseFloat(form.height) / 100,
+        depth: parseFloat(form.depth) / 100,
+      },
+      tags: ["custom", "uploaded"],
+      favorited: false,
+      thumbnail: imagePreview || undefined,
+    };
+  }, [form, imagePreview]);
+
+  const handleSaveToLibrary = useCallback(() => {
+    const item = buildFurnitureItem();
+    customFurnitureStore.addItem(item);
+    setSavedItem(item);
+    toast({ title: "Saved to Library", description: `"${item.name}" is now available in your Furniture Library and Room Editor.` });
+  }, [buildFurnitureItem, toast]);
+
+  const handlePreviewInAR = () => {
+    if (!savedItem) {
+      const item = buildFurnitureItem();
+      customFurnitureStore.addItem(item);
+      setSavedItem(item);
+    }
+    setStep("ar");
   };
 
-  const handleSave = () => {
-    toast({ title: t("furniture.saved"), description: `"${form.name}" ${t("furniture.savedDesc")}` });
-    handleClose();
+  const dims = {
+    width: parseFloat(form.width) / 100 || 0.5,
+    height: parseFloat(form.height) / 100 || 0.5,
+    depth: parseFloat(form.depth) / 100 || 0.5,
   };
+
+  const activeStepIndex = STEPS.indexOf(step);
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
@@ -107,11 +171,14 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
             <ImagePlus className="w-5 h-5 text-primary" />
             {step === "upload" && t("furniture.add")}
             {step === "details" && t("furniture.details")}
-            {step === "preview" && t("furniture.preview")}
+            {step === "generating" && "Generating 3D Model"}
+            {step === "preview3d" && "3D Preview"}
+            {step === "ar" && "Preview in AR"}
           </DialogTitle>
         </DialogHeader>
 
         <AnimatePresence mode="wait">
+          {/* STEP 1: Upload */}
           {step === "upload" && (
             <motion.div key="upload" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
               <p className="text-sm text-muted-foreground">{t("furniture.upload.desc")}</p>
@@ -131,6 +198,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
             </motion.div>
           )}
 
+          {/* STEP 2: Details */}
           {step === "details" && (
             <motion.div key="details" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-5">
               <div className="flex items-center gap-3">
@@ -147,7 +215,6 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                   <p className="text-xs text-muted-foreground">{imageFile && `${(imageFile.size / 1024).toFixed(0)} KB`}</p>
                 </div>
               </div>
-
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="name" className="text-xs">{t("furniture.name")} *</Label>
@@ -170,7 +237,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs">{t("furniture.dimensions")} *</Label>
+                  <Label className="text-xs">{t("furniture.dimensions")} (cm) *</Label>
                   <div className="grid grid-cols-3 gap-2 mt-1">
                     <Input placeholder="Width" type="number" value={form.width} onChange={(e) => updateField("width", e.target.value)} />
                     <Input placeholder="Height" type="number" value={form.height} onChange={(e) => updateField("height", e.target.value)} />
@@ -185,56 +252,119 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                   </Select>
                 </div>
               </div>
-
               <div className="flex gap-2 pt-2">
                 <Button variant="outline" className="flex-1" onClick={() => setStep("upload")}>{t("furniture.back")}</Button>
-                <Button className="flex-1 gap-2" disabled={!canGenerate || generating} onClick={handleGenerate}>
-                  {generating ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("furniture.generating")}</> : <><Sparkles className="w-4 h-4" /> {t("furniture.generate")}</>}
+                <Button className="flex-1 gap-2" disabled={!canGenerate} onClick={handleGenerate}>
+                  <Sparkles className="w-4 h-4" /> {t("furniture.generate")}
                 </Button>
               </div>
             </motion.div>
           )}
 
-          {step === "preview" && (
-            <motion.div key="preview" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-5">
-              <div className="aspect-square max-h-64 mx-auto bg-secondary/40 rounded-xl border border-border/50 flex flex-col items-center justify-center gap-3">
-                <Box className="w-16 h-16 text-primary/40" />
-                <p className="text-sm font-medium text-muted-foreground">{t("furniture.preview")}</p>
-                <p className="text-xs text-muted-foreground">{form.width} × {form.height} × {form.depth} cm</p>
+          {/* STEP 3: Generating animation */}
+          {step === "generating" && (
+            <motion.div key="generating" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="py-10 flex flex-col items-center gap-5">
+              <div className="relative w-20 h-20">
+                <motion.div
+                  className="absolute inset-0 rounded-2xl bg-primary/10"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                />
+                <div className="absolute inset-2 rounded-xl bg-card border border-border/50 flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                </div>
               </div>
+              <div className="text-center space-y-1">
+                <p className="text-sm font-medium text-foreground">
+                  {generateProgress < 30 && "Analyzing image…"}
+                  {generateProgress >= 30 && generateProgress < 60 && "Detecting shape…"}
+                  {generateProgress >= 60 && generateProgress < 85 && "Generating mesh…"}
+                  {generateProgress >= 85 && "Finalizing model…"}
+                </p>
+                <p className="text-xs text-muted-foreground">{form.name} · {form.width} × {form.height} × {form.depth} cm</p>
+              </div>
+              <div className="w-full max-w-xs">
+                <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-primary rounded-full"
+                    animate={{ width: `${generateProgress}%` }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                  />
+                </div>
+                <p className="text-[10px] text-muted-foreground text-right mt-1">{generateProgress}%</p>
+              </div>
+            </motion.div>
+          )}
 
-              <div className="bg-accent/30 rounded-xl p-4 space-y-2">
+          {/* STEP 4: Interactive 3D Preview */}
+          {step === "preview3d" && (
+            <motion.div key="preview3d" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-4">
+              <FurniturePreview3D
+                dimensions={dims}
+                color={MATERIAL_COLORS[form.material] || "#6B7280"}
+                material={form.material || "Mixed"}
+              />
+
+              <div className="bg-accent/30 rounded-xl p-3 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{t("furniture.name")}</span>
-                  <span className="text-sm font-medium text-foreground">{form.name}</span>
+                  <span className="text-[11px] text-muted-foreground">{t("furniture.name")}</span>
+                  <span className="text-xs font-medium text-foreground">{form.name}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{t("furniture.category")}</span>
-                  <span className="text-sm text-foreground">{form.category}</span>
+                  <span className="text-[11px] text-muted-foreground">{t("furniture.category")}</span>
+                  <span className="text-xs text-foreground">{form.category}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-muted-foreground">{t("furniture.dimensions")}</span>
+                  <span className="text-xs text-foreground">{form.width} × {form.height} × {form.depth} cm</span>
                 </div>
                 {form.material && (
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">{t("furniture.material")}</span>
-                    <span className="text-sm text-foreground">{form.material}</span>
+                    <span className="text-[11px] text-muted-foreground">{t("furniture.material")}</span>
+                    <span className="text-xs text-foreground">{form.material}</span>
                   </div>
                 )}
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{t("furniture.shape")}</span>
-                  <span className="text-sm text-foreground">{form.shape}</span>
-                </div>
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => setStep("details")}>{t("furniture.editDetails")}</Button>
-                <Button className="flex-1 gap-2" onClick={handleSave}><Check className="w-4 h-4" /> {t("furniture.save")}</Button>
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => setStep("details")}>
+                  Edit
+                </Button>
+                <Button variant="outline" size="sm" className="flex-1 gap-1.5" onClick={handlePreviewInAR}>
+                  <Smartphone className="w-3.5 h-3.5" /> AR Preview
+                </Button>
+                <Button size="sm" className="flex-1 gap-1.5" onClick={handleSaveToLibrary} disabled={!!savedItem}>
+                  <Check className="w-3.5 h-3.5" /> {savedItem ? "Saved" : "Save"}
+                </Button>
               </div>
+            </motion.div>
+          )}
+
+          {/* STEP 5: AR QR code */}
+          {step === "ar" && (
+            <motion.div key="ar" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+              <FurnitureARStep
+                item={savedItem || buildFurnitureItem()}
+                onBack={() => setStep("preview3d")}
+                onDone={handleClose}
+              />
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="flex items-center justify-center gap-2 pt-2">
-          {(["upload", "details", "preview"] as Step[]).map((s) => (
-            <div key={s} className={`h-1.5 rounded-full transition-all ${s === step ? "w-6 bg-primary" : "w-1.5 bg-border"}`} />
+        {/* Step indicators */}
+        <div className="flex items-center justify-center gap-1.5 pt-2">
+          {STEPS.filter((s) => s !== "generating").map((s, i) => (
+            <div
+              key={s}
+              className={`h-1.5 rounded-full transition-all ${
+                s === step || (step === "generating" && s === "details")
+                  ? "w-6 bg-primary"
+                  : STEPS.indexOf(s) < activeStepIndex
+                  ? "w-3 bg-primary/40"
+                  : "w-1.5 bg-border"
+              }`}
+            />
           ))}
         </div>
       </DialogContent>

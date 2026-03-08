@@ -9,8 +9,11 @@ import { FURNITURE_CATALOG, CATEGORIES, STYLES } from "@/data/furnitureCatalog";
 import FurnitureARModal from "@/components/ar/FurnitureARModal";
 import type { FurnitureItem } from "@/types/editor";
 import { cn } from "@/lib/utils";
+import { useCustomFurniture } from "@/hooks/useCustomFurniture";
 
 const FurnitureLibrary = () => {
+  const { customItems } = useCustomFurniture();
+  const allFurniture = [...FURNITURE_CATALOG, ...customItems];
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string>("all");
   const [style, setStyle] = useState<string>("all");
@@ -21,7 +24,7 @@ const FurnitureLibrary = () => {
   const [showFavOnly, setShowFavOnly] = useState(false);
   const [arItem, setArItem] = useState<FurnitureItem | null>(null);
 
-  const filtered = FURNITURE_CATALOG.filter((item) => {
+  const filtered = allFurniture.filter((item) => {
     const matchSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
       item.tags.some((t) => t.includes(search.toLowerCase()));
     const matchCat = category === "all" || item.category === category;
