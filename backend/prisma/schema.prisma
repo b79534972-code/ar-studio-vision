@@ -59,6 +59,22 @@ enum ModelFormat {
   usdz
 }
 
+enum AIFeatureType {
+  layout_suggest
+  style_transform
+  product_recommend
+  budget_optimize
+  photorealistic_render
+  full_room_redesign
+}
+
+enum AIRequestStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
 // ─── User & Auth ─────────────────────────────────────────────
 
 model User {
@@ -83,6 +99,7 @@ model User {
   layouts              Layout[]
   furnitureModels      FurnitureModel[]
   arSessions           ARSession[]
+  aiRequests           AIRequest[]
   auditLogs            AuditLog[]
 }
 
@@ -98,6 +115,9 @@ model UserUsage {
   // AI credit system (matches frontend UserUsage)
   aiCreditsUsed    Int      @default(0)
   aiCreditsTotal   Int      @default(5) // Free plan default
+
+  // Daily credit reset tracking (Free plan resets every 24h)
+  lastCreditReset  DateTime @default(now())
 
   updatedAt        DateTime @updatedAt
 
@@ -222,4 +242,32 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── AI Requests ─────────────────────────────────────────────
+
+model AIRequest {
+  id           String          @id @default(uuid())
+  userId       String
+  feature      AIFeatureType
+  creditCost   Int
+  status       AIRequestStatus @default(pending)
+
+  // Input parameters (room type, style, budget, etc.)
+  input        Json            @default("{}")
+
+  // AI output (suggestions, renders, recommendations)
+  output       Json?
+
+  // Performance tracking
+  processingMs Int?
+  errorMessage String?
+
+  createdAt    DateTime        @default(now())
+  completedAt  DateTime?
+
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([feature, status])
 }
