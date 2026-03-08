@@ -12,12 +12,18 @@ export interface SavedRoom {
   updatedAt: string;
 }
 
+export interface LayoutSnapshot {
+  id: string;
+  objects: PlacedObject[];
+  savedAt: string;
+}
+
 export interface SavedLayout {
   id: string;
   roomId: string;
   name: string;
   objects: PlacedObject[];
-  version: number;
+  history: LayoutSnapshot[];
   createdAt: string;
   updatedAt: string;
 }
@@ -33,7 +39,12 @@ try {
   const storedRooms = localStorage.getItem("saved-rooms");
   if (storedRooms) rooms = JSON.parse(storedRooms);
   const storedLayouts = localStorage.getItem("saved-layouts");
-  if (storedLayouts) layouts = JSON.parse(storedLayouts);
+  if (storedLayouts) {
+    layouts = JSON.parse(storedLayouts).map((l: any) => ({
+      ...l,
+      history: l.history || [],
+    }));
+  }
 } catch { /* ignore */ }
 
 function persist() {
@@ -83,13 +94,18 @@ export const roomStore = {
   },
 
   saveLayout: (roomId: string, name: string, objects: PlacedObject[]): SavedLayout => {
-    // Check if layout with same name for this room exists → update version
     const existing = layouts.find((l) => l.roomId === roomId && l.name === name);
     if (existing) {
+      // Push current state to history before overwriting
+      const snapshot: LayoutSnapshot = {
+        id: `snap-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        objects: existing.objects,
+        savedAt: existing.updatedAt,
+      };
       const updated: SavedLayout = {
         ...existing,
         objects,
-        version: existing.version + 1,
+        history: [...existing.history, snapshot],
         updatedAt: new Date().toISOString(),
       };
       layouts = layouts.map((l) => (l.id === existing.id ? updated : l));
@@ -103,7 +119,7 @@ export const roomStore = {
       roomId,
       name,
       objects,
-      version: 1,
+      history: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -111,6 +127,29 @@ export const roomStore = {
     persist();
     notify();
     return layout;
+  },
+
+  restoreSnapshot: (layoutId: string, snapshotId: string) => {
+    const layout = layouts.find((l) => l.id === layoutId);
+    if (!layout) return;
+    const snapshot = layout.history.find((s) => s.id === snapshotId);
+    if (!snapshot) return;
+
+    // Save current state to history before restoring
+    const currentSnap: LayoutSnapshot = {
+      id: `snap-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      objects: layout.objects,
+      savedAt: layout.updatedAt,
+    };
+    const updated: SavedLayout = {
+      ...layout,
+      objects: snapshot.objects,
+      history: [...layout.history, currentSnap],
+      updatedAt: new Date().toISOString(),
+    };
+    layouts = layouts.map((l) => (l.id === layoutId ? updated : l));
+    persist();
+    notify();
   },
 
   removeLayout: (id: string) => {
