@@ -264,7 +264,7 @@ const RoomEditor = () => {
         canUndo={canUndo}
         canRedo={canRedo}
         onARPreview={() => setShowARModal(true)}
-        onAISuggest={() => toast({ title: "AI Suggest", description: "Analyzing room layout…" })}
+        onAISuggest={() => setShowAIPanel(true)}
         objectCount={objects.length}
       />
 
