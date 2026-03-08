@@ -244,13 +244,16 @@ const AILayoutGenerator = () => {
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-muted-foreground" />
                         <Label className="text-sm font-medium">Number of Occupants</Label>
-                        <span className="text-xs font-bold text-primary ml-auto">{occupants[0]}</span>
                       </div>
-                      <Slider value={occupants} onValueChange={setOccupants} min={1} max={8} step={1} className="w-full" />
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>1 person</span>
-                        <span>8 people</span>
-                      </div>
+                      <Input
+                        type="number"
+                        value={occupants[0]}
+                        onChange={(e) => setOccupants([Math.max(1, Math.min(20, parseInt(e.target.value) || 1))])}
+                        min={1}
+                        max={20}
+                        className="h-9 w-32"
+                        placeholder="e.g. 2"
+                      />
                     </div>
 
                     {/* Budget */}
