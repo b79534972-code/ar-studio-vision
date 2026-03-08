@@ -319,7 +319,7 @@ const AILayoutGenerator = () => {
 
                     {/* Furniture Preferences */}
                     <div className="space-y-3">
-                      <Label className="text-sm font-medium">Must-Have Furniture</Label>
+                      <Label className="text-sm font-medium">{t("aiGen.mustHave")}</Label>
                       <div className="flex flex-wrap gap-2">
                         {FURNITURE_PREFS.map((f) => {
                           const active = furniturePrefs.includes(f.value);
