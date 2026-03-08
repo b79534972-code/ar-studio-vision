@@ -229,7 +229,7 @@ const RoomScan = () => {
                 </p>
 
                 <Progress value={progress} className="h-2 mb-3" />
-                <p className="text-xs text-muted-foreground">{progress}% complete</p>
+                <p className="text-xs text-muted-foreground">{progress}% {t("roomScan.complete")}</p>
 
                 {/* Analysis steps */}
                 <div className="mt-5 space-y-2 text-left">
