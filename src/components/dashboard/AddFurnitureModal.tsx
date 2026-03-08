@@ -298,7 +298,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                   {generateProgress >= 60 && generateProgress < 85 && "Generating mesh…"}
                   {generateProgress >= 85 && "Finalizing model…"}
                 </p>
-                <p className="text-xs text-muted-foreground">{form.name} · {form.width} × {form.height} × {form.depth} cm</p>
+                <p className="text-xs text-muted-foreground">{form.name} · {form.width} × {form.height} × {form.depth} {unit}</p>
               </div>
               <div className="w-full max-w-xs">
                 <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
