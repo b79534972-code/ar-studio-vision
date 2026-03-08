@@ -18,6 +18,9 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.profile": "Profile",
     "nav.billing": "Billing",
     "nav.settings": "Settings",
+    "nav.editor": "Room Editor",
+    "nav.furniture": "Furniture Library",
+    "nav.aiGenerator": "AI Generator",
 
     // Topbar
     "topbar.dashboard": "Dashboard",
@@ -180,6 +183,9 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.profile": "Hồ sơ",
     "nav.billing": "Thanh toán",
     "nav.settings": "Cài đặt",
+    "nav.editor": "Trình chỉnh sửa",
+    "nav.furniture": "Thư viện nội thất",
+    "nav.aiGenerator": "AI Tạo bố cục",
 
     // Topbar
     "topbar.dashboard": "Bảng điều khiển",

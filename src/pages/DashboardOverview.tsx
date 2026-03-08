@@ -182,7 +182,7 @@ const DashboardOverview = () => {
               variant="secondary"
               size="default"
               className="gap-2 min-h-[44px] rounded-xl font-medium"
-              onClick={() => navigate("/dashboard/layouts")}
+              onClick={() => navigate("/dashboard/editor")}
             >
               <Plus className="w-4 h-4" /> {t("overview.createLayout")}
             </Button>
@@ -190,7 +190,7 @@ const DashboardOverview = () => {
               variant="secondary"
               size="default"
               className="gap-2 min-h-[44px] rounded-xl font-medium"
-              onClick={() => navigate("/dashboard/models")}
+              onClick={() => navigate("/dashboard/furniture")}
             >
               <ImagePlus className="w-4 h-4" /> {t("overview.addFurniture")}
             </Button>
@@ -206,7 +206,7 @@ const DashboardOverview = () => {
               variant="secondary"
               size="default"
               className="gap-2 min-h-[44px] rounded-xl font-medium"
-              onClick={() => featureGate.canUseAI() && navigate("/dashboard/layouts")}
+              onClick={() => featureGate.canUseAI() && navigate("/dashboard/ai-generator")}
             >
               <Sparkles className="w-4 h-4" /> {t("overview.aiLayout")}
             </Button>
