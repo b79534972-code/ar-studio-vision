@@ -177,7 +177,14 @@ const MyRooms = () => {
                               <Clock className="w-2.5 h-2.5" />
                               {new Date(layout.updatedAt).toLocaleDateString()}
                             </span>
-                            <span className="text-[10px] text-muted-foreground/50 ml-auto">v{layout.version}</span>
+                            {layout.history.length > 0 && (
+                              <button
+                                className="text-[10px] text-primary font-medium ml-auto hover:underline"
+                                onClick={(e) => { e.stopPropagation(); setHistoryLayout(historyLayout?.id === layout.id ? null : layout); }}
+                              >
+                                {layout.history.length} {t("rooms.saves") || "saves"}
+                              </button>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

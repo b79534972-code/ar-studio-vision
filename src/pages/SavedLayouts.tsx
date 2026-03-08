@@ -113,7 +113,7 @@ const SavedLayouts = () => {
                     <span className="text-[10px] text-muted-foreground">
                       {new Date(layout.updatedAt).toLocaleDateString()}
                     </span>
-                    <span className="text-[10px] text-muted-foreground/50 ml-auto">v{layout.version}</span>
+                    <span className="text-[10px] text-muted-foreground/50 ml-auto">{layout.history.length} saves</span>
                   </div>
                 </div>
               </motion.div>

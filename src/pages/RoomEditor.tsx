@@ -211,7 +211,7 @@ const RoomEditor = () => {
 
     toast({
       title: "Layout Saved",
-      description: `${objects.length} objects · v${saved.version}`,
+      description: `${objects.length} objects saved`,
     });
   }, [objects, roomConfig, currentRoomId, roomName, toast]);
 
