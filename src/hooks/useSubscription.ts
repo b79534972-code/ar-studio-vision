@@ -25,6 +25,8 @@ const MOCK_USAGE: UserUsage = {
   layoutsCount: 2,
   arSessionsCount: 7,
   aiRequestsCount: 0,
+  aiCreditsUsed: 0,
+  aiCreditsTotal: 5, // Free plan = 5 credits
 };
 
 export function useSubscription() {
