@@ -40,6 +40,7 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.stats.models": "Models",
     "overview.stats.rooms": "Rooms",
     "overview.stats.layouts": "Layouts",
+    "overview.stats.furniture": "Furniture",
     "overview.stats.ai": "AI Suggestions",
     "overview.quickActions": "Quick Actions",
     "overview.recentActivity": "Recent Activity",
