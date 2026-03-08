@@ -391,6 +391,7 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.stats.models.desc": "Đối tượng nội thất trong thư viện",
     "overview.stats.rooms.desc": "Dự án phòng đang hoạt động",
     "overview.stats.layouts.desc": "Cấu hình AR đã lưu",
+    "overview.stats.furniture.desc": "Tổng nội thất trong danh mục",
     "overview.stats.ai.desc": "Gợi ý AI đã sử dụng",
 
     // Hero quick buttons
