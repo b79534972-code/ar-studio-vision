@@ -54,7 +54,7 @@ const MyRooms = () => {
     const room = addRoom(newRoom.name.trim(), config);
     setShowCreate(false);
     setNewRoom({ name: "", width: "6", depth: "5", height: "2.8" });
-    toast({ title: "Room Created", description: `${room.name} has been created` });
+    toast({ title: t("rooms.created"), description: `${room.name}` });
     navigate(`/dashboard/editor?roomId=${room.id}`);
   };
 
