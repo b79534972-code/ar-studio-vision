@@ -243,3 +243,31 @@ model AuditLog {
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+// ─── AI Requests ─────────────────────────────────────────────
+
+model AIRequest {
+  id           String          @id @default(uuid())
+  userId       String
+  feature      AIFeatureType
+  creditCost   Int
+  status       AIRequestStatus @default(pending)
+
+  // Input parameters (room type, style, budget, etc.)
+  input        Json            @default("{}")
+
+  // AI output (suggestions, renders, recommendations)
+  output       Json?
+
+  // Performance tracking
+  processingMs Int?
+  errorMessage String?
+
+  createdAt    DateTime        @default(now())
+  completedAt  DateTime?
+
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([feature, status])
+}
