@@ -68,7 +68,7 @@ const FeaturesSection = () => {
               }}
             >
               <motion.div
-                className="w-10 h-10 md:w-12 md:h-12 rounded-xl gradient-primary flex items-center justify-center mb-3 md:mb-4"
+                className="w-10 h-10 md:w-12 md:h-12 rounded-xl gradient-primary flex items-center justify-center mb-3 md:mb-4 transition-shadow duration-300 group-hover:shadow-glow"
                 whileInView={f.anim}
                 viewport={{ once: false, amount: 0.5 }}
                 transition={{ duration: 2, delay: i * 0.2 + 0.3, repeat: Infinity, repeatDelay: 3 }}

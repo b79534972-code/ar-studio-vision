@@ -62,8 +62,8 @@ const ProblemSection = () => {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: false, amount: 0.3 }}
                   transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
-                  whileHover={{ x: 4, boxShadow: "var(--shadow-soft)" }}
-                  className="flex items-start gap-3 p-3 md:p-4 rounded-xl border border-border/50 transition-colors"
+                  whileHover={{ x: 4, scale: 1.02, boxShadow: "var(--shadow-card), 0 0 20px hsl(235 60% 52% / 0.08)", borderColor: "hsl(235 60% 52% / 0.2)" }}
+                  className="flex items-start gap-3 p-3 md:p-4 rounded-xl border border-border/50 transition-all duration-300"
                   style={{
                     background: "hsl(var(--secondary) / 0.6)",
                     backdropFilter: "blur(8px)",

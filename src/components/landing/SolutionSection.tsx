@@ -39,9 +39,11 @@ const SolutionSection = () => {
                   transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.1 }}
                   whileHover={{
                     x: 4,
+                    scale: 1.02,
                     backgroundColor: "hsl(var(--accent) / 0.5)",
+                    boxShadow: "var(--shadow-soft), 0 0 16px hsl(235 60% 52% / 0.06)",
                   }}
-                  className="flex items-center gap-3 p-2.5 md:p-3 rounded-lg transition-colors cursor-default"
+                  className="flex items-center gap-3 p-2.5 md:p-3 rounded-lg transition-all duration-300 cursor-default"
                 >
                   <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg gradient-primary flex items-center justify-center shrink-0 shadow-soft">
                     <f.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary-foreground" />

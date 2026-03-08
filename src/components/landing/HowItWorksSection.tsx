@@ -60,7 +60,7 @@ const HowItWorksSection = () => {
               <motion.div
                 className="w-14 h-14 md:w-16 md:h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 md:mb-6 relative z-10"
                 style={{ boxShadow: "var(--shadow-soft), 0 0 20px hsl(235 60% 60% / 0.12)" }}
-                whileHover={{ scale: 1.1, boxShadow: "var(--shadow-elevated), 0 0 30px hsl(235 60% 60% / 0.2)" }}
+                whileHover={{ scale: 1.12, boxShadow: "var(--shadow-elevated), 0 0 40px hsl(235 60% 60% / 0.25)" }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <step.icon className="w-6 h-6 md:w-7 md:h-7 text-primary-foreground" />

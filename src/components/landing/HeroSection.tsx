@@ -89,16 +89,28 @@ const HeroSection = () => {
             className="relative mt-4 lg:mt-0"
             style={{ transform: `translate(${mouse.x * 0.8}px, ${mouse.y * 0.8}px)` }}
           >
-            <div className="rounded-2xl overflow-hidden shadow-elevated border border-border/50 relative group">
+            <div
+              className="rounded-2xl overflow-hidden border border-border/50 relative group transition-all duration-500"
+              style={{
+                boxShadow: "var(--shadow-elevated), 0 0 0px hsl(235 60% 52% / 0)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "var(--shadow-elevated), 0 0 40px hsl(235 60% 52% / 0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "var(--shadow-elevated), 0 0 0px hsl(235 60% 52% / 0)";
+              }}
+            >
               <img
                 src={heroImage}
                 alt="AR demo showing furniture placement in a real room with measurement overlays"
-                className="w-full h-auto transition-transform duration-700 group-hover:scale-[1.02]"
+                className="w-full h-auto transition-all duration-700 group-hover:scale-[1.04] group-hover:brightness-105 group-hover:contrast-[1.03]"
+                style={{ filter: "brightness(1.02) contrast(1.02)" }}
                 loading="eager"
               />
               <ARScanOverlay />
               {/* Glass reflection */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-transparent to-transparent pointer-events-none transition-opacity duration-500 group-hover:opacity-80" />
             </div>
 
             {/* Floating label - glassmorphism */}
