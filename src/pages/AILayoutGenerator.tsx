@@ -223,10 +223,10 @@ const AILayoutGenerator = () => {
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full"
               >
                 <ChevronDown className={cn("w-4 h-4 transition-transform", showAdvanced && "rotate-180")} />
-                Advanced Options
+                {t("aiGen.advanced")}
                 {(purposes.length > 0 || furniturePrefs.length > 0) && (
                   <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">
-                    {purposes.length + furniturePrefs.length} selected
+                    {purposes.length + furniturePrefs.length} {t("aiGen.selected")}
                   </Badge>
                 )}
               </button>
