@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Star, Filter, Grid3X3, List, Heart, Box, ArrowUpDown } from "lucide-react";
+import { Search, Star, Filter, Grid3X3, List, Heart, Box, ArrowUpDown, Smartphone } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FURNITURE_CATALOG, CATEGORIES, STYLES } from "@/data/furnitureCatalog";
+import FurnitureARModal from "@/components/ar/FurnitureARModal";
 import type { FurnitureItem } from "@/types/editor";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 
 const FurnitureLibrary = () => {
-  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string>("all");
   const [style, setStyle] = useState<string>("all");
@@ -20,6 +19,7 @@ const FurnitureLibrary = () => {
     new Set(FURNITURE_CATALOG.filter((f) => f.favorited).map((f) => f.id))
   );
   const [showFavOnly, setShowFavOnly] = useState(false);
+  const [arItem, setArItem] = useState<FurnitureItem | null>(null);
 
   const filtered = FURNITURE_CATALOG.filter((item) => {
     const matchSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -119,13 +119,13 @@ const FurnitureLibrary = () => {
       {viewMode === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filtered.map((item, i) => (
-            <FurnitureCard key={item.id} item={item} index={i} isFav={favorites.has(item.id)} onToggleFav={toggleFav} />
+            <FurnitureCard key={item.id} item={item} index={i} isFav={favorites.has(item.id)} onToggleFav={toggleFav} onARPreview={setArItem} />
           ))}
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map((item, i) => (
-            <FurnitureListItem key={item.id} item={item} index={i} isFav={favorites.has(item.id)} onToggleFav={toggleFav} />
+            <FurnitureListItem key={item.id} item={item} index={i} isFav={favorites.has(item.id)} onToggleFav={toggleFav} onARPreview={setArItem} />
           ))}
         </div>
       )}
@@ -136,12 +136,14 @@ const FurnitureLibrary = () => {
           <p className="text-sm text-muted-foreground">No furniture found matching your filters</p>
         </div>
       )}
+
+      <FurnitureARModal open={!!arItem} onClose={() => setArItem(null)} item={arItem} />
     </div>
   );
 };
 
-const FurnitureCard = ({ item, index, isFav, onToggleFav }: {
-  item: FurnitureItem; index: number; isFav: boolean; onToggleFav: (id: string) => void;
+const FurnitureCard = ({ item, index, isFav, onToggleFav, onARPreview }: {
+  item: FurnitureItem; index: number; isFav: boolean; onToggleFav: (id: string) => void; onARPreview: (item: FurnitureItem) => void;
 }) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
@@ -182,12 +184,22 @@ const FurnitureCard = ({ item, index, isFav, onToggleFav }: {
         <Badge variant="outline" className="text-[9px] px-1.5 py-0">{item.material}</Badge>
         <Badge variant="outline" className="text-[9px] px-1.5 py-0 capitalize">{item.category}</Badge>
       </div>
+      {/* AR Preview button */}
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full mt-2 h-8 text-xs gap-1.5"
+        onClick={(e) => { e.stopPropagation(); onARPreview(item); }}
+      >
+        <Smartphone className="w-3.5 h-3.5" />
+        Preview in AR
+      </Button>
     </div>
   </motion.div>
 );
 
-const FurnitureListItem = ({ item, index, isFav, onToggleFav }: {
-  item: FurnitureItem; index: number; isFav: boolean; onToggleFav: (id: string) => void;
+const FurnitureListItem = ({ item, index, isFav, onToggleFav, onARPreview }: {
+  item: FurnitureItem; index: number; isFav: boolean; onToggleFav: (id: string) => void; onARPreview: (item: FurnitureItem) => void;
 }) => (
   <motion.div
     initial={{ opacity: 0, x: -8 }}
@@ -206,6 +218,15 @@ const FurnitureListItem = ({ item, index, isFav, onToggleFav }: {
       </p>
     </div>
     <div className="flex items-center gap-2">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-8 w-8 p-0"
+        onClick={(e) => { e.stopPropagation(); onARPreview(item); }}
+        title="Preview in AR"
+      >
+        <Smartphone className="w-3.5 h-3.5 text-primary" />
+      </Button>
       <Badge variant="secondary" className="text-[9px] capitalize">{item.style}</Badge>
       <button onClick={() => onToggleFav(item.id)}>
         <Star className={cn("w-3.5 h-3.5", isFav ? "text-warning fill-warning" : "text-muted-foreground")} />

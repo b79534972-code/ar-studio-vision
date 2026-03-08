@@ -25,6 +25,7 @@ import FurnitureLibrary from "./pages/FurnitureLibrary";
 import AILayoutGenerator from "./pages/AILayoutGenerator";
 import ARViewer from "./pages/ARViewer";
 import RoomScan from "./pages/RoomScan";
+import ARObjectViewer from "./pages/ARObjectViewer";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/ar-demo" element={<ARDemo />} />
           <Route path="/ar-viewer/:layoutId" element={<ARViewer />} />
+          <Route path="/ar-object/:furnitureId" element={<ARObjectViewer />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/pricing" element={<Pricing />} />
