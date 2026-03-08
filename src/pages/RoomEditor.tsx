@@ -450,15 +450,33 @@ const RoomEditor = () => {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              drag="y"
-              dragConstraints={{ top: 0 }}
-              dragElastic={0.2}
-              onDragEnd={(_, info) => {
-                if (info.offset.y > 80 || info.velocity.y > 300) setShowAIPanel(false);
-              }}
-              className="lg:hidden fixed inset-x-0 bottom-[52px] z-40 h-[60vh] bg-card border-t border-border/40 shadow-elevated flex flex-col rounded-t-2xl"
+              className="lg:hidden fixed inset-x-0 bottom-[52px] z-40 bg-card border-t border-border/40 shadow-elevated flex flex-col rounded-t-2xl"
+              style={{ height: `${aiPanelHeight}vh` }}
             >
-              <div className="h-8 flex items-center justify-center shrink-0 cursor-grab active:cursor-grabbing touch-none">
+              <div
+                className="h-8 flex items-center justify-center shrink-0 cursor-grab active:cursor-grabbing touch-none select-none"
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  panelDragStartY.current = e.clientY;
+                  panelDragStartH.current = aiPanelHeight;
+                  const onMove = (ev: PointerEvent) => {
+                    const deltaVh = ((panelDragStartY.current - ev.clientY) / window.innerHeight) * 100;
+                    const newH = Math.min(PANEL_MAX_H, Math.max(PANEL_MIN_H, panelDragStartH.current + deltaVh));
+                    setAiPanelHeight(newH);
+                  };
+                  const onUp = (ev: PointerEvent) => {
+                    window.removeEventListener("pointermove", onMove);
+                    window.removeEventListener("pointerup", onUp);
+                    const deltaVh = ((ev.clientY - panelDragStartY.current) / window.innerHeight) * 100;
+                    if (deltaVh > 15) {
+                      setShowAIPanel(false);
+                      setAiPanelHeight(60);
+                    }
+                  };
+                  window.addEventListener("pointermove", onMove);
+                  window.addEventListener("pointerup", onUp);
+                }}
+              >
                 <div className="w-8 h-1 rounded-full bg-border" />
               </div>
               <AIOptimizePanel
