@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import type { AILayoutSuggestion } from "@/types/editor";
 import { cn } from "@/lib/utils";
-
+import { useLanguage } from "@/contexts/LanguageContext";
 const ROOM_TYPES = [
   { value: "living", label: "Living Room", icon: Sofa },
   { value: "bedroom", label: "Bedroom", icon: BedDouble },
