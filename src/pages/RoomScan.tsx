@@ -272,7 +272,7 @@ const RoomScan = () => {
                     <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                       <div className="flex items-center gap-2 bg-card/80 backdrop-blur-md rounded-lg px-3 py-1.5">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        <span className="text-xs font-semibold text-foreground">Room Detected</span>
+                        <span className="text-xs font-semibold text-foreground">{t("roomScan.detected")}</span>
                       </div>
                       <div className="bg-card/80 backdrop-blur-md rounded-lg px-3 py-1.5">
                         <span className="text-xs font-semibold text-foreground">
