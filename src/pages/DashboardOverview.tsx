@@ -117,10 +117,23 @@ const WorkflowStep = ({ step, index, total }: {
 /* ─── Main Component ─── */
 
 const DashboardOverview = () => {
-  const { user, usage, featureGate, useCredit } = useOutletContext<DashboardContext>();
+  const { user, usage: baseUsage, featureGate, useCredit } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
-  const usageStats = ApplicationService.getUsageStats(user, usage);
   const { t } = useLanguage();
+
+  // Read real counts from localStorage stores
+  const { rooms, layouts } = useRoomStore();
+  const { customItems } = useCustomFurniture();
+
+  // Override mock usage with real store data
+  const usage: UserUsage = {
+    ...baseUsage,
+    modelsCount: customItems.length,
+    layoutsCount: layouts.length,
+    arSessionsCount: rooms.length,
+  };
+
+  const usageStats = ApplicationService.getUsageStats(user, usage);
   const creditsRemaining = usage.aiCreditsTotal - usage.aiCreditsUsed;
   const creditPercentage = usage.aiCreditsTotal > 0 ? Math.round((creditsRemaining / usage.aiCreditsTotal) * 100) : 0;
 
