@@ -43,16 +43,17 @@ const DashboardSidebar = ({ user, collapsed }: DashboardSidebarProps) => {
         collapsed ? "w-[72px]" : "w-64"
       )}
     >
-      {/* Logo */}
+      {/* User info */}
       <div className="h-16 flex items-center px-5 border-b border-border/30 shrink-0">
-        <NavLink to="/dashboard" className="flex items-center gap-2.5 overflow-hidden">
-          <div className="w-8 h-8 rounded-xl gradient-hero flex items-center justify-center shrink-0">
-            <span className="text-primary-foreground font-display font-bold text-sm">A</span>
+        <NavLink to="/dashboard/profile" className="flex items-center gap-2.5 overflow-hidden min-w-0">
+          <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center shrink-0">
+            <span className="text-primary-foreground font-display font-bold text-sm">{user.name.charAt(0)}</span>
           </div>
           {!collapsed && (
-            <span className="font-display text-base font-bold text-foreground tracking-tight whitespace-nowrap">
-              InteriorAR
-            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-foreground truncate">{user.name}</p>
+              <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+            </div>
           )}
         </NavLink>
       </div>
