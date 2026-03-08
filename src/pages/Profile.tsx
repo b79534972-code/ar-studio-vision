@@ -143,7 +143,7 @@ const Profile = () => {
           <div className="space-y-6">
             <div className="p-4 bg-accent/20 rounded-xl border border-primary/10">
               <p className="text-sm font-medium text-foreground mb-1">{t("profile.currentPlan")}</p>
-              <p className="text-muted-foreground text-sm">{plan.name} — {formatPrice(user.subscriptionPlan, currency)}/mo</p>
+              <p className="text-muted-foreground text-sm">{plan.name} — {formatPrice(user.subscriptionPlan, currency)}{t("profile.perMonth")}</p>
             </div>
             <div className="space-y-3">
               <p className="text-sm font-medium text-foreground">{t("profile.paymentMethod")}</p>
