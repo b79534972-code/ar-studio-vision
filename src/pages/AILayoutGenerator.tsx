@@ -348,15 +348,15 @@ const AILayoutGenerator = () => {
 
               {/* AI Prompt */}
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Custom Prompt <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                <Label className="text-sm font-medium">{t("aiGen.customPrompt")} <span className="text-muted-foreground font-normal">{t("aiGen.optional")}</span></Label>
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="e.g. I want a cozy reading nook by the window, TV facing the sofa, and space for a yoga mat..."
+                  placeholder={t("aiGen.promptPlaceholder")}
                   className="min-h-[80px] text-sm resize-none"
                 />
                 <p className="text-[10px] text-muted-foreground">
-                  Describe your preferences, requirements, or specific furniture arrangements you'd like the AI to consider.
+                  {t("aiGen.promptHint")}
                 </p>
               </div>
 
