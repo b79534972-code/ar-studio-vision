@@ -185,21 +185,21 @@ const DashboardOverview = () => {
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-foreground/15 hover:bg-primary-foreground/25 text-primary-foreground text-sm font-medium transition-colors duration-200 backdrop-blur-sm"
               >
                 <Upload className="w-4 h-4" />
-                Upload Model
+                {t("hero.uploadModel")}
               </button>
               <button
                 onClick={() => navigate("/dashboard/rooms")}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-foreground/15 hover:bg-primary-foreground/25 text-primary-foreground text-sm font-medium transition-colors duration-200 backdrop-blur-sm"
               >
                 <Plus className="w-4 h-4" />
-                New Room
+                {t("hero.newRoom")}
               </button>
               <button
                 onClick={() => { featureGate.canUseAI() && navigate("/dashboard/ai-generator"); }}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-foreground/15 hover:bg-primary-foreground/25 text-primary-foreground text-sm font-medium transition-colors duration-200 backdrop-blur-sm"
               >
                 <Sparkles className="w-4 h-4" />
-                AI Generate
+                {t("hero.aiGenerate")}
               </button>
             </div>
           </div>
