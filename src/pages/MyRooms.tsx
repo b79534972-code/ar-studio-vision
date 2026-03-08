@@ -132,7 +132,7 @@ const MyRooms = () => {
               <div className="px-5 py-3.5 border-b border-border/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Layers className="w-4 h-4 text-muted-foreground" />
-                  <h3 className="text-sm font-semibold text-foreground">Saved Layouts</h3>
+                  <h3 className="text-sm font-semibold text-foreground">{t("rooms.savedLayouts")}</h3>
                   <span className="text-[10px] text-muted-foreground bg-accent/50 rounded-full px-2 py-0.5">
                     {roomLayouts.length}
                   </span>
