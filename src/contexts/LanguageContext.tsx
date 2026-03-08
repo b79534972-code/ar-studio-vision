@@ -531,6 +531,12 @@ const translations: Record<Language, Record<string, string>> = {
     "billing.subtitle": "Quản lý đăng ký và thanh toán",
     "billing.upgrade": "Nâng cấp gói",
     "billing.cancel": "Hủy đăng ký",
+    "billing.creditUsage": "Sử dụng Credit AI",
+    "billing.creditsUsedLabel": "đã dùng",
+    "billing.creditsRemaining": "credit còn lại",
+    "billing.buyMore": "Mua thêm credit",
+    "billing.aiRequests": "Yêu cầu AI",
+    "billing.remaining": "Còn lại",
 
     // Settings
     "settings.title": "Cài đặt",
