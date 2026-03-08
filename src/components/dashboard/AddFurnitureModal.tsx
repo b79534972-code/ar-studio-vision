@@ -121,6 +121,12 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
     setTimeout(() => setStep("preview3d"), 2600);
   }, [canGenerate]);
 
+  const toCm = (val: string) => {
+    const n = parseFloat(val);
+    if (isNaN(n)) return 0;
+    return unit === "m" ? n * 100 : n;
+  };
+
   const buildFurnitureItem = useCallback((): FurnitureItem => {
     const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     return {
@@ -131,15 +137,15 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
       material: form.material || "Mixed",
       color: MATERIAL_COLORS[form.material] || "#6B7280",
       dimensions: {
-        width: parseFloat(form.width) / 100,
-        height: parseFloat(form.height) / 100,
-        depth: parseFloat(form.depth) / 100,
+        width: toCm(form.width) / 100,
+        height: toCm(form.height) / 100,
+        depth: toCm(form.depth) / 100,
       },
       tags: ["custom", "uploaded"],
       favorited: false,
       thumbnail: imagePreview || undefined,
     };
-  }, [form, imagePreview]);
+  }, [form, imagePreview, unit]);
 
   const handleSaveToLibrary = useCallback(() => {
     const item = buildFurnitureItem();
