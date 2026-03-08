@@ -119,6 +119,8 @@ const DashboardOverview = () => {
   const navigate = useNavigate();
   const usageStats = ApplicationService.getUsageStats(user, usage);
   const { t } = useLanguage();
+  const creditsRemaining = usage.aiCreditsTotal - usage.aiCreditsUsed;
+  const creditPercentage = usage.aiCreditsTotal > 0 ? Math.round((creditsRemaining / usage.aiCreditsTotal) * 100) : 0;
 
   const stats = [
     { label: t("overview.stats.models"), icon: Box, key: "modelsCount" as const, color: "text-primary" },
