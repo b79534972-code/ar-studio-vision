@@ -15,6 +15,7 @@ interface EditorFurniturePanelProps {
 const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [showCategories, setShowCategories] = useState(false);
   const [activeTab, setActiveTab] = useState<"library" | "my">("library");
   const { customItems } = useCustomFurniture();
 
