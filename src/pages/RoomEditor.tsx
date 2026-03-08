@@ -293,6 +293,21 @@ const RoomEditor = () => {
           onDuplicateObject={handleDuplicateObject}
           onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
         />
+
+        {/* AI Optimize Panel */}
+        <AIOptimizePanel
+          open={showAIPanel}
+          onClose={() => setShowAIPanel(false)}
+          objects={objects}
+          roomConfig={roomConfig}
+          creditsRemaining={usage.aiCreditsTotal - usage.aiCreditsUsed}
+          useCredit={useCredit}
+          onApplySuggestion={(updated) => {
+            setObjects(updated);
+            pushHistory(updated);
+            toast({ title: "AI Applied", description: "Suggestion applied to layout" });
+          }}
+        />
       </div>
 
       {/* AR Preview Modal */}
