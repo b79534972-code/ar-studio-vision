@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Box, Home, Layers, User, CreditCard, Settings, Sparkles,
+  LayoutDashboard, Box, Home, User, CreditCard, Settings, Sparkles,
   Armchair, Wand2, PenTool, ScanLine,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,6 @@ const DashboardSidebar = ({ user, collapsed }: DashboardSidebarProps) => {
     { to: "/dashboard/room-scan", label: "Room Scan AI", icon: ScanLine },
     { to: "/dashboard/models", label: t("nav.models"), icon: Box },
     { to: "/dashboard/rooms", label: t("nav.rooms"), icon: Home },
-    { to: "/dashboard/layouts", label: t("nav.layouts"), icon: Layers },
   ];
 
   const bottomItems = [

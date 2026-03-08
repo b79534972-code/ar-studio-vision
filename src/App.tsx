@@ -16,7 +16,7 @@ import DashboardLayout from "./components/dashboard/DashboardLayout";
 import DashboardOverview from "./pages/DashboardOverview";
 import MyModels from "./pages/MyModels";
 import MyRooms from "./pages/MyRooms";
-import SavedLayouts from "./pages/SavedLayouts";
+
 import Profile from "./pages/Profile";
 import Billing from "./pages/Billing";
 import DashboardSettings from "./pages/DashboardSettings";
@@ -51,7 +51,7 @@ const App = () => (
             <Route index element={<DashboardOverview />} />
             <Route path="models" element={<MyModels />} />
             <Route path="rooms" element={<MyRooms />} />
-            <Route path="layouts" element={<SavedLayouts />} />
+            
             <Route path="furniture" element={<FurnitureLibrary />} />
             <Route path="ai-generator" element={<AILayoutGenerator />} />
             <Route path="room-scan" element={<RoomScan />} />
