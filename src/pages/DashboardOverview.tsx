@@ -9,6 +9,7 @@ import {
 import { ApplicationService } from "@/services/ApplicationService";
 import type { User, UserUsage, Currency } from "@/types/subscription";
 import { useLanguage } from "@/contexts/LanguageContext";
+import arWorkspaceHero from "@/assets/ar-workspace-hero.png";
 
 interface DashboardContext {
   user: User;
