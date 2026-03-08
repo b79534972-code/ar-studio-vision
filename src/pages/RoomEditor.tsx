@@ -37,6 +37,8 @@ const RoomEditor = () => {
   const [currentRoomId, setCurrentRoomId] = useState<string | null>(roomId);
   const [roomName, setRoomName] = useState("Untitled Room");
 
+  const [editingName, setEditingName] = useState(false);
+
   // ─── Load existing room / layout ───
   useEffect(() => {
     if (roomId) {
@@ -46,11 +48,20 @@ const RoomEditor = () => {
         setRoomName(room.name);
         setCurrentRoomId(room.id);
       }
-    }
-    if (layoutId) {
-      const layout = roomStore.getLayouts().find((l) => l.id === layoutId);
-      if (layout) {
-        setObjects(layout.objects);
+
+      // Load specific layout or the latest one for this room
+      if (layoutId) {
+        const layout = roomStore.getLayouts().find((l) => l.id === layoutId);
+        if (layout) setObjects(layout.objects);
+      } else {
+        const roomLayouts = roomStore.getLayoutsForRoom(roomId);
+        if (roomLayouts.length > 0) {
+          // Load most recent layout
+          const latest = roomLayouts.sort((a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          )[0];
+          setObjects(latest.objects);
+        }
       }
     }
   }, [roomId, layoutId]);
