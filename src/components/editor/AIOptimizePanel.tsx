@@ -111,7 +111,7 @@ const AIOptimizePanel = ({
           id: newPlantId,
           furnitureId: "plant-1",
           name: "Potted Plant",
-          category: "decor",
+          category: "plant",
           position: [roomConfig.width / 2 - 0.5, 0, roomConfig.depth / 2 - 0.5],
           rotation: [0, 0, 0],
           scale: [1, 1, 1],
