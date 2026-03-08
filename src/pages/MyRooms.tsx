@@ -209,7 +209,7 @@ const MyRooms = () => {
               <div className="text-center py-16 space-y-3">
                 <Home className="w-12 h-12 text-muted-foreground/30 mx-auto" />
                 <p className="text-sm text-muted-foreground">
-                  {rooms.length === 0 ? "No rooms yet. Create your first room to get started!" : "No rooms match your search"}
+                  {rooms.length === 0 ? t("rooms.empty") : t("rooms.noResults")}
                 </p>
                 {rooms.length === 0 && (
                   <Button variant="hero" size="sm" className="gap-1.5" onClick={() => setShowCreate(true)}>
