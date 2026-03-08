@@ -211,7 +211,7 @@ const AILayoutGenerator = () => {
                   <div className="flex-1 flex items-end">
                     <div className="bg-accent/40 rounded-xl p-3 text-center w-full">
                       <p className="text-lg font-bold text-foreground">{(parseFloat(width) * parseFloat(depth)).toFixed(1)}</p>
-                      <p className="text-[10px] text-muted-foreground">m² total</p>
+                      <p className="text-[10px] text-muted-foreground">{t("aiGen.totalArea")}</p>
                     </div>
                   </div>
                 </div>
