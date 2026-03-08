@@ -37,6 +37,7 @@ const RoomEditor = () => {
   const [showARModal, setShowARModal] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [showOutOfCredits, setShowOutOfCredits] = useState(false);
+  const [mobilePanel, setMobilePanel] = useState<"furniture" | "properties" | null>(null);
   const { usage, useCredit, user } = useSubscription();
   // Room/layout context
   const roomId = searchParams.get("roomId");
