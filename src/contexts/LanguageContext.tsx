@@ -183,6 +183,9 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.profile": "Hồ sơ",
     "nav.billing": "Thanh toán",
     "nav.settings": "Cài đặt",
+    "nav.editor": "Trình chỉnh sửa",
+    "nav.furniture": "Thư viện nội thất",
+    "nav.aiGenerator": "AI Tạo bố cục",
 
     // Topbar
     "topbar.dashboard": "Bảng điều khiển",
