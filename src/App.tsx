@@ -51,7 +51,7 @@ const App = () => (
             <Route index element={<DashboardOverview />} />
             <Route path="models" element={<MyModels />} />
             <Route path="rooms" element={<MyRooms />} />
-            <Route path="layouts" element={<SavedLayouts />} />
+            
             <Route path="furniture" element={<FurnitureLibrary />} />
             <Route path="ai-generator" element={<AILayoutGenerator />} />
             <Route path="room-scan" element={<RoomScan />} />

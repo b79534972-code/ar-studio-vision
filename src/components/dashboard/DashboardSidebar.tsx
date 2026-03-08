@@ -26,7 +26,6 @@ const DashboardSidebar = ({ user, collapsed }: DashboardSidebarProps) => {
     { to: "/dashboard/room-scan", label: "Room Scan AI", icon: ScanLine },
     { to: "/dashboard/models", label: t("nav.models"), icon: Box },
     { to: "/dashboard/rooms", label: t("nav.rooms"), icon: Home },
-    { to: "/dashboard/layouts", label: t("nav.layouts"), icon: Layers },
   ];
 
   const bottomItems = [
