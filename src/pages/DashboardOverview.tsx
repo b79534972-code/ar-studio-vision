@@ -165,24 +165,21 @@ const DashboardOverview = () => {
         <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-primary-foreground/[0.03] rounded-full blur-2xl translate-y-1/2 pointer-events-none" />
 
         <div className="relative p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
-            {/* Left — text */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="px-2.5 py-1 rounded-full bg-primary-foreground/10 text-[10px] font-semibold text-primary-foreground/80 uppercase tracking-wider">
-                  {t("plan.plan")}
-                </div>
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="px-2.5 py-1 rounded-full bg-primary-foreground/10 text-[10px] font-semibold text-primary-foreground/80 uppercase tracking-wider">
+                {t("plan.plan")}
               </div>
-              <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-primary-foreground mb-2 leading-tight">
-                {t("overview.title")}
-              </h1>
-              <p className="text-primary-foreground/65 text-sm sm:text-base max-w-xl leading-relaxed">
-                {t("overview.subtitle")}
-              </p>
             </div>
+            <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-primary-foreground mb-2 leading-tight">
+              {t("overview.title")}
+            </h1>
+            <p className="text-primary-foreground/65 text-sm sm:text-base max-w-xl leading-relaxed mb-5">
+              {t("overview.subtitle")}
+            </p>
 
-            {/* Right — quick feature buttons */}
-            <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:shrink-0">
+            {/* Quick feature buttons */}
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => navigate("/dashboard/models")}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-foreground/15 hover:bg-primary-foreground/25 text-primary-foreground text-sm font-medium transition-colors duration-200 backdrop-blur-sm"
