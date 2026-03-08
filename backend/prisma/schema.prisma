@@ -59,6 +59,22 @@ enum ModelFormat {
   usdz
 }
 
+enum AIFeatureType {
+  layout_suggest
+  style_transform
+  product_recommend
+  budget_optimize
+  photorealistic_render
+  full_room_redesign
+}
+
+enum AIRequestStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
 // ─── User & Auth ─────────────────────────────────────────────
 
 model User {
