@@ -10,8 +10,10 @@ import FurnitureARModal from "@/components/ar/FurnitureARModal";
 import type { FurnitureItem } from "@/types/editor";
 import { cn } from "@/lib/utils";
 import { useCustomFurniture } from "@/hooks/useCustomFurniture";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const FurnitureLibrary = () => {
+  const { t } = useLanguage();
   const { customItems } = useCustomFurniture();
   const allFurniture = [...FURNITURE_CATALOG, ...customItems];
   const [search, setSearch] = useState("");
