@@ -13,6 +13,7 @@ import AIOptimizePanel from "@/components/editor/AIOptimizePanel";
 import OutOfCreditsModal from "@/components/dashboard/OutOfCreditsModal";
 import { roomStore } from "@/stores/roomStore";
 import { useSubscription } from "@/hooks/useSubscription";
+import { cn } from "@/lib/utils";
 import type { PlacedObject, RoomConfig, FurnitureItem } from "@/types/editor";
 
 const DEFAULT_ROOM: RoomConfig = {
