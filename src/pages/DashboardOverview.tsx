@@ -154,7 +154,7 @@ const DashboardOverview = () => {
 
   return (
     <div className="space-y-6 lg:space-y-8">
-      {/* ── Hero Banner — welcome + status ── */}
+      {/* ── Hero Banner — welcome + quick features ── */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -165,17 +165,47 @@ const DashboardOverview = () => {
         <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-primary-foreground/[0.03] rounded-full blur-2xl translate-y-1/2 pointer-events-none" />
 
         <div className="relative p-6 sm:p-8">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="px-2.5 py-1 rounded-full bg-primary-foreground/10 text-[10px] font-semibold text-primary-foreground/80 uppercase tracking-wider">
-              {t("plan.plan")}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
+            {/* Left — text */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="px-2.5 py-1 rounded-full bg-primary-foreground/10 text-[10px] font-semibold text-primary-foreground/80 uppercase tracking-wider">
+                  {t("plan.plan")}
+                </div>
+              </div>
+              <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-primary-foreground mb-2 leading-tight">
+                {t("overview.title")}
+              </h1>
+              <p className="text-primary-foreground/65 text-sm sm:text-base max-w-xl leading-relaxed">
+                {t("overview.subtitle")}
+              </p>
+            </div>
+
+            {/* Right — quick feature buttons */}
+            <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:shrink-0">
+              <button
+                onClick={() => navigate("/dashboard/models")}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-foreground/15 hover:bg-primary-foreground/25 text-primary-foreground text-sm font-medium transition-colors duration-200 backdrop-blur-sm"
+              >
+                <Upload className="w-4 h-4" />
+                Upload Model
+              </button>
+              <button
+                onClick={() => navigate("/dashboard/rooms")}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-foreground/15 hover:bg-primary-foreground/25 text-primary-foreground text-sm font-medium transition-colors duration-200 backdrop-blur-sm"
+              >
+                <Plus className="w-4 h-4" />
+                New Room
+              </button>
+              <button
+                onClick={() => { featureGate.canUseAI() && navigate("/dashboard/ai-generator"); }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-foreground/15 hover:bg-primary-foreground/25 text-primary-foreground text-sm font-medium transition-colors duration-200 backdrop-blur-sm"
+              >
+                <Sparkles className="w-4 h-4" />
+                AI Generate
+              </button>
             </div>
           </div>
-          <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-primary-foreground mb-2 leading-tight">
-            {t("overview.title")}
-          </h1>
-          <p className="text-primary-foreground/65 text-sm sm:text-base max-w-xl leading-relaxed">
-            {t("overview.subtitle")}
-          </p>
         </div>
       </motion.div>
 
