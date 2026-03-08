@@ -61,6 +61,7 @@ enum ModelFormat {
 
 enum AIFeatureType {
   layout_suggest
+  layout_optimize
   style_transform
   product_recommend
   budget_optimize
@@ -73,6 +74,18 @@ enum AIRequestStatus {
   processing
   completed
   failed
+}
+
+enum Currency {
+  VND
+  USD
+}
+
+enum PurchaseStatus {
+  pending
+  completed
+  failed
+  refunded
 }
 
 // ─── User & Auth ─────────────────────────────────────────────
@@ -100,7 +113,11 @@ model User {
   furnitureModels      FurnitureModel[]
   arSessions           ARSession[]
   aiRequests           AIRequest[]
+  creditPurchases      CreditPurchase[]
   auditLogs            AuditLog[]
+
+  @@index([email])
+  @@index([stripeCustomerId])
 }
 
 // ─── Usage & Credits ─────────────────────────────────────────
@@ -122,6 +139,32 @@ model UserUsage {
   updatedAt        DateTime @updatedAt
 
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Credit Purchases (one-time buy, use until depleted) ─────
+
+model CreditPurchase {
+  id              String           @id @default(uuid())
+  userId          String
+
+  plan            SubscriptionPlan // which plan pack was purchased
+  creditAmount    Int              // number of credits purchased
+  priceAmount     Int              // price in smallest currency unit (cents/dong)
+  currency        Currency         @default(VND)
+
+  // Stripe payment tracking
+  stripePaymentId String?          @unique
+  stripeInvoiceId String?
+
+  status          PurchaseStatus   @default(pending)
+
+  purchasedAt     DateTime         @default(now())
+  expiresAt       DateTime?        // credit validity window
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purchasedAt])
+  @@index([stripePaymentId])
 }
 
 // ─── Room ────────────────────────────────────────────────────
@@ -147,6 +190,8 @@ model Room {
 
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   layouts    Layout[]
+
+  @@index([userId])
 }
 
 // ─── Layout & Versioning ─────────────────────────────────────
@@ -171,6 +216,9 @@ model Layout {
   room      Room            @relation(fields: [roomId], references: [id], onDelete: Cascade)
   versions  LayoutVersion[]
   sessions  ARSession[]
+
+  @@index([userId])
+  @@index([roomId])
 }
 
 model LayoutVersion {
@@ -182,6 +230,8 @@ model LayoutVersion {
   createdAt DateTime @default(now())
 
   layout    Layout   @relation(fields: [layoutId], references: [id], onDelete: Cascade)
+
+  @@index([layoutId, version])
 }
 
 // ─── Furniture Models ────────────────────────────────────────
@@ -214,21 +264,32 @@ model FurnitureModel {
   createdAt   DateTime          @default(now())
 
   user        User?             @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([category])
+  @@index([style])
+  @@index([createdBy])
 }
 
 // ─── AR Sessions ─────────────────────────────────────────────
 
 model ARSession {
-  id        String    @id @default(uuid())
-  userId    String
-  layoutId  String?
+  id          String    @id @default(uuid())
+  userId      String
+  layoutId    String?
 
-  device    String?
-  startedAt DateTime  @default(now())
-  endedAt   DateTime?
+  device      String?   // e.g. "iPhone 15 Pro", "Android Chrome"
+  engine      String?   // "webxr" | "quicklook" | "desktop_viewer"
+  objectCount Int?      // number of objects in the scene
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  layout    Layout?   @relation(fields: [layoutId], references: [id])
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+  durationMs  Int?      // calculated on session end
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  layout      Layout?   @relation(fields: [layoutId], references: [id])
+
+  @@index([userId, startedAt])
+  @@index([layoutId])
 }
 
 // ─── Audit Log ───────────────────────────────────────────────
@@ -236,12 +297,15 @@ model ARSession {
 model AuditLog {
   id        String   @id @default(uuid())
   userId    String
-  action    String
+  action    String   // e.g. "room.create", "layout.save", "credit.purchase", "ai.request"
   metadata  Json?
 
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([action])
 }
 
 // ─── AI Requests ─────────────────────────────────────────────
@@ -253,11 +317,15 @@ model AIRequest {
   creditCost   Int
   status       AIRequestStatus @default(pending)
 
-  // Input parameters (room type, style, budget, etc.)
+  // Input parameters (room config, style, budget, objects, etc.)
   input        Json            @default("{}")
 
-  // AI output (suggestions, renders, recommendations)
+  // AI output (suggestions, renders, recommendations, optimized layout)
   output       Json?
+
+  // Linked room/layout context
+  roomId       String?
+  layoutId     String?
 
   // Performance tracking
   processingMs Int?
@@ -270,4 +338,5 @@ model AIRequest {
 
   @@index([userId, createdAt])
   @@index([feature, status])
+  @@index([roomId])
 }
