@@ -16,6 +16,7 @@ interface DashboardContext {
   usage: UserUsage;
   currency: Currency;
   featureGate: { canUseAI: () => boolean; canUseAdvancedAI: () => boolean };
+  useCredit: (amount?: number) => boolean;
 }
 
 /* ─── Sub-components ─── */
