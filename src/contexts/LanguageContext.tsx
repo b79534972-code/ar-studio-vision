@@ -18,6 +18,9 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.profile": "Profile",
     "nav.billing": "Billing",
     "nav.settings": "Settings",
+    "nav.editor": "Room Editor",
+    "nav.furniture": "Furniture Library",
+    "nav.aiGenerator": "AI Generator",
 
     // Topbar
     "topbar.dashboard": "Dashboard",
