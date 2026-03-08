@@ -32,7 +32,8 @@ const RoomEditor = () => {
   const [roomConfig, setRoomConfig] = useState<RoomConfig>(DEFAULT_ROOM);
   const [viewMode, setViewMode] = useState<"3d" | "top">("3d");
   const [showARModal, setShowARModal] = useState(false);
-
+  const [showAIPanel, setShowAIPanel] = useState(false);
+  const { usage, useCredit } = useSubscription();
   // Room/layout context
   const roomId = searchParams.get("roomId");
   const layoutId = searchParams.get("layoutId");
