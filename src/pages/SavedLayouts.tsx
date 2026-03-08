@@ -94,7 +94,7 @@ const SavedLayouts = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleOpen(layout); }}>
-                          <ArrowRight className="w-3.5 h-3.5 mr-2" /> Open in Editor
+                          <ArrowRight className="w-3.5 h-3.5 mr-2" /> {t("layouts.openEditor")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
