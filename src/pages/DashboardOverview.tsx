@@ -149,7 +149,7 @@ const DashboardOverview = () => {
   const statDescriptions = [
     t("overview.stats.models.desc"),
     t("overview.stats.rooms.desc"),
-    t("overview.stats.layouts.desc"),
+    t("overview.stats.furniture.desc"),
     t("overview.stats.ai.desc"),
   ];
 
