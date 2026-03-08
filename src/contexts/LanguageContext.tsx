@@ -40,6 +40,7 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.stats.models": "Models",
     "overview.stats.rooms": "Rooms",
     "overview.stats.layouts": "Layouts",
+    "overview.stats.furniture": "Furniture",
     "overview.stats.ai": "AI Suggestions",
     "overview.quickActions": "Quick Actions",
     "overview.recentActivity": "Recent Activity",
@@ -58,6 +59,7 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.stats.models.desc": "Furniture objects in your library",
     "overview.stats.rooms.desc": "Active room projects",
     "overview.stats.layouts.desc": "Saved AR configurations",
+    "overview.stats.furniture.desc": "Total furniture in your catalog",
     "overview.stats.ai.desc": "AI-powered suggestions used",
 
     // Hero quick buttons
@@ -370,6 +372,7 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.stats.models": "Mô hình",
     "overview.stats.rooms": "Phòng",
     "overview.stats.layouts": "Bố cục",
+    "overview.stats.furniture": "Nội thất",
     "overview.stats.ai": "Gợi ý AI",
     "overview.quickActions": "Thao tác nhanh",
     "overview.recentActivity": "Hoạt động gần đây",
@@ -388,6 +391,7 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.stats.models.desc": "Đối tượng nội thất trong thư viện",
     "overview.stats.rooms.desc": "Dự án phòng đang hoạt động",
     "overview.stats.layouts.desc": "Cấu hình AR đã lưu",
+    "overview.stats.furniture.desc": "Tổng nội thất trong danh mục",
     "overview.stats.ai.desc": "Gợi ý AI đã sử dụng",
 
     // Hero quick buttons

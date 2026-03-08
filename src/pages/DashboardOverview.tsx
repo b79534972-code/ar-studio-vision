@@ -4,12 +4,13 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import {
   Box, Home, Layers, Sparkles, Smartphone, Zap, Plus,
   Clock, ImagePlus, ArrowRight, TrendingUp, Upload,
-  Eye, Layout, Cuboid, Palette, CreditCard, Crown,
+  Eye, Layout, Cuboid, Palette, CreditCard, Crown, Armchair,
 } from "lucide-react";
 import { ApplicationService } from "@/services/ApplicationService";
 import type { User, UserUsage, Currency } from "@/types/subscription";
 import { useRoomStore } from "@/hooks/useRoomStore";
 import { useCustomFurniture } from "@/hooks/useCustomFurniture";
+import { FURNITURE_CATALOG } from "@/data/furnitureCatalog";
 import { PLAN_CONFIG } from "@/types/subscription";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -126,10 +127,11 @@ const DashboardOverview = () => {
   const { customItems } = useCustomFurniture();
 
   // Override mock usage with real store data
+  const totalFurniture = FURNITURE_CATALOG.length + customItems.length;
   const usage: UserUsage = {
     ...baseUsage,
     modelsCount: customItems.length,
-    layoutsCount: layouts.length,
+    layoutsCount: totalFurniture,
     arSessionsCount: rooms.length,
   };
 
@@ -140,14 +142,14 @@ const DashboardOverview = () => {
   const stats = [
     { label: t("overview.stats.models"), icon: Box, key: "modelsCount" as const, color: "text-primary" },
     { label: t("overview.stats.rooms"), icon: Home, key: "arSessionsCount" as const, color: "text-accent-foreground" },
-    { label: t("overview.stats.layouts"), icon: Layers, key: "layoutsCount" as const, color: "text-primary" },
+    { label: t("overview.stats.furniture"), icon: Armchair, key: "layoutsCount" as const, color: "text-primary" },
     { label: t("overview.stats.ai"), icon: Sparkles, key: "aiRequestsCount" as const, color: "text-accent-foreground" },
   ];
 
   const statDescriptions = [
     t("overview.stats.models.desc"),
     t("overview.stats.rooms.desc"),
-    t("overview.stats.layouts.desc"),
+    t("overview.stats.furniture.desc"),
     t("overview.stats.ai.desc"),
   ];
 
