@@ -483,6 +483,9 @@ const translations: Record<Language, Record<string, string>> = {
     "profile.aiSuggestDesc": "Nhận gợi ý AI khi thiết kế",
     "profile.language": "Ngôn ngữ",
     "profile.languageDesc": "Chọn ngôn ngữ ưa thích của bạn",
+    "profile.perMonth": "/tháng",
+    "profile.theme.dark": "Tối",
+    "profile.theme.light": "Sáng",
 
     // Billing
     "billing.title": "Thanh toán",
