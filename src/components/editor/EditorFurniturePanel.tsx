@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Plus, Star, Upload, BookOpen } from "lucide-react";
+import { Search, Plus, Star, Upload, BookOpen, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ interface EditorFurniturePanelProps {
 const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [showCategories, setShowCategories] = useState(false);
   const [activeTab, setActiveTab] = useState<"library" | "my">("library");
   const { customItems } = useCustomFurniture();
 
@@ -74,7 +75,14 @@ const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => 
             className="pl-8 h-8 text-xs rounded-lg"
           />
         </div>
-        {activeTab === "library" && (
+        <button
+          onClick={() => setShowCategories((v) => !v)}
+          className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronDown className={cn("w-3 h-3 transition-transform", showCategories && "rotate-180")} />
+          Categories {activeCategory !== "all" && `· ${activeCategory}`}
+        </button>
+        {showCategories && (
           <div className="flex flex-wrap gap-1">
             {CATEGORIES.map((cat) => (
               <button
