@@ -47,14 +47,36 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.upgradePlan": "Upgrade Plan",
     "overview.upgradePlan.desc": "Unlock AI features and unlimited resources",
     "overview.used": "used",
+    "overview.startAR": "Start AR Session",
+    "overview.addFurniture.desc": "Upload images and generate 3D furniture",
+    "overview.recentRooms": "Recent Rooms",
+    "overview.items": "items",
+    "overview.stats.models.desc": "Furniture objects in your library",
+    "overview.stats.rooms.desc": "Active room projects",
+    "overview.stats.layouts.desc": "Saved AR configurations",
+    "overview.stats.ai.desc": "AI-powered suggestions used",
+
+    // Workflow
+    "workflow.title": "Your Design Workflow",
+    "workflow.upload": "Upload Model",
+    "workflow.createRoom": "Create Room",
+    "workflow.arrange": "Arrange Layout",
+    "workflow.viewAR": "View in AR",
 
     // Activity
     "activity.uploadedSofa": "Uploaded Modern Sofa model",
     "activity.createdLayout": "Created living room layout",
     "activity.arSession": "AR session completed",
+    "activity.editedRoom": "Edited bedroom layout",
     "activity.2hAgo": "2 hours ago",
     "activity.5hAgo": "5 hours ago",
     "activity.yesterday": "Yesterday",
+    "activity.2dAgo": "2 days ago",
+
+    // Recent Rooms
+    "rooms.recent.living": "Living Room",
+    "rooms.recent.bedroom": "Master Bedroom",
+    "rooms.recent.office": "Home Office",
 
     // My Models / Furniture
     "models.title": "My Furniture",
@@ -187,14 +209,36 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.upgradePlan": "Nâng cấp gói",
     "overview.upgradePlan.desc": "Mở khóa tính năng AI và tài nguyên không giới hạn",
     "overview.used": "đã dùng",
+    "overview.startAR": "Mở phiên AR",
+    "overview.addFurniture.desc": "Tải ảnh lên và tạo nội thất 3D",
+    "overview.recentRooms": "Phòng gần đây",
+    "overview.items": "đối tượng",
+    "overview.stats.models.desc": "Đối tượng nội thất trong thư viện",
+    "overview.stats.rooms.desc": "Dự án phòng đang hoạt động",
+    "overview.stats.layouts.desc": "Cấu hình AR đã lưu",
+    "overview.stats.ai.desc": "Gợi ý AI đã sử dụng",
+
+    // Workflow
+    "workflow.title": "Quy trình thiết kế",
+    "workflow.upload": "Tải mô hình",
+    "workflow.createRoom": "Tạo phòng",
+    "workflow.arrange": "Sắp xếp bố cục",
+    "workflow.viewAR": "Xem trong AR",
 
     // Activity
     "activity.uploadedSofa": "Đã tải lên mô hình Sofa hiện đại",
     "activity.createdLayout": "Đã tạo bố cục phòng khách",
     "activity.arSession": "Phiên AR đã hoàn thành",
+    "activity.editedRoom": "Đã chỉnh sửa bố cục phòng ngủ",
     "activity.2hAgo": "2 giờ trước",
     "activity.5hAgo": "5 giờ trước",
     "activity.yesterday": "Hôm qua",
+    "activity.2dAgo": "2 ngày trước",
+
+    // Recent Rooms
+    "rooms.recent.living": "Phòng khách",
+    "rooms.recent.bedroom": "Phòng ngủ chính",
+    "rooms.recent.office": "Phòng làm việc",
 
     // My Models / Furniture
     "models.title": "Nội thất của tôi",
