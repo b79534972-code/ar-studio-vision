@@ -20,6 +20,9 @@ import SavedLayouts from "./pages/SavedLayouts";
 import Profile from "./pages/Profile";
 import Billing from "./pages/Billing";
 import DashboardSettings from "./pages/DashboardSettings";
+import RoomEditor from "./pages/RoomEditor";
+import FurnitureLibrary from "./pages/FurnitureLibrary";
+import AILayoutGenerator from "./pages/AILayoutGenerator";
 
 const queryClient = new QueryClient();
 
