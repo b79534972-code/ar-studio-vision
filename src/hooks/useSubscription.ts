@@ -5,7 +5,7 @@
  * real auth + DB queries. For now, provides mock data with localStorage persistence.
  */
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSyncExternalStore } from "react";
 import { PLAN_CONFIG, type User, type UserUsage, type SubscriptionPlan, type Currency } from "@/types/subscription";
 import { subscriptionStore } from "@/stores/subscriptionStore";
@@ -38,12 +38,23 @@ export function useSubscription() {
     subscriptionPlan: currentPlan,
   }), [currentPlan]);
 
-  const [usage, setUsage] = useState<UserUsage>(() => ({
-    ...MOCK_USAGE,
-    aiCreditsTotal: PLAN_CONFIG[currentPlan].limits.aiCredits ?? 5,
-  }));
+  const [usage, setUsage] = useState<UserUsage>(() => {
+    try {
+      const stored = localStorage.getItem("user-usage");
+      if (stored) return JSON.parse(stored) as UserUsage;
+    } catch { /* ignore */ }
+    return {
+      ...MOCK_USAGE,
+      aiCreditsTotal: PLAN_CONFIG[currentPlan].limits.aiCredits ?? 5,
+    };
+  });
   const [currency, setCurrency] = useState<Currency>("USD");
   const [isAuthenticated, setIsAuthenticated] = useState(true);
+
+  // Persist usage to localStorage whenever it changes
+  useEffect(() => {
+    try { localStorage.setItem("user-usage", JSON.stringify(usage)); } catch { /* ignore */ }
+  }, [usage]);
 
   const upgradePlan = useCallback((plan: SubscriptionPlan) => {
     subscriptionStore.upgradePlan(plan);
