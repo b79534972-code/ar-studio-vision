@@ -157,16 +157,16 @@ const RoomScan = () => {
                   group-hover:bg-primary/15 transition-colors">
                   <Upload className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="font-display font-semibold text-lg text-foreground mb-2">Upload Room Photo</h3>
+                <h3 className="font-display font-semibold text-lg text-foreground mb-2">{t("roomScan.uploadTitle")}</h3>
                 <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
-                  Take a photo of your room or drag and drop an image here. AI will detect walls, floor, and room boundaries.
+                  {t("roomScan.uploadDesc")}
                 </p>
                 <div className="flex items-center justify-center gap-3">
                   <Button variant="default" className="gap-2">
-                    <Camera className="w-4 h-4" /> Choose Photo
+                    <Camera className="w-4 h-4" /> {t("roomScan.choosePhoto")}
                   </Button>
                 </div>
-                <p className="text-[11px] text-muted-foreground/60 mt-4">Supports JPG, PNG, WEBP • Max 20MB</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-4">{t("roomScan.fileHint")}</p>
               </div>
               <input
                 ref={fileInputRef}
