@@ -170,12 +170,12 @@ const AILayoutGenerator = () => {
   const [activeFeature, setActiveFeature] = useState<string>("layout_suggest");
 
   const aiTools = [
-    { id: "layout_suggest", icon: LayoutGrid, cost: getFeatureCost("layout_suggest"), nameKey: "ai.feature.layoutSuggest", descKey: "ai.feature.layoutSuggestDesc", plan: "free" },
-    { id: "style_transform", icon: Wand2, cost: getFeatureCost("style_transform"), nameKey: "ai.feature.styleTransform", descKey: "ai.feature.styleTransformDesc", plan: "basic" },
-    { id: "product_recommend", icon: Eye, cost: getFeatureCost("product_recommend"), nameKey: "ai.feature.productRecommend", descKey: "ai.feature.productRecommendDesc", plan: "basic" },
-    { id: "budget_optimize", icon: DollarSign, cost: getFeatureCost("budget_optimize"), nameKey: "ai.feature.budgetOptimize", descKey: "ai.feature.budgetOptimizeDesc", plan: "basic" },
-    { id: "photorealistic_render", icon: Sparkles, cost: getFeatureCost("photorealistic_render"), nameKey: "ai.feature.photoRender", descKey: "ai.feature.photoRenderDesc", plan: "advanced" },
-    { id: "full_room_redesign", icon: Home, cost: getFeatureCost("full_room_redesign"), nameKey: "ai.feature.fullRedesign", descKey: "ai.feature.fullRedesignDesc", plan: "pro" },
+    { id: "layout_suggest", icon: LayoutGrid, cost: getFeatureCost("layout_suggest"), nameKey: "ai.feature.layoutSuggest", descKey: "ai.feature.layoutSuggestDesc" },
+    { id: "style_transform", icon: Wand2, cost: getFeatureCost("style_transform"), nameKey: "ai.feature.styleTransform", descKey: "ai.feature.styleTransformDesc" },
+    { id: "product_recommend", icon: ShoppingBag, cost: getFeatureCost("product_recommend"), nameKey: "ai.feature.productRecommend", descKey: "ai.feature.productRecommendDesc" },
+    { id: "budget_optimize", icon: PiggyBank, cost: getFeatureCost("budget_optimize"), nameKey: "ai.feature.budgetOptimize", descKey: "ai.feature.budgetOptimizeDesc" },
+    { id: "photorealistic_render", icon: Camera, cost: getFeatureCost("photorealistic_render"), nameKey: "ai.feature.photoRender", descKey: "ai.feature.photoRenderDesc" },
+    { id: "full_room_redesign", icon: Home, cost: getFeatureCost("full_room_redesign"), nameKey: "ai.feature.fullRedesign", descKey: "ai.feature.fullRedesignDesc" },
   ];
 
   return (
