@@ -46,9 +46,7 @@ const DashboardSidebar = ({ user, collapsed }: DashboardSidebarProps) => {
       {/* Logo */}
       <div className="h-16 flex items-center px-5 border-b border-border/30 shrink-0">
         <NavLink to="/dashboard" className="flex items-center gap-2.5 overflow-hidden">
-          <div className="w-8 h-8 rounded-xl gradient-hero flex items-center justify-center shrink-0">
-            <span className="text-primary-foreground font-display font-bold text-sm">A</span>
-          </div>
+          <img src="/logo.png" alt="InteriorAR logo" className="h-8 w-8 object-contain shrink-0" />
           {!collapsed && (
             <span className="font-display text-base font-bold text-foreground tracking-tight whitespace-nowrap">
               InteriorAR

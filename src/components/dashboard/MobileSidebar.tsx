@@ -47,9 +47,7 @@ const MobileSidebar = ({ user, open, onOpenChange }: MobileSidebarProps) => {
             onClick={() => onOpenChange(false)}
             className="flex items-center gap-2.5 flex-1 min-w-0"
           >
-            <div className="w-8 h-8 rounded-xl gradient-hero flex items-center justify-center shrink-0">
-              <span className="text-primary-foreground font-display font-bold text-sm">A</span>
-            </div>
+            <img src="/logo.png" alt="InteriorAR logo" className="h-8 w-8 object-contain shrink-0" />
             <SheetTitle className="text-base font-display font-bold text-foreground tracking-tight">
               InteriorAR
             </SheetTitle>
