@@ -4,7 +4,7 @@ import {
   Sparkles, Wand2, Check, ArrowRight, Loader2,
   Home, BedDouble, Sofa, Monitor, LayoutGrid, Eye, Pencil,
   ChefHat, Bath, UtensilsCrossed, Baby, TreePalm, Shirt,
-  ChevronDown, Users, DollarSign, Target, Zap, Lock,
+  ChevronDown, Users, DollarSign, Target, Zap, Lock, Camera, ShoppingBag, PiggyBank,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,11 @@ import type { AILayoutSuggestion } from "@/types/editor";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getFeatureCost } from "@/config/aiCreditCosts";
+import AIStyleTransform from "@/components/ai/AIStyleTransform";
+import AIProductRecommend from "@/components/ai/AIProductRecommend";
+import AIBudgetOptimize from "@/components/ai/AIBudgetOptimize";
+import AIPhotoRender from "@/components/ai/AIPhotoRender";
+import AIFullRedesign from "@/components/ai/AIFullRedesign";
 const ROOM_TYPES = [
   { value: "living", label: "Living Room", icon: Sofa },
   { value: "bedroom", label: "Bedroom", icon: BedDouble },
@@ -165,12 +170,12 @@ const AILayoutGenerator = () => {
   const [activeFeature, setActiveFeature] = useState<string>("layout_suggest");
 
   const aiTools = [
-    { id: "layout_suggest", icon: LayoutGrid, cost: getFeatureCost("layout_suggest"), nameKey: "ai.feature.layoutSuggest", descKey: "ai.feature.layoutSuggestDesc", plan: "free" },
-    { id: "style_transform", icon: Wand2, cost: getFeatureCost("style_transform"), nameKey: "ai.feature.styleTransform", descKey: "ai.feature.styleTransformDesc", plan: "basic" },
-    { id: "product_recommend", icon: Eye, cost: getFeatureCost("product_recommend"), nameKey: "ai.feature.productRecommend", descKey: "ai.feature.productRecommendDesc", plan: "basic" },
-    { id: "budget_optimize", icon: DollarSign, cost: getFeatureCost("budget_optimize"), nameKey: "ai.feature.budgetOptimize", descKey: "ai.feature.budgetOptimizeDesc", plan: "basic" },
-    { id: "photorealistic_render", icon: Sparkles, cost: getFeatureCost("photorealistic_render"), nameKey: "ai.feature.photoRender", descKey: "ai.feature.photoRenderDesc", plan: "advanced" },
-    { id: "full_room_redesign", icon: Home, cost: getFeatureCost("full_room_redesign"), nameKey: "ai.feature.fullRedesign", descKey: "ai.feature.fullRedesignDesc", plan: "pro" },
+    { id: "layout_suggest", icon: LayoutGrid, cost: getFeatureCost("layout_suggest"), nameKey: "ai.feature.layoutSuggest", descKey: "ai.feature.layoutSuggestDesc" },
+    { id: "style_transform", icon: Wand2, cost: getFeatureCost("style_transform"), nameKey: "ai.feature.styleTransform", descKey: "ai.feature.styleTransformDesc" },
+    { id: "product_recommend", icon: ShoppingBag, cost: getFeatureCost("product_recommend"), nameKey: "ai.feature.productRecommend", descKey: "ai.feature.productRecommendDesc" },
+    { id: "budget_optimize", icon: PiggyBank, cost: getFeatureCost("budget_optimize"), nameKey: "ai.feature.budgetOptimize", descKey: "ai.feature.budgetOptimizeDesc" },
+    { id: "photorealistic_render", icon: Camera, cost: getFeatureCost("photorealistic_render"), nameKey: "ai.feature.photoRender", descKey: "ai.feature.photoRenderDesc" },
+    { id: "full_room_redesign", icon: Home, cost: getFeatureCost("full_room_redesign"), nameKey: "ai.feature.fullRedesign", descKey: "ai.feature.fullRedesignDesc" },
   ];
 
   return (
@@ -204,28 +209,20 @@ const AILayoutGenerator = () => {
           {aiTools.map((tool) => {
             const Icon = tool.icon;
             const isActive = activeFeature === tool.id;
-            const isLocked = tool.id !== "layout_suggest"; // Only layout_suggest is implemented
             return (
               <button
                 key={tool.id}
                 onClick={() => {
-                  if (isLocked) {
-                    toast({ title: t("ai.comingSoon") || "Coming Soon", description: t(tool.nameKey) });
-                    return;
-                  }
                   setActiveFeature(tool.id);
+                  setStep("config");
                 }}
                 className={cn(
                   "relative flex flex-col items-center gap-2 p-4 rounded-xl border transition-all text-center",
                   isActive
                     ? "border-primary bg-primary/5 shadow-sm"
                     : "border-border/40 hover:border-border bg-card",
-                  isLocked && "opacity-60"
                 )}
               >
-                {isLocked && (
-                  <Lock className="absolute top-2 right-2 w-3 h-3 text-muted-foreground" />
-                )}
                 <Icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground")} />
                 <span className="text-[11px] font-medium leading-tight">{t(tool.nameKey)}</span>
                 <Badge variant="outline" className="text-[9px] px-1.5 py-0">
@@ -237,6 +234,15 @@ const AILayoutGenerator = () => {
         </div>
       </motion.div>
 
+      {/* Feature-specific panels */}
+      {activeFeature === "style_transform" && <AIStyleTransform creditsRemaining={creditsRemaining} useCredit={useCredit} />}
+      {activeFeature === "product_recommend" && <AIProductRecommend creditsRemaining={creditsRemaining} useCredit={useCredit} />}
+      {activeFeature === "budget_optimize" && <AIBudgetOptimize creditsRemaining={creditsRemaining} useCredit={useCredit} />}
+      {activeFeature === "photorealistic_render" && <AIPhotoRender creditsRemaining={creditsRemaining} useCredit={useCredit} />}
+      {activeFeature === "full_room_redesign" && <AIFullRedesign creditsRemaining={creditsRemaining} useCredit={useCredit} />}
+
+      {/* Layout Suggest (original) */}
+      {activeFeature === "layout_suggest" && (
       <AnimatePresence mode="wait">
         {/* ─── Step 1: Configuration ─── */}
         {step === "config" && (
@@ -572,6 +578,7 @@ const AILayoutGenerator = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      )}
     </div>
   );
 };
