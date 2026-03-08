@@ -73,7 +73,7 @@ const FurnitureLibrary = () => {
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger className="w-[140px] h-9 text-xs">
               <Filter className="w-3 h-3 mr-1" />
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder={t("furnitureLib.category")} />
             </SelectTrigger>
             <SelectContent>
               {CATEGORIES.map((c) => (
