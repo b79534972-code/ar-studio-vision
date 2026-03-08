@@ -4,7 +4,7 @@ import {
   Sparkles, Wand2, Check, ArrowRight, Loader2,
   Home, BedDouble, Sofa, Monitor, LayoutGrid, Eye, Pencil,
   ChefHat, Bath, UtensilsCrossed, Baby, TreePalm, Shirt,
-  ChevronDown, Users, DollarSign, Target, Zap, Lock,
+  ChevronDown, Users, DollarSign, Target, Zap, Lock, Camera, ShoppingBag, PiggyBank,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,11 @@ import type { AILayoutSuggestion } from "@/types/editor";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getFeatureCost } from "@/config/aiCreditCosts";
+import AIStyleTransform from "@/components/ai/AIStyleTransform";
+import AIProductRecommend from "@/components/ai/AIProductRecommend";
+import AIBudgetOptimize from "@/components/ai/AIBudgetOptimize";
+import AIPhotoRender from "@/components/ai/AIPhotoRender";
+import AIFullRedesign from "@/components/ai/AIFullRedesign";
 const ROOM_TYPES = [
   { value: "living", label: "Living Room", icon: Sofa },
   { value: "bedroom", label: "Bedroom", icon: BedDouble },
