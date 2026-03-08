@@ -1,5 +1,12 @@
 import type { FurnitureItem } from "@/types/editor";
 
+/**
+ * FURNITURE_CATALOG — Thư viện nội thất mặc định
+ * 
+ * Thay toàn bộ danh sách bên dưới bằng furniture thật của bạn khi deploy.
+ * Mỗi item cần đầy đủ: id, name, category, style, material, color, dimensions (m), tags.
+ * Custom furniture do user upload sẽ tự động merge vào từ customFurnitureStore.
+ */
 export const FURNITURE_CATALOG: FurnitureItem[] = [
   // Sofas
   { id: "sofa-1", name: "Modern Sectional", category: "sofa", style: "modern", material: "Fabric", color: "#6B7280", dimensions: { width: 2.4, height: 0.85, depth: 1.0 }, tags: ["seating", "large"], favorited: false },
