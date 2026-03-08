@@ -182,9 +182,9 @@ const RoomScan = () => {
               {/* Tips */}
               <div className="mt-6 grid grid-cols-3 gap-3">
                 {[
-                  { icon: Camera, title: "Wide angle", desc: "Capture the full room" },
-                  { icon: Ruler, title: "Good lighting", desc: "Ensure walls are visible" },
-                  { icon: Box, title: "Clear floor", desc: "Less clutter = better scan" },
+                  { icon: Camera, title: t("roomScan.tipWide"), desc: t("roomScan.tipWideDesc") },
+                  { icon: Ruler, title: t("roomScan.tipLight"), desc: t("roomScan.tipLightDesc") },
+                  { icon: Box, title: t("roomScan.tipClear"), desc: t("roomScan.tipClearDesc") },
                 ].map((tip, i) => (
                   <div key={i} className="bg-card rounded-xl border border-border/30 p-4 text-center">
                     <tip.icon className="w-5 h-5 text-primary mx-auto mb-2" />
