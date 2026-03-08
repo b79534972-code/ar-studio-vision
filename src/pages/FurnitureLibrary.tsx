@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import { useCustomFurniture } from "@/hooks/useCustomFurniture";
 
 const FurnitureLibrary = () => {
+  const { customItems } = useCustomFurniture();
+  const allFurniture = [...FURNITURE_CATALOG, ...customItems];
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string>("all");
   const [style, setStyle] = useState<string>("all");
