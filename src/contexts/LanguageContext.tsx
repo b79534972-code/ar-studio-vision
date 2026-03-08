@@ -647,6 +647,7 @@ const translations: Record<Language, Record<string, string>> = {
     "ai.noCredits": "Không đủ credit",
     "ai.noCreditsDesc": "Bạn không đủ AI credit. Vui lòng nâng cấp gói.",
     "ai.notEnoughCredits": "Không đủ Credit — Nâng cấp gói",
+    "ai.comingSoon": "Sắp ra mắt",
     "ai.feature.layoutSuggest": "AI Gợi ý bố cục",
     "ai.feature.layoutSuggestDesc": "Tạo bố cục nội thất tối ưu cho mọi loại phòng",
     "ai.feature.styleTransform": "AI Chuyển đổi phong cách",
