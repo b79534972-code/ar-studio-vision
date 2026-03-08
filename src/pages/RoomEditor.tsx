@@ -144,6 +144,14 @@ const RoomEditor = () => {
           onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
         />
       </div>
+
+      {/* AR Preview Modal */}
+      <ARPreviewModal
+        open={showARModal}
+        onClose={() => setShowARModal(false)}
+        objects={objects}
+        roomConfig={roomConfig}
+      />
     </div>
   );
 };
