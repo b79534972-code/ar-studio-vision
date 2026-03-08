@@ -197,7 +197,9 @@ const Pricing = () => {
       <Dialog open={!!confirmPlan} onOpenChange={(open) => !processing && !open && setConfirmPlan(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-display">Confirm Upgrade</DialogTitle>
+            <DialogTitle className="font-display">
+              {confirmPlan === currentPlan ? "Buy More Credits" : "Confirm Upgrade"}
+            </DialogTitle>
           </DialogHeader>
           {confirmPlan && (
             <div className="space-y-4 py-2">
