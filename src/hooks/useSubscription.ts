@@ -48,7 +48,11 @@ export function useSubscription() {
   const upgradePlan = useCallback((plan: SubscriptionPlan) => {
     subscriptionStore.upgradePlan(plan);
     const newCredits = PLAN_CONFIG[plan].limits.aiCredits ?? 5;
-    setUsage((prev) => ({ ...prev, aiCreditsTotal: newCredits, aiCreditsUsed: 0 }));
+    setUsage((prev) => ({
+      ...prev,
+      aiCreditsTotal: newCredits,
+      // Giữ nguyên số đã dùng, không reset — credit cộng dồn
+    }));
   }, []);
 
   const useCredit = useCallback((amount: number = 1): boolean => {
