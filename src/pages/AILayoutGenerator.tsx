@@ -98,6 +98,7 @@ const MOCK_SUGGESTIONS: AILayoutSuggestion[] = [
 const AILayoutGenerator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [step, setStep] = useState<"config" | "generating" | "results">("config");
   const [roomType, setRoomType] = useState("living");
   const [designStyle, setDesignStyle] = useState("minimalist");
