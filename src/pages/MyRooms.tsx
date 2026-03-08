@@ -61,7 +61,7 @@ const MyRooms = () => {
   const handleDeleteRoom = (id: string, name: string) => {
     removeRoom(id);
     if (selectedRoom?.id === id) setSelectedRoom(null);
-    toast({ title: "Deleted", description: `${name} removed` });
+    toast({ title: t("rooms.deleted"), description: `${name} ${t("rooms.removed")}` });
   };
 
   const handleDeleteLayout = (id: string, name: string) => {
