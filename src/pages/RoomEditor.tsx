@@ -309,6 +309,7 @@ const RoomEditor = () => {
             pushHistory(updated);
             toast({ title: "AI Applied", description: "Suggestion applied to layout" });
           }}
+          onOutOfCredits={() => setShowOutOfCredits(true)}
         />
       </div>
 
@@ -318,6 +319,16 @@ const RoomEditor = () => {
         onClose={() => setShowARModal(false)}
         objects={objects}
         roomConfig={roomConfig}
+      />
+
+      {/* Out of Credits Modal */}
+      <OutOfCreditsModal
+        open={showOutOfCredits}
+        onClose={() => setShowOutOfCredits(false)}
+        currentPlan={user.subscriptionPlan}
+        onBuyMore={() => {
+          navigate("/pricing");
+        }}
       />
     </div>
   );
