@@ -326,7 +326,7 @@ const AIOptimizePanel = ({
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
