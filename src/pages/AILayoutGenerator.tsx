@@ -100,6 +100,14 @@ const AILayoutGenerator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const context = useOutletContext<{
+    usage: { aiCreditsTotal: number; aiCreditsUsed: number };
+    useCredit: (amount?: number) => boolean;
+  }>();
+  const { usage, useCredit } = context || { usage: { aiCreditsTotal: 0, aiCreditsUsed: 0 }, useCredit: () => false };
+  const creditsRemaining = usage.aiCreditsTotal - usage.aiCreditsUsed;
+  const layoutCost = getFeatureCost("layout_suggest");
+
   const [step, setStep] = useState<"config" | "generating" | "results">("config");
   const [roomType, setRoomType] = useState("living");
   const [designStyle, setDesignStyle] = useState("minimalist");
@@ -115,6 +123,27 @@ const AILayoutGenerator = () => {
   const [furniturePrefs, setFurniturePrefs] = useState<string[]>([]);
 
   const handleGenerate = async () => {
+    // Check credits before generating
+    if (creditsRemaining < layoutCost) {
+      toast({
+        title: t("ai.noCredits"),
+        description: t("ai.noCreditsDesc"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Deduct credit
+    const success = useCredit(layoutCost);
+    if (!success) {
+      toast({
+        title: t("ai.noCredits"),
+        description: t("ai.noCreditsDesc"),
+        variant: "destructive",
+      });
+      return;
+    }
+
     setStep("generating");
     setProgress(0);
 
