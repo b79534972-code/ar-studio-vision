@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Upload,
   Camera,
