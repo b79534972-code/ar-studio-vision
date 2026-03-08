@@ -437,10 +437,10 @@ const AILayoutGenerator = () => {
 
                     <div className="flex gap-2">
                       <Button size="sm" className="flex-1 gap-1.5 text-xs h-8" onClick={() => handleApply(s)}>
-                        <Check className="w-3 h-3" /> Apply
+                        <Check className="w-3 h-3" /> {t("aiGen.apply")}
                       </Button>
                       <Button variant="outline" size="sm" className="gap-1.5 text-xs h-8" onClick={() => navigate("/dashboard/editor")}>
-                        <Pencil className="w-3 h-3" /> Edit
+                        <Pencil className="w-3 h-3" /> {t("aiGen.edit")}
                       </Button>
                     </div>
                   </div>
