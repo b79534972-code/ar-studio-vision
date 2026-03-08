@@ -38,10 +38,16 @@ export function useSubscription() {
     subscriptionPlan: currentPlan,
   }), [currentPlan]);
 
-  const [usage, setUsage] = useState<UserUsage>(() => ({
-    ...MOCK_USAGE,
-    aiCreditsTotal: PLAN_CONFIG[currentPlan].limits.aiCredits ?? 5,
-  }));
+  const [usage, setUsage] = useState<UserUsage>(() => {
+    try {
+      const stored = localStorage.getItem("user-usage");
+      if (stored) return JSON.parse(stored) as UserUsage;
+    } catch { /* ignore */ }
+    return {
+      ...MOCK_USAGE,
+      aiCreditsTotal: PLAN_CONFIG[currentPlan].limits.aiCredits ?? 5,
+    };
+  });
   const [currency, setCurrency] = useState<Currency>("USD");
   const [isAuthenticated, setIsAuthenticated] = useState(true);
 
