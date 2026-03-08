@@ -1,9 +1,19 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Check, Sparkles, Flame, ArrowLeft, Zap, Crown } from "lucide-react";
+import { Check, Sparkles, Flame, ArrowLeft, Zap, Crown, CreditCard, Loader2 } from "lucide-react";
 import { PLAN_CONFIG, formatPrice, formatPerCredit, type SubscriptionPlan, type Currency } from "@/types/subscription";
+import { subscriptionStore } from "@/stores/subscriptionStore";
+import { useSyncExternalStore } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const plans: SubscriptionPlan[] = ["free", "basic", "advanced", "pro"];
 
@@ -16,7 +26,39 @@ const planIcons: Record<SubscriptionPlan, React.ReactNode> = {
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [currency, setCurrency] = useState<Currency>("VND");
+  const currentPlan = useSyncExternalStore(subscriptionStore.subscribe, subscriptionStore.getPlan);
+  const [confirmPlan, setConfirmPlan] = useState<SubscriptionPlan | null>(null);
+  const [processing, setProcessing] = useState(false);
+
+  const handleUpgrade = (planKey: SubscriptionPlan) => {
+    if (planKey === currentPlan || planKey === "free") return;
+    setConfirmPlan(planKey);
+  };
+
+  const handleConfirm = async () => {
+    if (!confirmPlan) return;
+    setProcessing(true);
+    // Simulate payment processing
+    await new Promise((r) => setTimeout(r, 1500));
+    subscriptionStore.upgradePlan(confirmPlan);
+    setProcessing(false);
+    setConfirmPlan(null);
+    toast({
+      title: "Upgrade Successful! 🎉",
+      description: `You're now on the ${PLAN_CONFIG[confirmPlan].name} plan with ${PLAN_CONFIG[confirmPlan].aiCredits} AI credits.`,
+    });
+    navigate("/dashboard/billing");
+  };
+
+  const getButtonLabel = (planKey: SubscriptionPlan) => {
+    if (planKey === currentPlan) return "Current Plan";
+    if (planKey === "free") return "Free Plan";
+    const planIndex = plans.indexOf(planKey);
+    const currentIndex = plans.indexOf(currentPlan);
+    return planIndex > currentIndex ? `Upgrade to ${PLAN_CONFIG[planKey].name}` : `Switch to ${PLAN_CONFIG[planKey].name}`;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,6 +112,7 @@ const Pricing = () => {
           {plans.map((planKey, i) => {
             const plan = PLAN_CONFIG[planKey];
             const isHighlighted = plan.highlighted;
+            const isCurrent = planKey === currentPlan;
             const isFree = planKey === "free";
 
             return (
@@ -80,6 +123,8 @@ const Pricing = () => {
                 transition={{ delay: i * 0.1 }}
                 className={`relative rounded-2xl border p-6 flex flex-col ${isHighlighted
                   ? "border-primary/40 bg-card shadow-elevated ring-1 ring-primary/20"
+                  : isCurrent
+                  ? "border-primary/30 bg-card shadow-card ring-1 ring-primary/10"
                   : "border-border/50 bg-card shadow-card"
                   }`}
               >
@@ -131,24 +176,74 @@ const Pricing = () => {
                 </ul>
 
                 <Button
-                  variant={isHighlighted ? "hero" : isFree ? "outline" : "outline"}
+                  variant={isHighlighted ? "hero" : "outline"}
                   size="lg"
                   className="w-full"
-                  disabled={isFree}
-                  onClick={() => {
-                    if (!isFree) {
-                      // TODO: Integrate Stripe checkout when backend is connected
-                      navigate("/dashboard/billing");
-                    }
-                  }}
+                  disabled={isCurrent || isFree}
+                  onClick={() => handleUpgrade(planKey)}
                 >
-                  {isFree ? "Current Plan" : `Upgrade to ${plan.name}`}
+                  {getButtonLabel(planKey)}
                 </Button>
               </motion.div>
             );
           })}
         </div>
       </div>
+
+      {/* Checkout Confirmation Dialog */}
+      <Dialog open={!!confirmPlan} onOpenChange={(open) => !processing && !open && setConfirmPlan(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Confirm Upgrade</DialogTitle>
+          </DialogHeader>
+          {confirmPlan && (
+            <div className="space-y-4 py-2">
+              <div className="p-4 bg-accent/30 rounded-xl border border-border/30">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    {planIcons[confirmPlan]}
+                    <span className="font-display font-bold text-foreground">{PLAN_CONFIG[confirmPlan].name}</span>
+                  </div>
+                  <span className="font-display font-bold text-primary">{formatPrice(confirmPlan, currency)}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">{PLAN_CONFIG[confirmPlan].tagline}</p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">AI Credits</span>
+                  <span className="font-medium text-foreground">{PLAN_CONFIG[confirmPlan].aiCredits} credits</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Validity</span>
+                  <span className="font-medium text-foreground">{PLAN_CONFIG[confirmPlan].creditValidity}</span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-secondary/40 rounded-lg border border-border/20 flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-muted-foreground shrink-0" />
+                <p className="text-xs text-muted-foreground">
+                  Payment will be processed via Stripe when connected. This is a demo upgrade.
+                </p>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setConfirmPlan(null)} disabled={processing}>
+              Cancel
+            </Button>
+            <Button variant="hero" onClick={handleConfirm} disabled={processing}>
+              {processing ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> Processing...
+                </>
+              ) : (
+                "Confirm Upgrade"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
