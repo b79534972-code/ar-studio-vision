@@ -4,7 +4,7 @@ import {
   Sparkles, Wand2, Check, ArrowRight, Loader2,
   Home, BedDouble, Sofa, Monitor, LayoutGrid, Eye, Pencil,
   ChefHat, Bath, UtensilsCrossed, Baby, TreePalm, Shirt,
-  ChevronDown, Users, DollarSign, Target,
+  ChevronDown, Users, DollarSign, Target, Zap, Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,11 +13,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import type { AILayoutSuggestion } from "@/types/editor";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getFeatureCost } from "@/config/aiCreditCosts";
 const ROOM_TYPES = [
   { value: "living", label: "Living Room", icon: Sofa },
   { value: "bedroom", label: "Bedroom", icon: BedDouble },
