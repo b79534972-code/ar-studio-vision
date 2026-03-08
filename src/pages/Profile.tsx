@@ -104,7 +104,7 @@ const Profile = () => {
               </div>
               <p className="font-display text-xl font-bold text-primary">
                 {formatPrice(user.subscriptionPlan, currency)}
-                {user.subscriptionPlan !== "free" && <span className="text-xs text-muted-foreground font-normal"> /mo</span>}
+                {user.subscriptionPlan !== "free" && <span className="text-xs text-muted-foreground font-normal"> {t("profile.perMonth")}</span>}
               </p>
             </div>
 
