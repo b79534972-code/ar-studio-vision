@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import type { RoomConfig } from "@/types/editor";
 import type { SavedRoom, SavedLayout } from "@/stores/roomStore";
+import { roomStore } from "@/stores/roomStore";
 import { cn } from "@/lib/utils";
 
 const MyRooms = () => {
