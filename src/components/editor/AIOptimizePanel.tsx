@@ -18,6 +18,14 @@ interface AIOptimizePanelProps {
   onApplySuggestion: (updatedObjects: PlacedObject[]) => void;
 }
 
+interface SuggestionAction {
+  objectId?: string;
+  type: "move" | "rotate" | "add" | "remove" | "swap";
+  positionDelta?: [number, number, number];
+  rotationDelta?: [number, number, number];
+  newObject?: PlacedObject;
+}
+
 interface Suggestion {
   id: string;
   type: "move" | "rotate" | "add" | "remove" | "swap";
@@ -26,6 +34,7 @@ interface Suggestion {
   description: string;
   impact: "high" | "medium" | "low";
   applied: boolean;
+  action: SuggestionAction;
 }
 
 const CREDIT_COST = 1;
