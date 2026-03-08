@@ -209,28 +209,20 @@ const AILayoutGenerator = () => {
           {aiTools.map((tool) => {
             const Icon = tool.icon;
             const isActive = activeFeature === tool.id;
-            const isLocked = tool.id !== "layout_suggest"; // Only layout_suggest is implemented
             return (
               <button
                 key={tool.id}
                 onClick={() => {
-                  if (isLocked) {
-                    toast({ title: t("ai.comingSoon") || "Coming Soon", description: t(tool.nameKey) });
-                    return;
-                  }
                   setActiveFeature(tool.id);
+                  setStep("config");
                 }}
                 className={cn(
                   "relative flex flex-col items-center gap-2 p-4 rounded-xl border transition-all text-center",
                   isActive
                     ? "border-primary bg-primary/5 shadow-sm"
                     : "border-border/40 hover:border-border bg-card",
-                  isLocked && "opacity-60"
                 )}
               >
-                {isLocked && (
-                  <Lock className="absolute top-2 right-2 w-3 h-3 text-muted-foreground" />
-                )}
                 <Icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground")} />
                 <span className="text-[11px] font-medium leading-tight">{t(tool.nameKey)}</span>
                 <Badge variant="outline" className="text-[9px] px-1.5 py-0">
@@ -242,6 +234,15 @@ const AILayoutGenerator = () => {
         </div>
       </motion.div>
 
+      {/* Feature-specific panels */}
+      {activeFeature === "style_transform" && <AIStyleTransform creditsRemaining={creditsRemaining} useCredit={useCredit} />}
+      {activeFeature === "product_recommend" && <AIProductRecommend creditsRemaining={creditsRemaining} useCredit={useCredit} />}
+      {activeFeature === "budget_optimize" && <AIBudgetOptimize creditsRemaining={creditsRemaining} useCredit={useCredit} />}
+      {activeFeature === "photorealistic_render" && <AIPhotoRender creditsRemaining={creditsRemaining} useCredit={useCredit} />}
+      {activeFeature === "full_room_redesign" && <AIFullRedesign creditsRemaining={creditsRemaining} useCredit={useCredit} />}
+
+      {/* Layout Suggest (original) */}
+      {activeFeature === "layout_suggest" && (
       <AnimatePresence mode="wait">
         {/* ─── Step 1: Configuration ─── */}
         {step === "config" && (
