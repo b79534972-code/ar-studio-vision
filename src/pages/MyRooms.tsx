@@ -284,7 +284,7 @@ const MyRooms = () => {
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Create New Room</DialogTitle>
+            <DialogTitle>{t("rooms.createNew")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
