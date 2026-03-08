@@ -284,7 +284,7 @@ const RoomScan = () => {
                 )}
 
                 <div className="p-6">
-                  <h3 className="font-display font-bold text-lg text-foreground mb-4">Detected Room Structure</h3>
+                  <h3 className="font-display font-bold text-lg text-foreground mb-4">{t("roomScan.detectedTitle")}</h3>
 
                   {/* Room preview - top-down */}
                   <div className="bg-accent/30 rounded-xl border border-border/20 p-6 mb-5">
