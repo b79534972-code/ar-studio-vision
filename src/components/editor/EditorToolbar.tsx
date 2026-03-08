@@ -61,21 +61,21 @@ const EditorToolbar = ({
 
       <Separator orientation="vertical" className="h-5" />
 
-      <span className="text-[10px] text-muted-foreground">{objectCount} objects</span>
+      <span className="text-[10px] text-muted-foreground whitespace-nowrap">{objectCount} objects</span>
 
-      <div className="flex-1" />
+      <div className="flex-1 min-w-2" />
 
-      <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[11px] px-2" onClick={onAISuggest}>
-        <Sparkles className="w-3 h-3 text-primary" /> AI Suggest
+      <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[11px] px-2 shrink-0 whitespace-nowrap" onClick={onAISuggest}>
+        <Sparkles className="w-3 h-3 text-primary" /> <span className="hidden sm:inline">AI Suggest</span><span className="sm:hidden">AI</span>
       </Button>
 
-      <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[11px] px-2" onClick={onARPreview}>
-        <Smartphone className="w-3 h-3" /> AR Preview
+      <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[11px] px-2 shrink-0 whitespace-nowrap" onClick={onARPreview}>
+        <Smartphone className="w-3 h-3" /> <span className="hidden sm:inline">AR Preview</span><span className="sm:hidden">AR</span>
       </Button>
 
-      <Separator orientation="vertical" className="h-5" />
+      <Separator orientation="vertical" className="h-5 shrink-0" />
 
-      <Button variant="default" size="sm" className="h-7 gap-1.5 text-[11px] px-3" onClick={onSave}>
+      <Button variant="default" size="sm" className="h-7 gap-1.5 text-[11px] px-3 shrink-0 whitespace-nowrap" onClick={onSave}>
         <Save className="w-3 h-3" /> Save
       </Button>
     </div>
