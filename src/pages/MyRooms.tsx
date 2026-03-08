@@ -297,7 +297,7 @@ const MyRooms = () => {
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">Width (m)</Label>
+                <Label className="text-xs">{t("rooms.width")}</Label>
                 <Input type="number" value={newRoom.width} onChange={(e) => setNewRoom((p) => ({ ...p, width: e.target.value }))} min="1" max="20" step="0.5" />
               </div>
               <div className="space-y-1.5">
