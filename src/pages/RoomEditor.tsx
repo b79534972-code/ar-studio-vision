@@ -9,6 +9,7 @@ import EditorToolbar from "@/components/editor/EditorToolbar";
 import RoomCanvas3D from "@/components/editor/RoomCanvas3D";
 import ARPreviewModal from "@/components/editor/ARPreviewModal";
 import AIOptimizePanel from "@/components/editor/AIOptimizePanel";
+import OutOfCreditsModal from "@/components/dashboard/OutOfCreditsModal";
 import { roomStore } from "@/stores/roomStore";
 import { useSubscription } from "@/hooks/useSubscription";
 import type { PlacedObject, RoomConfig, FurnitureItem } from "@/types/editor";
