@@ -337,10 +337,10 @@ const RoomScan = () => {
                   {/* Actions */}
                   <div className="flex gap-3">
                     <Button variant="outline" className="flex-1 gap-2" onClick={handleReset}>
-                      <RotateCcw className="w-4 h-4" /> Upload Another
+                      <RotateCcw className="w-4 h-4" /> {t("roomScan.uploadAnother")}
                     </Button>
                     <Button variant="default" className="flex-1 gap-2" onClick={handleUseLayout}>
-                      <ArrowRight className="w-4 h-4" /> Use This Layout
+                      <ArrowRight className="w-4 h-4" /> {t("roomScan.useLayout")}
                     </Button>
                   </div>
                 </div>
