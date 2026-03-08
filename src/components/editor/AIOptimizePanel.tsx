@@ -57,29 +57,46 @@ const AIOptimizePanel = ({
     const result: Suggestion[] = [];
 
     if (objects.length > 0) {
+      const obj = objects[0];
+      // Calculate delta to push object closer to nearest wall
+      const wallX = obj.position[0] > 0 ? roomConfig.width / 2 - 0.3 : -roomConfig.width / 2 + 0.3;
+      const deltaX = wallX - obj.position[0];
       result.push({
         id: "s1",
         type: "move",
         icon: Move,
         title: t("ai.opt.moveForFlow") || "Improve traffic flow",
-        description: t("ai.opt.moveForFlowDesc") || `Move "${objects[0]?.name}" 30cm towards the wall for better walking space`,
+        description: t("ai.opt.moveForFlowDesc") || `Move "${obj.name}" towards the wall for better walking space`,
         impact: "high",
         applied: false,
+        action: {
+          objectId: obj.id,
+          type: "move",
+          positionDelta: [deltaX * 0.5, 0, 0],
+        },
       });
     }
 
     if (objects.length > 1) {
+      const obj = objects[1];
       result.push({
         id: "s2",
         type: "rotate",
         icon: RotateCcw,
         title: t("ai.opt.rotateAlign") || "Better alignment",
-        description: t("ai.opt.rotateAlignDesc") || `Rotate "${objects[1]?.name}" 45° to face the room center for conversation flow`,
+        description: t("ai.opt.rotateAlignDesc") || `Rotate "${obj.name}" 45° to face the room center`,
         impact: "medium",
         applied: false,
+        action: {
+          objectId: obj.id,
+          type: "rotate",
+          rotationDelta: [0, Math.PI / 4, 0],
+        },
       });
     }
 
+    // Add greenery suggestion
+    const newPlantId = `obj-${Date.now()}-plant`;
     result.push({
       id: "s3",
       type: "add",
@@ -88,6 +105,20 @@ const AIOptimizePanel = ({
       description: t("ai.opt.addPlantDesc") || "The far corner is underutilized — adding a plant would balance the composition",
       impact: "low",
       applied: false,
+      action: {
+        type: "add",
+        newObject: {
+          id: newPlantId,
+          furnitureId: "plant-1",
+          name: "Potted Plant",
+          category: "decor",
+          position: [roomConfig.width / 2 - 0.5, 0, roomConfig.depth / 2 - 0.5],
+          rotation: [0, 0, 0],
+          scale: [1, 1, 1],
+          color: "#4CAF50",
+          dimensions: { width: 40, depth: 40, height: 80 },
+        },
+      },
     });
 
     return result;
@@ -110,11 +141,47 @@ const AIOptimizePanel = ({
   };
 
   const handleApply = (id: string) => {
+    const suggestion = suggestions.find((s) => s.id === id);
+    if (!suggestion || suggestion.applied) return;
+
     setSuggestions((prev) =>
       prev.map((s) => (s.id === id ? { ...s, applied: true } : s))
     );
-    // Mock: just pass current objects back (real impl would modify positions)
-    onApplySuggestion(objects);
+
+    const { action } = suggestion;
+    let updatedObjects = [...objects];
+
+    if (action.type === "move" && action.objectId && action.positionDelta) {
+      updatedObjects = updatedObjects.map((o) => {
+        if (o.id !== action.objectId) return o;
+        return {
+          ...o,
+          position: [
+            o.position[0] + action.positionDelta![0],
+            o.position[1] + action.positionDelta![1],
+            o.position[2] + action.positionDelta![2],
+          ] as [number, number, number],
+        };
+      });
+    } else if (action.type === "rotate" && action.objectId && action.rotationDelta) {
+      updatedObjects = updatedObjects.map((o) => {
+        if (o.id !== action.objectId) return o;
+        return {
+          ...o,
+          rotation: [
+            o.rotation[0] + action.rotationDelta![0],
+            o.rotation[1] + action.rotationDelta![1],
+            o.rotation[2] + action.rotationDelta![2],
+          ] as [number, number, number],
+        };
+      });
+    } else if (action.type === "add" && action.newObject) {
+      updatedObjects.push(action.newObject);
+    } else if (action.type === "remove" && action.objectId) {
+      updatedObjects = updatedObjects.filter((o) => o.id !== action.objectId);
+    }
+
+    onApplySuggestion(updatedObjects);
   };
 
   const handleReset = () => {
