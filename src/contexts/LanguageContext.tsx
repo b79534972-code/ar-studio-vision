@@ -59,6 +59,7 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.stats.models.desc": "Furniture objects in your library",
     "overview.stats.rooms.desc": "Active room projects",
     "overview.stats.layouts.desc": "Saved AR configurations",
+    "overview.stats.furniture.desc": "Total furniture in your catalog",
     "overview.stats.ai.desc": "AI-powered suggestions used",
 
     // Hero quick buttons
