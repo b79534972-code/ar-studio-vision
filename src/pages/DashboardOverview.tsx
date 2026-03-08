@@ -115,7 +115,7 @@ const WorkflowStep = ({ step, index, total }: {
 /* ─── Main Component ─── */
 
 const DashboardOverview = () => {
-  const { user, usage, featureGate } = useOutletContext<DashboardContext>();
+  const { user, usage, featureGate, useCredit } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
   const usageStats = ApplicationService.getUsageStats(user, usage);
   const { t } = useLanguage();
