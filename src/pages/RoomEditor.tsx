@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import EditorFurniturePanel from "@/components/editor/EditorFurniturePanel";
@@ -37,6 +37,8 @@ const RoomEditor = () => {
   const [currentRoomId, setCurrentRoomId] = useState<string | null>(roomId);
   const [roomName, setRoomName] = useState("Untitled Room");
 
+  const [editingName, setEditingName] = useState(false);
+
   // ─── Load existing room / layout ───
   useEffect(() => {
     if (roomId) {
@@ -46,11 +48,20 @@ const RoomEditor = () => {
         setRoomName(room.name);
         setCurrentRoomId(room.id);
       }
-    }
-    if (layoutId) {
-      const layout = roomStore.getLayouts().find((l) => l.id === layoutId);
-      if (layout) {
-        setObjects(layout.objects);
+
+      // Load specific layout or the latest one for this room
+      if (layoutId) {
+        const layout = roomStore.getLayouts().find((l) => l.id === layoutId);
+        if (layout) setObjects(layout.objects);
+      } else {
+        const roomLayouts = roomStore.getLayoutsForRoom(roomId);
+        if (roomLayouts.length > 0) {
+          // Load most recent layout
+          const latest = roomLayouts.sort((a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          )[0];
+          setObjects(latest.objects);
+        }
       }
     }
   }, [roomId, layoutId]);
@@ -191,7 +202,7 @@ const RoomEditor = () => {
       rId = room.id;
       setCurrentRoomId(rId);
     } else {
-      roomStore.updateRoom(rId, { config: roomConfig });
+      roomStore.updateRoom(rId, { name: roomName, config: roomConfig });
     }
 
     // Save layout
@@ -212,7 +223,29 @@ const RoomEditor = () => {
           <ArrowLeft className="w-3.5 h-3.5" /> Back
         </Button>
         <div className="h-5 w-px bg-border/40" />
-        <h1 className="font-display text-sm font-bold text-foreground">{roomName}</h1>
+        {editingName ? (
+          <div className="flex items-center gap-1.5">
+            <input
+              autoFocus
+              value={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") setEditingName(false); }}
+              onBlur={() => setEditingName(false)}
+              className="font-display text-sm font-bold text-foreground bg-transparent border-b border-primary outline-none w-36"
+            />
+            <button onClick={() => setEditingName(false)} className="text-primary">
+              <Check className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setEditingName(true)}
+            className="flex items-center gap-1.5 hover:text-primary transition-colors group"
+          >
+            <h1 className="font-display text-sm font-bold text-foreground">{roomName}</h1>
+            <Pencil className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+        )}
         <span className="text-[10px] text-muted-foreground">
           {roomConfig.width}m × {roomConfig.depth}m
         </span>
