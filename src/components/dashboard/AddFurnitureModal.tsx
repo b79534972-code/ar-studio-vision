@@ -67,6 +67,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
     setImagePreview(null);
     setGenerateProgress(0);
     setSavedItem(null);
+    setUnit("cm");
     setForm({ name: "", category: "", width: "", height: "", depth: "", shape: "Auto (from image)", material: "" });
   };
 
