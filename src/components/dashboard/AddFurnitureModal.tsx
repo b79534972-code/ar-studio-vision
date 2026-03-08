@@ -333,7 +333,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] text-muted-foreground">{t("furniture.dimensions")}</span>
-                  <span className="text-xs text-foreground">{form.width} × {form.height} × {form.depth} cm</span>
+                  <span className="text-xs text-foreground">{form.width} × {form.height} × {form.depth} {unit}</span>
                 </div>
                 {form.material && (
                   <div className="flex items-center justify-between">
