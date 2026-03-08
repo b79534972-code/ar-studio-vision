@@ -246,7 +246,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t("furniture.dimensions")} *</Label>
+                    <Label className="text-xs">{t("furniture.dimensions")} ({unit}) *</Label>
                     <div className="flex rounded-lg overflow-hidden border border-border/50">
                       <button type="button" onClick={() => setUnit("cm")}
                         className={`text-[10px] font-semibold px-2.5 py-1 transition-colors ${unit === "cm" ? "bg-primary text-primary-foreground" : "bg-secondary/40 text-muted-foreground hover:text-foreground"}`}>
@@ -259,9 +259,9 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-2 mt-1">
-                    <Input placeholder={t("rooms.width")} type="number" value={form.width} onChange={(e) => updateField("width", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
-                    <Input placeholder={t("rooms.height")} type="number" value={form.height} onChange={(e) => updateField("height", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
-                    <Input placeholder={t("rooms.depth")} type="number" value={form.depth} onChange={(e) => updateField("depth", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
+                    <Input placeholder={`${t("rooms.width")} (${unit})`} type="number" value={form.width} onChange={(e) => updateField("width", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
+                    <Input placeholder={`${t("rooms.height")} (${unit})`} type="number" value={form.height} onChange={(e) => updateField("height", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
+                    <Input placeholder={`${t("rooms.depth")} (${unit})`} type="number" value={form.depth} onChange={(e) => updateField("depth", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
                   </div>
                 </div>
                 <div>
