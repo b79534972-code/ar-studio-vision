@@ -244,7 +244,7 @@ const DashboardOverview = () => {
             <QuickActionCard
               icon={Plus}
               title={t("overview.createLayout")}
-              description="Start a new room layout in the editor"
+              description={t("overview.createLayout.desc")}
               onClick={() => navigate("/dashboard/rooms")}
               delay={0.1}
               accent
