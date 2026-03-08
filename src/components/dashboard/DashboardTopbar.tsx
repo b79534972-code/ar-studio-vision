@@ -83,14 +83,6 @@ const DashboardTopbar = ({
           <Globe className="w-4 h-4" />
           <span className="hidden sm:inline">{language === "en" ? "EN" : "VI"}</span>
         </button>
-        <Button variant="outline" size="sm" className="hidden md:flex gap-1.5 rounded-xl" onClick={onUploadModel}>
-          <Upload className="w-3.5 h-3.5" />
-          {t("topbar.uploadModel")}
-        </Button>
-        <Button variant="outline" size="sm" className="hidden md:flex gap-1.5 rounded-xl" onClick={onCreateRoom}>
-          <Plus className="w-3.5 h-3.5" />
-          {t("topbar.createRoom")}
-        </Button>
         <div className="w-px h-7 bg-border/40 mx-1 hidden md:block" />
         <ProfileDropdown user={user} onLogout={onLogout} />
       </div>
