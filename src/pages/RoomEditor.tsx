@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +7,7 @@ import EditorFurniturePanel from "@/components/editor/EditorFurniturePanel";
 import EditorPropertiesPanel from "@/components/editor/EditorPropertiesPanel";
 import EditorToolbar from "@/components/editor/EditorToolbar";
 import RoomCanvas3D from "@/components/editor/RoomCanvas3D";
+import ARPreviewModal from "@/components/editor/ARPreviewModal";
 import type { PlacedObject, RoomConfig, FurnitureItem } from "@/types/editor";
 
 const DEFAULT_ROOM: RoomConfig = {
@@ -19,11 +20,28 @@ const DEFAULT_ROOM: RoomConfig = {
 
 const RoomEditor = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [objects, setObjects] = useState<PlacedObject[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [roomConfig, setRoomConfig] = useState<RoomConfig>(DEFAULT_ROOM);
   const [viewMode, setViewMode] = useState<"3d" | "top">("3d");
+  const [showARModal, setShowARModal] = useState(false);
+
+  // Load scanned room config if coming from Room Scan AI
+  useEffect(() => {
+    if (searchParams.get("source") === "scan") {
+      try {
+        const stored = sessionStorage.getItem("scanned-room");
+        if (stored) {
+          const scanned = JSON.parse(stored);
+          setRoomConfig((prev) => ({ ...prev, ...scanned }));
+          sessionStorage.removeItem("scanned-room");
+          toast({ title: "Room Loaded", description: "Scanned room structure applied" });
+        }
+      } catch { /* ignore */ }
+    }
+  }, [searchParams, toast]);
 
   const selectedObject = objects.find((o) => o.id === selectedId) || null;
 
@@ -98,7 +116,7 @@ const RoomEditor = () => {
         onSave={handleSave}
         onUndo={() => {}}
         onRedo={() => {}}
-        onARPreview={() => navigate("/ar-demo")}
+        onARPreview={() => setShowARModal(true)}
         onAISuggest={() => toast({ title: "AI Suggest", description: "Analyzing room layout…" })}
         objectCount={objects.length}
       />
@@ -126,6 +144,14 @@ const RoomEditor = () => {
           onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
         />
       </div>
+
+      {/* AR Preview Modal */}
+      <ARPreviewModal
+        open={showARModal}
+        onClose={() => setShowARModal(false)}
+        objects={objects}
+        roomConfig={roomConfig}
+      />
     </div>
   );
 };

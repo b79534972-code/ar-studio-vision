@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Box, Home, Layers, User, CreditCard, Settings, Sparkles,
-  Armchair, Wand2, PenTool,
+  Armchair, Wand2, PenTool, ScanLine,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { User as UserType } from "@/types/subscription";
@@ -23,6 +23,7 @@ const DashboardSidebar = ({ user, collapsed }: DashboardSidebarProps) => {
     { to: "/dashboard/editor", label: t("nav.editor"), icon: PenTool },
     { to: "/dashboard/furniture", label: t("nav.furniture"), icon: Armchair },
     { to: "/dashboard/ai-generator", label: t("nav.aiGenerator"), icon: Wand2 },
+    { to: "/dashboard/room-scan", label: "Room Scan AI", icon: ScanLine },
     { to: "/dashboard/models", label: t("nav.models"), icon: Box },
     { to: "/dashboard/rooms", label: t("nav.rooms"), icon: Home },
     { to: "/dashboard/layouts", label: t("nav.layouts"), icon: Layers },
