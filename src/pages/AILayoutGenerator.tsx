@@ -65,6 +65,7 @@ const AILayoutGenerator = () => {
   const [designStyle, setDesignStyle] = useState("minimalist");
   const [width, setWidth] = useState("5");
   const [depth, setDepth] = useState("4");
+  const [prompt, setPrompt] = useState("");
   const [progress, setProgress] = useState(0);
   const [suggestions, setSuggestions] = useState<AILayoutSuggestion[]>([]);
 
