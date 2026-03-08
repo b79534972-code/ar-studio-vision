@@ -101,7 +101,7 @@ const FurnitureLibrary = () => {
             onClick={() => setShowFavOnly(!showFavOnly)}
           >
             <Heart className={cn("w-3.5 h-3.5", showFavOnly && "fill-current")} />
-            Favorites
+            {t("furnitureLib.favorites")}
           </Button>
 
           <div className="flex gap-1 ml-auto">
