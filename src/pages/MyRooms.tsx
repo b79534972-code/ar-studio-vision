@@ -213,7 +213,7 @@ const MyRooms = () => {
                 </p>
                 {rooms.length === 0 && (
                   <Button variant="hero" size="sm" className="gap-1.5" onClick={() => setShowCreate(true)}>
-                    <Plus className="w-3.5 h-3.5" /> Create Room
+                    <Plus className="w-3.5 h-3.5" /> {t("rooms.create")}
                   </Button>
                 )}
               </div>
