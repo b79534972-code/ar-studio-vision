@@ -74,22 +74,24 @@ const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => 
             className="pl-8 h-8 text-xs rounded-lg"
           />
         </div>
-        <div className="flex flex-wrap gap-1">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={cn(
-                "px-2 py-0.5 rounded-md text-[10px] font-medium capitalize transition-colors",
-                activeCategory === cat
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-accent/60 text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+        {activeTab === "library" && (
+          <div className="flex flex-wrap gap-1">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={cn(
+                  "px-2 py-0.5 rounded-md text-[10px] font-medium capitalize transition-colors",
+                  activeCategory === cat
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-accent/60 text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <ScrollArea className="flex-1">
