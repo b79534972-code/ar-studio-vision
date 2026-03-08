@@ -153,7 +153,7 @@ const AILayoutGenerator = () => {
             <div className="bg-card rounded-2xl border border-border/40 shadow-card p-6 space-y-6">
               {/* Room Type */}
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Room Type</Label>
+                <Label className="text-sm font-medium">{t("aiGen.roomType")}</Label>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                   {ROOM_TYPES.map((rt) => (
                     <button
