@@ -127,10 +127,11 @@ const DashboardOverview = () => {
   const { customItems } = useCustomFurniture();
 
   // Override mock usage with real store data
+  const totalFurniture = FURNITURE_CATALOG.length + customItems.length;
   const usage: UserUsage = {
     ...baseUsage,
     modelsCount: customItems.length,
-    layoutsCount: layouts.length,
+    layoutsCount: totalFurniture,
     arSessionsCount: rooms.length,
   };
 
@@ -141,7 +142,7 @@ const DashboardOverview = () => {
   const stats = [
     { label: t("overview.stats.models"), icon: Box, key: "modelsCount" as const, color: "text-primary" },
     { label: t("overview.stats.rooms"), icon: Home, key: "arSessionsCount" as const, color: "text-accent-foreground" },
-    { label: t("overview.stats.layouts"), icon: Layers, key: "layoutsCount" as const, color: "text-primary" },
+    { label: t("overview.stats.furniture"), icon: Armchair, key: "layoutsCount" as const, color: "text-primary" },
     { label: t("overview.stats.ai"), icon: Sparkles, key: "aiRequestsCount" as const, color: "text-accent-foreground" },
   ];
 
