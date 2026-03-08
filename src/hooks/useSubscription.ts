@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback } from "react";
-import type { User, UserUsage, SubscriptionPlan, Currency } from "@/types/subscription";
+import { PLAN_CONFIG, type User, type UserUsage, type SubscriptionPlan, type Currency } from "@/types/subscription";
 
 const MOCK_USER: User = {
   id: "usr_demo_001",
