@@ -290,6 +290,7 @@ const translations: Record<Language, Record<string, string>> = {
     "ai.noCredits": "Not enough credits",
     "ai.noCreditsDesc": "You don't have enough AI credits. Please upgrade your plan.",
     "ai.notEnoughCredits": "Not Enough Credits — Upgrade Plan",
+    "ai.comingSoon": "Coming Soon",
     "ai.feature.layoutSuggest": "AI Layout Suggest",
     "ai.feature.layoutSuggestDesc": "Generate optimized furniture layouts for any room type",
     "ai.feature.styleTransform": "AI Style Transform",
