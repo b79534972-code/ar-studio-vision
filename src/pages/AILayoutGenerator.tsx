@@ -395,11 +395,11 @@ const AILayoutGenerator = () => {
           <motion.div key="results" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-display text-lg font-bold text-foreground">AI Suggestions</h2>
-                <p className="text-xs text-muted-foreground">3 layout options generated for your {ROOM_TYPES.find((r) => r.value === roomType)?.label}</p>
+                <h2 className="font-display text-lg font-bold text-foreground">{t("aiGen.suggestions")}</h2>
+                <p className="text-xs text-muted-foreground">3 {t("aiGen.suggestionsDesc")} {ROOM_TYPES.find((r) => r.value === roomType)?.label}</p>
               </div>
               <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => setStep("config")}>
-                Regenerate
+                {t("aiGen.regenerate")}
               </Button>
             </div>
 
