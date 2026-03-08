@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Smartphone, Camera, QrCode, Eye, Ruler } from "lucide-react";
+import { Smartphone, Ruler } from "lucide-react";
 import type { FurnitureItem } from "@/types/editor";
 
 interface FurnitureARModalProps {
@@ -15,34 +15,23 @@ interface FurnitureARModalProps {
   item: FurnitureItem | null;
 }
 
-const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
-  if (!item) return null;
-
+/** Encode model metadata directly into URL — no localStorage needed */
+function buildARUrl(item: FurnitureItem): string {
   const payload = {
-    id: item.id,
     name: item.name,
-    category: item.category,
     color: item.color,
+    category: item.category,
     material: item.material,
     dimensions: item.dimensions,
   };
+  const encoded = btoa(JSON.stringify(payload));
+  return `${window.location.origin}/ar-demo?model=${encoded}`;
+}
 
-  const encodedId = btoa(JSON.stringify(payload)).slice(0, 32);
-  const arUrl = `${window.location.origin}/ar-object/${encodedId}`;
+const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
+  if (!item) return null;
 
-  if (open) {
-    try {
-      localStorage.setItem(`ar-object-${encodedId}`, JSON.stringify(payload));
-    } catch {
-      // storage full
-    }
-  }
-
-  const steps = [
-    { icon: Camera, text: "Open camera on your phone" },
-    { icon: QrCode, text: "Scan the QR code below" },
-    { icon: Eye, text: "View furniture in your space" },
-  ];
+  const arUrl = buildARUrl(item);
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -81,20 +70,9 @@ const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
             </span>
           </div>
 
-          {/* Steps */}
-          <div className="w-full space-y-3">
-            {steps.map((step, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm">
-                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <step.icon className="w-3.5 h-3.5 text-primary" />
-                </div>
-                <span className="text-muted-foreground">
-                  <span className="font-semibold text-foreground mr-1">{i + 1}.</span>
-                  {step.text}
-                </span>
-              </div>
-            ))}
-          </div>
+          <p className="text-muted-foreground/60 text-[11px] text-center max-w-xs">
+            Model data is encoded directly in the QR — works across devices without sharing storage
+          </p>
         </div>
       </DialogContent>
     </Dialog>
