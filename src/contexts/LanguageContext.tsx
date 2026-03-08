@@ -47,14 +47,36 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.upgradePlan": "Upgrade Plan",
     "overview.upgradePlan.desc": "Unlock AI features and unlimited resources",
     "overview.used": "used",
+    "overview.startAR": "Start AR Session",
+    "overview.addFurniture.desc": "Upload images and generate 3D furniture",
+    "overview.recentRooms": "Recent Rooms",
+    "overview.items": "items",
+    "overview.stats.models.desc": "Furniture objects in your library",
+    "overview.stats.rooms.desc": "Active room projects",
+    "overview.stats.layouts.desc": "Saved AR configurations",
+    "overview.stats.ai.desc": "AI-powered suggestions used",
+
+    // Workflow
+    "workflow.title": "Your Design Workflow",
+    "workflow.upload": "Upload Model",
+    "workflow.createRoom": "Create Room",
+    "workflow.arrange": "Arrange Layout",
+    "workflow.viewAR": "View in AR",
 
     // Activity
     "activity.uploadedSofa": "Uploaded Modern Sofa model",
     "activity.createdLayout": "Created living room layout",
     "activity.arSession": "AR session completed",
+    "activity.editedRoom": "Edited bedroom layout",
     "activity.2hAgo": "2 hours ago",
     "activity.5hAgo": "5 hours ago",
     "activity.yesterday": "Yesterday",
+    "activity.2dAgo": "2 days ago",
+
+    // Recent Rooms
+    "rooms.recent.living": "Living Room",
+    "rooms.recent.bedroom": "Master Bedroom",
+    "rooms.recent.office": "Home Office",
 
     // My Models / Furniture
     "models.title": "My Furniture",
