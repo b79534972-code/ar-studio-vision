@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Plus, Star, Upload } from "lucide-react";
+import { Search, Plus, Star, Upload, BookOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -15,11 +15,12 @@ interface EditorFurniturePanelProps {
 const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<"library" | "my">("library");
   const { customItems } = useCustomFurniture();
 
-  const allItems = [...FURNITURE_CATALOG, ...customItems];
+  const sourceItems = activeTab === "library" ? FURNITURE_CATALOG : customItems;
 
-  const filtered = allItems.filter((item) => {
+  const filtered = sourceItems.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
       item.tags.some((t) => t.includes(search.toLowerCase()));
     const matchesCategory = activeCategory === "all" || item.category === activeCategory;
@@ -29,7 +30,41 @@ const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => 
   return (
     <div className="w-64 bg-card border-r border-border/40 flex flex-col h-full">
       <div className="p-3 border-b border-border/30 space-y-3">
-        <h3 className="font-display text-sm font-bold text-foreground">Furniture Library</h3>
+        <h3 className="font-display text-sm font-bold text-foreground">Furniture</h3>
+
+        {/* Tabs */}
+        <div className="flex rounded-lg bg-muted/50 p-0.5 gap-0.5">
+          <button
+            onClick={() => setActiveTab("library")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md text-[11px] font-medium transition-all",
+              activeTab === "library"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <BookOpen className="w-3 h-3" />
+            Library
+          </button>
+          <button
+            onClick={() => setActiveTab("my")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md text-[11px] font-medium transition-all",
+              activeTab === "my"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Upload className="w-3 h-3" />
+            My Furniture
+            {customItems.length > 0 && (
+              <span className="bg-primary text-primary-foreground text-[9px] rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                {customItems.length}
+              </span>
+            )}
+          </button>
+        </div>
+
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
           <Input
@@ -59,22 +94,14 @@ const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => 
 
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1.5">
-          {/* Custom items section */}
-          {customItems.length > 0 && activeCategory === "all" && !search && (
-            <div className="mb-2">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2.5 mb-1.5 flex items-center gap-1">
-                <Upload className="w-3 h-3" /> My Furniture
-              </p>
-            </div>
-          )}
-
           {filtered.map((item) => (
             <button
               key={item.id}
               onClick={() => onAddFurniture(item)}
               className="w-full flex items-start gap-2.5 p-2.5 rounded-xl text-left hover:bg-accent/50 transition-colors group"
             >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border border-border/30 overflow-hidden"
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border border-border/30 overflow-hidden"
                 style={{ backgroundColor: item.color + "22" }}
               >
                 {item.thumbnail ? (
@@ -98,8 +125,20 @@ const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => 
               <Plus className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
             </button>
           ))}
+
           {filtered.length === 0 && (
-            <p className="text-xs text-muted-foreground text-center py-8">No furniture found</p>
+            <div className="text-center py-8 space-y-2">
+              <p className="text-xs text-muted-foreground">
+                {activeTab === "my" && customItems.length === 0
+                  ? "No custom furniture yet"
+                  : "No furniture found"}
+              </p>
+              {activeTab === "my" && customItems.length === 0 && (
+                <p className="text-[10px] text-muted-foreground">
+                  Upload furniture from My Furniture page
+                </p>
+              )}
+            </div>
           )}
         </div>
       </ScrollArea>
