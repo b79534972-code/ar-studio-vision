@@ -123,7 +123,7 @@ const MyRooms = () => {
                 </p>
               </div>
               <Button size="sm" className="gap-1.5 text-xs" onClick={() => handleOpenEditor(selectedRoom.id)}>
-                <PenTool className="w-3.5 h-3.5" /> Open Editor
+                <PenTool className="w-3.5 h-3.5" /> {t("rooms.openEditor")}
               </Button>
             </div>
 
