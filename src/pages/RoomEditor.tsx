@@ -343,34 +343,47 @@ const RoomEditor = () => {
       {/* Mobile slide-up panels */}
       <AnimatePresence>
         {mobilePanel && (
-          <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-[52px] z-40 h-[50vh] bg-card border-t border-border/40 shadow-elevated lg:hidden overflow-hidden flex flex-col"
-          >
-            <div className="h-8 flex items-center justify-center shrink-0">
-              <div className="w-8 h-1 rounded-full bg-border" />
-            </div>
-            {mobilePanel === "furniture" && (
-              <div className="flex-1 overflow-hidden">
-                <EditorFurniturePanel onAddFurniture={(item) => { handleAddFurniture(item); setMobilePanel(null); }} />
-              </div>
-            )}
-            {mobilePanel === "properties" && (
-              <div className="flex-1 overflow-y-auto">
-                <EditorPropertiesPanel
-                  selectedObject={selectedObject}
-                  roomConfig={roomConfig}
-                  onUpdateObject={handleUpdateObject}
-                  onDeleteObject={handleDeleteObject}
-                  onDuplicateObject={handleDuplicateObject}
-                  onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
-                />
-              </div>
-            )}
-          </motion.div>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-30 bg-foreground/20 lg:hidden"
+              onClick={() => setMobilePanel(null)}
+            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed inset-x-0 bottom-[52px] z-40 h-[45vh] bg-card border-t border-border/40 shadow-elevated lg:hidden overflow-hidden flex flex-col rounded-t-2xl"
+            >
+              <button
+                className="h-8 flex items-center justify-center shrink-0 w-full"
+                onClick={() => setMobilePanel(null)}
+              >
+                <div className="w-8 h-1 rounded-full bg-border" />
+              </button>
+              {mobilePanel === "furniture" && (
+                <div className="flex-1 overflow-hidden">
+                  <EditorFurniturePanel onAddFurniture={(item) => { handleAddFurniture(item); setMobilePanel(null); }} />
+                </div>
+              )}
+              {mobilePanel === "properties" && (
+                <div className="flex-1 overflow-y-auto">
+                  <EditorPropertiesPanel
+                    selectedObject={selectedObject}
+                    roomConfig={roomConfig}
+                    onUpdateObject={handleUpdateObject}
+                    onDeleteObject={handleDeleteObject}
+                    onDuplicateObject={handleDuplicateObject}
+                    onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
+                  />
+                </div>
+              )}
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
