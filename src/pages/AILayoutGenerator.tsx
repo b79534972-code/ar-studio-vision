@@ -401,8 +401,16 @@ const AILayoutGenerator = () => {
                 </p>
               </div>
 
-              <Button className="w-full gap-2 h-11" onClick={handleGenerate}>
-                <Wand2 className="w-4 h-4" /> {t("aiGen.generate")}
+              <Button
+                className="w-full gap-2 h-11"
+                onClick={handleGenerate}
+                disabled={creditsRemaining < layoutCost}
+              >
+                {creditsRemaining < layoutCost ? (
+                  <><Lock className="w-4 h-4" /> {t("ai.notEnoughCredits")}</>
+                ) : (
+                  <><Wand2 className="w-4 h-4" /> {t("aiGen.generate")} <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">{layoutCost} credit</Badge></>
+                )}
               </Button>
             </div>
           </motion.div>
