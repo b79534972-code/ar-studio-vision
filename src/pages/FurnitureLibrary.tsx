@@ -48,8 +48,8 @@ const FurnitureLibrary = () => {
     <div className="space-y-6">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <h1 className="font-display text-2xl font-bold text-foreground">Furniture Library</h1>
-        <p className="text-sm text-muted-foreground mt-1">Browse, search, and manage your furniture catalog</p>
+        <h1 className="font-display text-2xl font-bold text-foreground">{t("furnitureLib.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{t("furnitureLib.subtitle")}</p>
       </motion.div>
 
       {/* Filters bar */}
