@@ -406,6 +406,8 @@ const translations: Record<Language, Record<string, string>> = {
     "rooms.layouts": "bố cục",
     "rooms.empty": "Chưa có phòng nào. Tạo phòng đầu tiên để bắt đầu!",
     "rooms.noResults": "Không tìm thấy phòng phù hợp",
+    "rooms.emptyDesc": "Thiết kế và quản lý phòng của bạn với trình chỉnh sửa 3D",
+    "rooms.noResultsDesc": "Thử từ khóa tìm kiếm khác",
     "rooms.allRooms": "Tất cả phòng",
     "rooms.openEditor": "Mở trình chỉnh sửa",
     "rooms.viewLayouts": "Xem bố cục",
