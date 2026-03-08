@@ -222,10 +222,10 @@ const RoomScan = () => {
 
                 <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-4" />
                 <h3 className="font-display font-semibold text-lg text-foreground mb-2">
-                  Analyzing Room Structure
+                  {t("roomScan.analyzing")}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-5">
-                  Detecting walls, floor boundaries, and room dimensions…
+                  {t("roomScan.analyzingDesc")}
                 </p>
 
                 <Progress value={progress} className="h-2 mb-3" />
