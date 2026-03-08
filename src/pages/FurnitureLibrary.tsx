@@ -65,7 +65,7 @@ const FurnitureLibrary = () => {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search furniture by name, tag, or material…"
+              placeholder={t("furnitureLib.search")}
               className="pl-9 h-9 text-sm"
             />
           </div>
