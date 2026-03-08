@@ -23,6 +23,8 @@ function buildARUrl(item: FurnitureItem): string {
     category: item.category,
     material: item.material,
     dimensions: item.dimensions,
+    modelUrl: item.modelUrl,
+    usdzUrl: item.usdzUrl,
   };
   const encoded = btoa(JSON.stringify(payload));
   return `${window.location.origin}/ar-demo?model=${encoded}`;
