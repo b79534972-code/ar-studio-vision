@@ -8,9 +8,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Smartphone, Monitor, Loader2 } from "lucide-react";
+import { ArrowLeft, Smartphone, Monitor, Loader2, QrCode, X } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { useAREngine } from "@/ar";
 import ARSessionHUD from "@/components/ar/ARSessionHUD";
 import ARToolbar from "@/components/ar/ARToolbar";
@@ -22,6 +23,10 @@ const ARDemo = () => {
   const [sessionStarted, setSessionStarted] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+
+  // Build mobile AR URL for QR code
+  const mobileARUrl = `${window.location.origin}/ar-demo`;
 
   const {
     platform,
@@ -146,21 +151,95 @@ const ARDemo = () => {
 
       {/* ========== Desktop back button (no HUD) ========== */}
       {sessionStarted && !error && isDesktop && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="absolute top-4 left-4 z-10"
-        >
-          <Button
-            variant="ghost"
-            size="sm"
-            className="bg-card/80 backdrop-blur-md border border-border/40"
-            onClick={handleEndSession}
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute top-4 left-4 z-10 flex gap-2"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        </motion.div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="bg-card/80 backdrop-blur-md border border-border/40"
+              onClick={handleEndSession}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+          </motion.div>
+
+          {/* QR Code button — bottom right */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="absolute bottom-6 right-6 z-10"
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              className="bg-card/80 backdrop-blur-md border border-border/40 gap-2"
+              onClick={() => setShowQR(true)}
+            >
+              <QrCode className="w-4 h-4" />
+              View on Phone
+            </Button>
+          </motion.div>
+
+          {/* QR Code overlay */}
+          <AnimatePresence>
+            {showQR && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-30 flex items-center justify-center bg-foreground/60 backdrop-blur-sm"
+                onClick={() => setShowQR(false)}
+              >
+                <motion.div
+                  initial={{ scale: 0.85, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.85, opacity: 0 }}
+                  transition={{ type: "spring", damping: 22, stiffness: 300 }}
+                  className="bg-card rounded-2xl p-6 shadow-elevated border border-border/50 max-w-sm w-full mx-4 text-center"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={() => setShowQR(false)}
+                    className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+
+                  <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center mx-auto mb-4">
+                    <Smartphone className="w-6 h-6 text-primary-foreground" />
+                  </div>
+
+                  <h3 className="font-display text-lg font-bold text-foreground mb-1">
+                    View in AR on your phone
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-5">
+                    Scan this QR code with your phone camera to see the 3D model in your real space
+                  </p>
+
+                  <div className="bg-background rounded-xl p-4 inline-block mb-4 border border-border/30">
+                    <QRCodeSVG
+                      value={mobileARUrl}
+                      size={180}
+                      level="M"
+                      bgColor="transparent"
+                      fgColor="hsl(var(--foreground))"
+                    />
+                  </div>
+
+                  <p className="text-muted-foreground/60 text-[11px]">
+                    Works best on iOS (AR Quick Look) and Android (WebXR)
+                  </p>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
       )}
 
       {/* ========== Save modal ========== */}
