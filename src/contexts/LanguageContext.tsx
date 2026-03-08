@@ -372,6 +372,7 @@ const translations: Record<Language, Record<string, string>> = {
     "overview.stats.models": "Mô hình",
     "overview.stats.rooms": "Phòng",
     "overview.stats.layouts": "Bố cục",
+    "overview.stats.furniture": "Nội thất",
     "overview.stats.ai": "Gợi ý AI",
     "overview.quickActions": "Thao tác nhanh",
     "overview.recentActivity": "Hoạt động gần đây",
