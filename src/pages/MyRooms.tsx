@@ -253,7 +253,7 @@ const MyRooms = () => {
                                 <PenTool className="w-3.5 h-3.5 mr-2" /> {t("rooms.openEditor")}
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setSelectedRoom(room); }}>
-                                <Layers className="w-3.5 h-3.5 mr-2" /> View Layouts
+                                <Layers className="w-3.5 h-3.5 mr-2" /> {t("rooms.viewLayouts")}
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="text-destructive"
