@@ -1,0 +1,97 @@
+import { Eye, Grid3X3, Undo, Redo, Save, Smartphone, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+
+interface EditorToolbarProps {
+  viewMode: "3d" | "top";
+  onToggleView: () => void;
+  onSave: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
+  onARPreview: () => void;
+  onAISuggest: () => void;
+  objectCount: number;
+}
+
+const EditorToolbar = ({
+  viewMode,
+  onToggleView,
+  onSave,
+  onUndo,
+  onRedo,
+  onARPreview,
+  onAISuggest,
+  objectCount,
+}: EditorToolbarProps) => {
+  return (
+    <div className="h-11 bg-card border-b border-border/40 flex items-center px-3 gap-1.5">
+      <div className="flex items-center gap-1">
+        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onUndo} title="Undo">
+          <Undo className="w-3.5 h-3.5" />
+        </Button>
+        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onRedo} title="Redo">
+          <Redo className="w-3.5 h-3.5" />
+        </Button>
+      </div>
+
+      <Separator orientation="vertical" className="h-5" />
+
+      <div className="flex items-center gap-1">
+        <Button
+          variant={viewMode === "3d" ? "secondary" : "ghost"}
+          size="sm"
+          className="h-7 gap-1 text-[11px] px-2"
+          onClick={() => viewMode !== "3d" && onToggleView()}
+        >
+          <Eye className="w-3 h-3" /> 3D
+        </Button>
+        <Button
+          variant={viewMode === "top" ? "secondary" : "ghost"}
+          size="sm"
+          className="h-7 gap-1 text-[11px] px-2"
+          onClick={() => viewMode !== "top" && onToggleView()}
+        >
+          <Grid3X3 className="w-3 h-3" /> Top
+        </Button>
+      </div>
+
+      <Separator orientation="vertical" className="h-5" />
+
+      <span className="text-[10px] text-muted-foreground">{objectCount} objects</span>
+
+      <div className="flex-1" />
+
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-7 gap-1.5 text-[11px] px-2"
+        onClick={onAISuggest}
+      >
+        <Sparkles className="w-3 h-3 text-primary" /> AI Suggest
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-7 gap-1.5 text-[11px] px-2"
+        onClick={onARPreview}
+      >
+        <Smartphone className="w-3 h-3" /> AR Preview
+      </Button>
+
+      <Separator orientation="vertical" className="h-5" />
+
+      <Button
+        variant="default"
+        size="sm"
+        className="h-7 gap-1.5 text-[11px] px-3"
+        onClick={onSave}
+      >
+        <Save className="w-3 h-3" /> Save
+      </Button>
+    </div>
+  );
+};
+
+export default EditorToolbar;
