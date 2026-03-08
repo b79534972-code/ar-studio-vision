@@ -27,9 +27,16 @@ const Navbar = () => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled || mobileOpen ? "bg-card/95 backdrop-blur-xl shadow-soft" : "bg-transparent"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled || mobileOpen
+            ? "shadow-soft border-b border-border/30"
+            : "bg-transparent"
         }`}
+        style={
+          scrolled || mobileOpen
+            ? { background: "hsl(var(--card) / 0.8)", backdropFilter: "blur(20px)" }
+            : {}
+        }
       >
         <div className="w-full flex items-center justify-between h-14 md:h-16 px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32">
           <a
@@ -48,9 +55,10 @@ const Navbar = () => {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
               >
                 {link.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-primary transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
           </div>
@@ -72,14 +80,14 @@ const Navbar = () => {
         </div>
       </motion.nav>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="fixed top-14 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-b border-border/50 p-4 space-y-2 md:hidden"
+            className="fixed top-14 left-0 right-0 z-40 border-b border-border/30 p-4 space-y-2 md:hidden"
+            style={{ background: "hsl(var(--card) / 0.9)", backdropFilter: "blur(20px)" }}
           >
             {navLinks.map((link) => (
               <a
