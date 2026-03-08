@@ -9,6 +9,7 @@ import { FURNITURE_CATALOG, CATEGORIES, STYLES } from "@/data/furnitureCatalog";
 import FurnitureARModal from "@/components/ar/FurnitureARModal";
 import type { FurnitureItem } from "@/types/editor";
 import { cn } from "@/lib/utils";
+import { useCustomFurniture } from "@/hooks/useCustomFurniture";
 
 const FurnitureLibrary = () => {
   const [search, setSearch] = useState("");
