@@ -51,7 +51,11 @@ export function useSubscription() {
   const [currency, setCurrency] = useState<Currency>("USD");
   const [isAuthenticated, setIsAuthenticated] = useState(true);
 
-  const upgradePlan = useCallback((plan: SubscriptionPlan) => {
+  // Persist usage to localStorage whenever it changes
+  useEffect(() => {
+    try { localStorage.setItem("user-usage", JSON.stringify(usage)); } catch { /* ignore */ }
+  }, [usage]);
+
     subscriptionStore.upgradePlan(plan);
     const newPlanCredits = PLAN_CONFIG[plan].limits.aiCredits ?? 5;
     setUsage((prev) => {
