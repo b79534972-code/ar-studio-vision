@@ -168,7 +168,7 @@ const MyRooms = () => {
                           <p className="text-sm font-medium text-foreground truncate">{layout.name}</p>
                           <div className="flex items-center gap-3 mt-0.5">
                             <span className="text-[10px] text-muted-foreground">
-                              {layout.objects.length} objects
+                              {layout.objects.length} {t("rooms.objects")}
                             </span>
                             <span className="text-[10px] text-muted-foreground/50">·</span>
                             <span className="text-[10px] text-muted-foreground flex items-center gap-1">
