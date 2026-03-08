@@ -578,6 +578,7 @@ const AILayoutGenerator = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      )}
     </div>
   );
 };
