@@ -4,7 +4,7 @@ import {
   Sparkles, Wand2, Check, ArrowRight, Loader2,
   Home, BedDouble, Sofa, Monitor, LayoutGrid, Eye, Pencil,
   ChefHat, Bath, UtensilsCrossed, Baby, TreePalm, Shirt,
-  ChevronDown, Users, DollarSign, Target,
+  ChevronDown, Users, DollarSign, Target, Zap, Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,11 +13,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import type { AILayoutSuggestion } from "@/types/editor";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getFeatureCost } from "@/config/aiCreditCosts";
 const ROOM_TYPES = [
   { value: "living", label: "Living Room", icon: Sofa },
   { value: "bedroom", label: "Bedroom", icon: BedDouble },
@@ -99,6 +100,14 @@ const AILayoutGenerator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const context = useOutletContext<{
+    usage: { aiCreditsTotal: number; aiCreditsUsed: number };
+    useCredit: (amount?: number) => boolean;
+  }>();
+  const { usage, useCredit } = context || { usage: { aiCreditsTotal: 0, aiCreditsUsed: 0 }, useCredit: () => false };
+  const creditsRemaining = usage.aiCreditsTotal - usage.aiCreditsUsed;
+  const layoutCost = getFeatureCost("layout_suggest");
+
   const [step, setStep] = useState<"config" | "generating" | "results">("config");
   const [roomType, setRoomType] = useState("living");
   const [designStyle, setDesignStyle] = useState("minimalist");
@@ -114,6 +123,27 @@ const AILayoutGenerator = () => {
   const [furniturePrefs, setFurniturePrefs] = useState<string[]>([]);
 
   const handleGenerate = async () => {
+    // Check credits before generating
+    if (creditsRemaining < layoutCost) {
+      toast({
+        title: t("ai.noCredits"),
+        description: t("ai.noCreditsDesc"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Deduct credit
+    const success = useCredit(layoutCost);
+    if (!success) {
+      toast({
+        title: t("ai.noCredits"),
+        description: t("ai.noCreditsDesc"),
+        variant: "destructive",
+      });
+      return;
+    }
+
     setStep("generating");
     setProgress(0);
 
@@ -132,18 +162,78 @@ const AILayoutGenerator = () => {
     navigate("/dashboard/editor");
   };
 
+  const [activeFeature, setActiveFeature] = useState<string>("layout_suggest");
+
+  const aiTools = [
+    { id: "layout_suggest", icon: LayoutGrid, cost: getFeatureCost("layout_suggest"), nameKey: "ai.feature.layoutSuggest", descKey: "ai.feature.layoutSuggestDesc", plan: "free" },
+    { id: "style_transform", icon: Wand2, cost: getFeatureCost("style_transform"), nameKey: "ai.feature.styleTransform", descKey: "ai.feature.styleTransformDesc", plan: "basic" },
+    { id: "product_recommend", icon: Eye, cost: getFeatureCost("product_recommend"), nameKey: "ai.feature.productRecommend", descKey: "ai.feature.productRecommendDesc", plan: "basic" },
+    { id: "budget_optimize", icon: DollarSign, cost: getFeatureCost("budget_optimize"), nameKey: "ai.feature.budgetOptimize", descKey: "ai.feature.budgetOptimizeDesc", plan: "basic" },
+    { id: "photorealistic_render", icon: Sparkles, cost: getFeatureCost("photorealistic_render"), nameKey: "ai.feature.photoRender", descKey: "ai.feature.photoRenderDesc", plan: "advanced" },
+    { id: "full_room_redesign", icon: Home, cost: getFeatureCost("full_room_redesign"), nameKey: "ai.feature.fullRedesign", descKey: "ai.feature.fullRedesignDesc", plan: "pro" },
+  ];
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-primary-foreground" />
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="font-display text-2xl font-bold text-foreground">{t("aiGen.title")}</h1>
+              <p className="text-sm text-muted-foreground">{t("aiGen.subtitle")}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="font-display text-2xl font-bold text-foreground">{t("aiGen.title")}</h1>
-            <p className="text-sm text-muted-foreground">{t("aiGen.subtitle")}</p>
+          {/* Credit indicator */}
+          <div className="flex items-center gap-2 bg-card border border-border/40 rounded-xl px-4 py-2.5 shadow-sm">
+            <Zap className="w-4 h-4 text-primary" />
+            <div className="text-right">
+              <p className="text-sm font-bold text-foreground">{creditsRemaining}</p>
+              <p className="text-[10px] text-muted-foreground">{t("ai.creditsLeft")}</p>
+            </div>
           </div>
+        </div>
+      </motion.div>
+
+      {/* AI Tools Grid */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {aiTools.map((tool) => {
+            const Icon = tool.icon;
+            const isActive = activeFeature === tool.id;
+            const isLocked = tool.id !== "layout_suggest"; // Only layout_suggest is implemented
+            return (
+              <button
+                key={tool.id}
+                onClick={() => {
+                  if (isLocked) {
+                    toast({ title: t("ai.comingSoon") || "Coming Soon", description: t(tool.nameKey) });
+                    return;
+                  }
+                  setActiveFeature(tool.id);
+                }}
+                className={cn(
+                  "relative flex flex-col items-center gap-2 p-4 rounded-xl border transition-all text-center",
+                  isActive
+                    ? "border-primary bg-primary/5 shadow-sm"
+                    : "border-border/40 hover:border-border bg-card",
+                  isLocked && "opacity-60"
+                )}
+              >
+                {isLocked && (
+                  <Lock className="absolute top-2 right-2 w-3 h-3 text-muted-foreground" />
+                )}
+                <Icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground")} />
+                <span className="text-[11px] font-medium leading-tight">{t(tool.nameKey)}</span>
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0">
+                  {tool.cost} credit{tool.cost > 1 ? "s" : ""}
+                </Badge>
+              </button>
+            );
+          })}
         </div>
       </motion.div>
 
@@ -361,8 +451,16 @@ const AILayoutGenerator = () => {
                 </p>
               </div>
 
-              <Button className="w-full gap-2 h-11" onClick={handleGenerate}>
-                <Wand2 className="w-4 h-4" /> {t("aiGen.generate")}
+              <Button
+                className="w-full gap-2 h-11"
+                onClick={handleGenerate}
+                disabled={creditsRemaining < layoutCost}
+              >
+                {creditsRemaining < layoutCost ? (
+                  <><Lock className="w-4 h-4" /> {t("ai.notEnoughCredits")}</>
+                ) : (
+                  <><Wand2 className="w-4 h-4" /> {t("aiGen.generate")} <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">{layoutCost} credit</Badge></>
+                )}
               </Button>
             </div>
           </motion.div>

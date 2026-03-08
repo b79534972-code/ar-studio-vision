@@ -285,6 +285,25 @@ const translations: Record<Language, Record<string, string>> = {
     "roomScan.uploadAnother": "Upload Another",
     "roomScan.useLayout": "Use This Layout",
 
+    // AI Credits
+    "ai.creditsLeft": "credits left",
+    "ai.noCredits": "Not enough credits",
+    "ai.noCreditsDesc": "You don't have enough AI credits. Please upgrade your plan.",
+    "ai.notEnoughCredits": "Not Enough Credits — Upgrade Plan",
+    "ai.comingSoon": "Coming Soon",
+    "ai.feature.layoutSuggest": "AI Layout Suggest",
+    "ai.feature.layoutSuggestDesc": "Generate optimized furniture layouts for any room type",
+    "ai.feature.styleTransform": "AI Style Transform",
+    "ai.feature.styleTransformDesc": "Transform your room into a different design style",
+    "ai.feature.productRecommend": "AI Product Recommend",
+    "ai.feature.productRecommendDesc": "Get furniture recommendations based on your room",
+    "ai.feature.budgetOptimize": "AI Budget Optimize",
+    "ai.feature.budgetOptimizeDesc": "Optimize your interior design within your budget",
+    "ai.feature.photoRender": "AI Photorealistic Render",
+    "ai.feature.photoRenderDesc": "Generate photorealistic images of your room design",
+    "ai.feature.fullRedesign": "AI Full Room Redesign",
+    "ai.feature.fullRedesignDesc": "Complete room redesign with AI-powered suggestions",
+
     // AI Layout Generator
     "aiGen.title": "AI Layout Generator",
     "aiGen.subtitle": "Generate optimized room layouts powered by AI",
@@ -622,6 +641,25 @@ const translations: Record<Language, Record<string, string>> = {
     "roomScan.height": "Chiều cao",
     "roomScan.uploadAnother": "Tải ảnh khác",
     "roomScan.useLayout": "Sử dụng bố cục này",
+
+    // AI Credits
+    "ai.creditsLeft": "credit còn lại",
+    "ai.noCredits": "Không đủ credit",
+    "ai.noCreditsDesc": "Bạn không đủ AI credit. Vui lòng nâng cấp gói.",
+    "ai.notEnoughCredits": "Không đủ Credit — Nâng cấp gói",
+    "ai.comingSoon": "Sắp ra mắt",
+    "ai.feature.layoutSuggest": "AI Gợi ý bố cục",
+    "ai.feature.layoutSuggestDesc": "Tạo bố cục nội thất tối ưu cho mọi loại phòng",
+    "ai.feature.styleTransform": "AI Chuyển đổi phong cách",
+    "ai.feature.styleTransformDesc": "Chuyển đổi phòng sang phong cách thiết kế khác",
+    "ai.feature.productRecommend": "AI Gợi ý sản phẩm",
+    "ai.feature.productRecommendDesc": "Gợi ý nội thất phù hợp với phòng của bạn",
+    "ai.feature.budgetOptimize": "AI Tối ưu ngân sách",
+    "ai.feature.budgetOptimizeDesc": "Tối ưu thiết kế nội thất trong ngân sách",
+    "ai.feature.photoRender": "AI Render chân thực",
+    "ai.feature.photoRenderDesc": "Tạo ảnh chân thực từ thiết kế phòng của bạn",
+    "ai.feature.fullRedesign": "AI Thiết kế lại toàn bộ",
+    "ai.feature.fullRedesignDesc": "Thiết kế lại hoàn toàn phòng với gợi ý AI",
 
     // AI Layout Generator
     "aiGen.title": "AI Tạo bố cục",
