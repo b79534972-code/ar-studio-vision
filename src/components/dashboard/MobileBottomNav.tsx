@@ -15,20 +15,25 @@ const MobileBottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border/50 md:hidden safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 glass-strong md:hidden safe-area-bottom">
       <div className="flex items-center justify-around h-16">
         {tabs.map((tab) => {
-          const active = tab.end ? location.pathname === tab.to : (!tab.end && location.pathname.startsWith(tab.to));
+          const active = tab.end ? location.pathname === tab.to : location.pathname.startsWith(tab.to);
           return (
             <NavLink
               key={tab.to}
               to={tab.to}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium transition-colors min-w-[44px]",
+                "flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium transition-all duration-200 min-w-[44px]",
                 active ? "text-primary" : "text-muted-foreground"
               )}
             >
-              <tab.icon className="w-5 h-5" />
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200",
+                active && "bg-primary/10"
+              )}>
+                <tab.icon className="w-5 h-5" />
+              </div>
               <span>{tab.label}</span>
             </NavLink>
           );

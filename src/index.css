@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 220 20% 98%;
+    --background: 225 25% 97%;
     --foreground: 224 30% 12%;
 
     --card: 0 0% 100%;
@@ -15,49 +15,64 @@
     --popover: 0 0% 100%;
     --popover-foreground: 224 30% 12%;
 
-    --primary: 230 65% 48%;
+    --primary: 235 60% 52%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 95%;
+    --secondary: 225 20% 94%;
     --secondary-foreground: 224 30% 12%;
 
-    --muted: 220 14% 94%;
+    --muted: 225 14% 93%;
     --muted-foreground: 220 10% 46%;
 
-    --accent: 220 60% 96%;
-    --accent-foreground: 230 65% 48%;
+    --accent: 225 55% 96%;
+    --accent-foreground: 235 60% 52%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --success: 142 76% 36%;
+    --success: 152 60% 42%;
     --success-foreground: 0 0% 100%;
 
-    --border: 220 15% 90%;
-    --input: 220 15% 90%;
-    --ring: 230 65% 48%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --info: 200 80% 50%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 225 15% 90%;
+    --input: 225 15% 90%;
+    --ring: 235 60% 52%;
 
     --radius: 0.75rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(230 65% 48%), hsl(250 60% 58%));
-    --gradient-cta: linear-gradient(135deg, hsl(230 70% 52%), hsl(260 65% 60%));
-    --gradient-subtle: linear-gradient(180deg, hsl(220 20% 98%), hsl(220 25% 95%));
-    --shadow-soft: 0 2px 20px -4px hsl(230 65% 48% / 0.12);
-    --shadow-card: 0 4px 30px -8px hsl(230 65% 48% / 0.08);
-    --shadow-elevated: 0 12px 40px -12px hsl(230 65% 48% / 0.15);
+    /* Spatial / AR-inspired gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(235 60% 52%), hsl(260 55% 58%));
+    --gradient-hero: linear-gradient(145deg, hsl(235 60% 50%), hsl(265 50% 55%), hsl(220 60% 48%));
+    --gradient-cta: linear-gradient(135deg, hsl(235 70% 55%), hsl(265 65% 60%));
+    --gradient-subtle: linear-gradient(180deg, hsl(225 25% 97%), hsl(225 28% 94%));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.4));
+    --gradient-mesh: radial-gradient(ellipse at 20% 50%, hsl(235 60% 52% / 0.06) 0%, transparent 50%),
+                     radial-gradient(ellipse at 80% 20%, hsl(265 55% 58% / 0.04) 0%, transparent 50%);
 
-    /* Pro glow — only active via data-plan="pro" */
+    /* Depth system */
+    --shadow-xs: 0 1px 2px hsl(235 60% 52% / 0.04);
+    --shadow-soft: 0 2px 12px -2px hsl(235 60% 52% / 0.08);
+    --shadow-card: 0 4px 24px -6px hsl(235 60% 52% / 0.06);
+    --shadow-elevated: 0 12px 40px -8px hsl(235 60% 52% / 0.12);
+    --shadow-glow: 0 0 32px -8px hsl(235 60% 52% / 0.2);
+
+    /* Pro glow */
     --pro-glow: none;
     --pro-gradient: var(--gradient-primary);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 224 20% 30%;
+    --sidebar-primary: 235 60% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 225 40% 96%;
+    --sidebar-accent-foreground: 235 60% 52%;
+    --sidebar-border: 225 15% 92%;
+    --sidebar-ring: 235 60% 52%;
   }
 
   .dark {
@@ -67,32 +82,35 @@
     --card-foreground: 220 20% 95%;
     --popover: 224 25% 10%;
     --popover-foreground: 220 20% 95%;
-    --primary: 230 65% 60%;
+    --primary: 235 65% 62%;
     --primary-foreground: 0 0% 100%;
     --secondary: 224 20% 15%;
     --secondary-foreground: 220 20% 95%;
     --muted: 224 15% 18%;
     --muted-foreground: 220 10% 55%;
-    --accent: 230 30% 18%;
-    --accent-foreground: 230 65% 70%;
+    --accent: 235 30% 18%;
+    --accent-foreground: 235 65% 72%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --success: 142 76% 36%;
+    --success: 152 60% 42%;
     --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 200 80% 50%;
+    --info-foreground: 0 0% 100%;
     --border: 224 15% 18%;
     --input: 224 15% 18%;
-    --ring: 230 65% 60%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --ring: 235 65% 62%;
+    --sidebar-background: 224 25% 8%;
+    --sidebar-foreground: 220 15% 70%;
+    --sidebar-primary: 235 65% 62%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 224 20% 14%;
+    --sidebar-accent-foreground: 235 65% 72%;
+    --sidebar-border: 224 15% 16%;
+    --sidebar-ring: 235 65% 62%;
   }
 
-  /* Pro plan visual differentiation — applied via data attribute */
   [data-plan="pro"] {
     --pro-glow: 0 0 20px hsl(263 70% 58% / 0.6);
     --pro-gradient: linear-gradient(135deg, hsl(250 65% 55%), hsl(280 70% 60%), hsl(230 65% 55%));
@@ -113,12 +131,7 @@
     font-family: 'Inter', sans-serif;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', sans-serif;
   }
 }
@@ -126,6 +139,10 @@
 @layer utilities {
   .gradient-primary {
     background: var(--gradient-primary);
+  }
+
+  .gradient-hero {
+    background: var(--gradient-hero);
   }
 
   .gradient-cta {
@@ -136,8 +153,20 @@
     background: var(--gradient-subtle);
   }
 
+  .gradient-glass {
+    background: var(--gradient-glass);
+  }
+
+  .gradient-mesh {
+    background: var(--gradient-mesh);
+  }
+
   .gradient-pro {
     background: var(--pro-gradient);
+  }
+
+  .shadow-xs {
+    box-shadow: var(--shadow-xs);
   }
 
   .shadow-soft {
@@ -152,11 +181,24 @@
     box-shadow: var(--shadow-elevated);
   }
 
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
   .shadow-pro {
     box-shadow: var(--pro-glow);
   }
 
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Glass morphism utility */
+  .glass {
+    @apply bg-card/70 backdrop-blur-xl border border-border/40;
+  }
+
+  .glass-strong {
+    @apply bg-card/85 backdrop-blur-2xl border border-border/50;
   }
 }

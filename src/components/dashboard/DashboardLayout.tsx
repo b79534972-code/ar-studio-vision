@@ -32,14 +32,14 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background gradient-mesh">
       {/* Desktop sidebar */}
       {!isMobile && <DashboardSidebar user={subscription.user} collapsed={collapsed} />}
-      
+
       <div
         className={cn(
-          "transition-all duration-300",
-          isMobile ? "ml-0" : collapsed ? "ml-[68px]" : "ml-60"
+          "min-h-screen flex flex-col transition-all duration-300 ease-in-out",
+          isMobile ? "ml-0" : collapsed ? "ml-[72px]" : "ml-64"
         )}
       >
         <DashboardTopbar
@@ -50,13 +50,20 @@ const DashboardLayout = () => {
           onCreateRoom={handleCreateRoom}
           onLogout={handleLogout}
         />
-        <main className={cn("p-4 md:p-6 lg:p-8 xl:p-10 2xl:p-12", isMobile && "pb-20")}>
-          <Outlet
-            context={{
-              ...subscription,
-              featureGate,
-            }}
-          />
+        <main
+          className={cn(
+            "flex-1 p-4 sm:p-6 lg:p-8",
+            isMobile && "pb-24"
+          )}
+        >
+          <div className="max-w-[1400px] mx-auto w-full">
+            <Outlet
+              context={{
+                ...subscription,
+                featureGate,
+              }}
+            />
+          </div>
         </main>
       </div>
 
