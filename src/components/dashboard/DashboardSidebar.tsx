@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Box, Home, Layers, User, CreditCard, Settings, Sparkles,
+  Armchair, Wand2, PenTool,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { User as UserType } from "@/types/subscription";
