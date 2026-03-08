@@ -219,7 +219,7 @@ const RoomEditor = () => {
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
       {/* Top bar */}
       <div className="h-12 bg-card border-b border-border/40 flex items-center px-4 gap-3 shrink-0">
-        <Button variant="ghost" size="sm" className="gap-1.5 h-8 text-xs" onClick={() => navigate("/dashboard")}>
+        <Button variant="ghost" size="sm" className="gap-1.5 h-8 text-xs" onClick={() => navigate("/dashboard/rooms")}>
           <ArrowLeft className="w-3.5 h-3.5" /> Back
         </Button>
         <div className="h-5 w-px bg-border/40" />
