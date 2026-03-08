@@ -58,13 +58,26 @@ const SolutionSection = () => {
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
           >
-            <div className="rounded-2xl overflow-hidden shadow-card border border-border/50 group">
+            <div
+              className="rounded-2xl overflow-hidden border border-border/50 relative group transition-all duration-500"
+              style={{
+                boxShadow: "var(--shadow-card), 0 0 0px hsl(235 60% 52% / 0)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "var(--shadow-elevated), 0 0 32px hsl(235 60% 52% / 0.12)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "var(--shadow-card), 0 0 0px hsl(235 60% 52% / 0)";
+              }}
+            >
               <img
                 src={solutionImage}
                 alt="3D furniture model with measurement annotations"
-                className="w-full h-auto transition-transform duration-700 group-hover:scale-[1.02]"
+                className="w-full h-auto transition-all duration-700 group-hover:scale-[1.04] group-hover:brightness-105"
+                style={{ filter: "brightness(1.02) contrast(1.01)" }}
                 loading="lazy"
               />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none transition-opacity duration-500 opacity-0 group-hover:opacity-100" />
             </div>
           </motion.div>
         </div>
