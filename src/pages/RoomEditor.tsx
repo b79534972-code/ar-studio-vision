@@ -9,6 +9,7 @@ import EditorToolbar from "@/components/editor/EditorToolbar";
 import RoomCanvas3D from "@/components/editor/RoomCanvas3D";
 import ARPreviewModal from "@/components/editor/ARPreviewModal";
 import AIOptimizePanel from "@/components/editor/AIOptimizePanel";
+import OutOfCreditsModal from "@/components/dashboard/OutOfCreditsModal";
 import { roomStore } from "@/stores/roomStore";
 import { useSubscription } from "@/hooks/useSubscription";
 import type { PlacedObject, RoomConfig, FurnitureItem } from "@/types/editor";
@@ -33,7 +34,8 @@ const RoomEditor = () => {
   const [viewMode, setViewMode] = useState<"3d" | "top">("3d");
   const [showARModal, setShowARModal] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
-  const { usage, useCredit } = useSubscription();
+  const [showOutOfCredits, setShowOutOfCredits] = useState(false);
+  const { usage, useCredit, user } = useSubscription();
   // Room/layout context
   const roomId = searchParams.get("roomId");
   const layoutId = searchParams.get("layoutId");
@@ -307,6 +309,7 @@ const RoomEditor = () => {
             pushHistory(updated);
             toast({ title: "AI Applied", description: "Suggestion applied to layout" });
           }}
+          onOutOfCredits={() => setShowOutOfCredits(true)}
         />
       </div>
 
@@ -316,6 +319,16 @@ const RoomEditor = () => {
         onClose={() => setShowARModal(false)}
         objects={objects}
         roomConfig={roomConfig}
+      />
+
+      {/* Out of Credits Modal */}
+      <OutOfCreditsModal
+        open={showOutOfCredits}
+        onClose={() => setShowOutOfCredits(false)}
+        currentPlan={user.subscriptionPlan}
+        onBuyMore={() => {
+          navigate("/pricing");
+        }}
       />
     </div>
   );

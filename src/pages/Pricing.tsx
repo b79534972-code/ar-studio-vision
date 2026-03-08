@@ -33,28 +33,31 @@ const Pricing = () => {
   const [processing, setProcessing] = useState(false);
 
   const handleUpgrade = (planKey: SubscriptionPlan) => {
-    if (planKey === currentPlan || planKey === "free") return;
+    if (planKey === "free") return;
     setConfirmPlan(planKey);
   };
 
   const handleConfirm = async () => {
     if (!confirmPlan) return;
     setProcessing(true);
-    // Simulate payment processing
     await new Promise((r) => setTimeout(r, 1500));
     subscriptionStore.upgradePlan(confirmPlan);
     setProcessing(false);
     setConfirmPlan(null);
+
+    const isRepurchase = confirmPlan === currentPlan;
     toast({
-      title: "Upgrade Successful! 🎉",
-      description: `You're now on the ${PLAN_CONFIG[confirmPlan].name} plan with ${PLAN_CONFIG[confirmPlan].aiCredits} AI credits.`,
+      title: isRepurchase ? "Credits Added! 🎉" : "Upgrade Successful! 🎉",
+      description: isRepurchase
+        ? `${PLAN_CONFIG[confirmPlan].aiCredits} AI credits added to your account.`
+        : `You're now on the ${PLAN_CONFIG[confirmPlan].name} plan with ${PLAN_CONFIG[confirmPlan].aiCredits} AI credits.`,
     });
     navigate("/dashboard/billing");
   };
 
   const getButtonLabel = (planKey: SubscriptionPlan) => {
-    if (planKey === currentPlan) return "Current Plan";
     if (planKey === "free") return "Free Plan";
+    if (planKey === currentPlan) return `Buy ${PLAN_CONFIG[planKey].aiCredits} More Credits`;
     const planIndex = plans.indexOf(planKey);
     const currentIndex = plans.indexOf(currentPlan);
     return planIndex > currentIndex ? `Upgrade to ${PLAN_CONFIG[planKey].name}` : `Switch to ${PLAN_CONFIG[planKey].name}`;
@@ -176,10 +179,10 @@ const Pricing = () => {
                 </ul>
 
                 <Button
-                  variant={isHighlighted ? "hero" : "outline"}
+                  variant={isHighlighted ? "hero" : isCurrent ? "default" : "outline"}
                   size="lg"
                   className="w-full"
-                  disabled={isCurrent || isFree}
+                  disabled={isFree}
                   onClick={() => handleUpgrade(planKey)}
                 >
                   {getButtonLabel(planKey)}
@@ -194,7 +197,9 @@ const Pricing = () => {
       <Dialog open={!!confirmPlan} onOpenChange={(open) => !processing && !open && setConfirmPlan(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-display">Confirm Upgrade</DialogTitle>
+            <DialogTitle className="font-display">
+              {confirmPlan === currentPlan ? "Buy More Credits" : "Confirm Upgrade"}
+            </DialogTitle>
           </DialogHeader>
           {confirmPlan && (
             <div className="space-y-4 py-2">
@@ -237,6 +242,8 @@ const Pricing = () => {
                 <>
                   <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> Processing...
                 </>
+              ) : confirmPlan === currentPlan ? (
+                "Buy Credits"
               ) : (
                 "Confirm Upgrade"
               )}

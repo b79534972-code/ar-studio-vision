@@ -16,6 +16,7 @@ interface AIOptimizePanelProps {
   creditsRemaining: number;
   useCredit: (amount?: number) => boolean;
   onApplySuggestion: (updatedObjects: PlacedObject[]) => void;
+  onOutOfCredits?: () => void;
 }
 
 interface SuggestionAction {
@@ -47,6 +48,7 @@ const AIOptimizePanel = ({
   creditsRemaining,
   useCredit,
   onApplySuggestion,
+  onOutOfCredits,
 }: AIOptimizePanelProps) => {
   const { t } = useLanguage();
   const [step, setStep] = useState<"idle" | "analyzing" | "results">("idle");
@@ -125,7 +127,10 @@ const AIOptimizePanel = ({
   };
 
   const handleAnalyze = async () => {
-    if (creditsRemaining < CREDIT_COST) return;
+    if (creditsRemaining < CREDIT_COST) {
+      onOutOfCredits?.();
+      return;
+    }
     if (!useCredit(CREDIT_COST)) return;
 
     setStep("analyzing");
