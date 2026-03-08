@@ -45,10 +45,11 @@ const MyRooms = () => {
 
   const handleCreate = () => {
     if (!newRoom.name.trim()) return;
+    const toM = (v: string) => { const n = parseFloat(v) || 0; return roomUnit === "cm" ? n / 100 : n; };
     const config: RoomConfig = {
-      width: parseFloat(newRoom.width) || 6,
-      depth: parseFloat(newRoom.depth) || 5,
-      height: parseFloat(newRoom.height) || 2.8,
+      width: toM(newRoom.width) || 6,
+      depth: toM(newRoom.depth) || 5,
+      height: toM(newRoom.height) || 2.8,
       wallColor: "#F5F5F4",
       floorColor: "#D6D3D1",
     };
