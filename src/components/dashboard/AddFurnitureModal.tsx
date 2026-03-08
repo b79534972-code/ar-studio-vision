@@ -245,11 +245,20 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs">{t("furniture.dimensions")} (cm) *</Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs">{t("furniture.dimensions")} *</Label>
+                    <button
+                      type="button"
+                      onClick={() => setUnit(unit === "cm" ? "m" : "cm")}
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      {unit}
+                    </button>
+                  </div>
                   <div className="grid grid-cols-3 gap-2 mt-1">
-                    <Input placeholder="Width" type="number" value={form.width} onChange={(e) => updateField("width", e.target.value)} />
-                    <Input placeholder="Height" type="number" value={form.height} onChange={(e) => updateField("height", e.target.value)} />
-                    <Input placeholder="Depth" type="number" value={form.depth} onChange={(e) => updateField("depth", e.target.value)} />
+                    <Input placeholder={t("rooms.width")} type="number" value={form.width} onChange={(e) => updateField("width", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
+                    <Input placeholder={t("rooms.height")} type="number" value={form.height} onChange={(e) => updateField("height", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
+                    <Input placeholder={t("rooms.depth")} type="number" value={form.depth} onChange={(e) => updateField("depth", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
                   </div>
                 </div>
                 <div>
