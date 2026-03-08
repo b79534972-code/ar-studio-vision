@@ -249,8 +249,9 @@ model FurnitureModel {
   height      Float
   depth       Float
 
-  // 3D model files
-  modelUrl    String?
+  // 3D model files (matches FurnitureItem.modelUrl / usdzUrl)
+  modelUrl    String?           // .glb/.gltf for WebXR & Desktop viewer
+  usdzUrl     String?           // .usdz for iOS AR Quick Look
   textureUrl  String?
   thumbnail   String?
   format      ModelFormat?
