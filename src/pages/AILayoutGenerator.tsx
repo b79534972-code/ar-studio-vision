@@ -175,7 +175,7 @@ const AILayoutGenerator = () => {
 
               {/* Design Style */}
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Design Style</Label>
+                <Label className="text-sm font-medium">{t("aiGen.designStyle")}</Label>
                 <div className="flex flex-wrap gap-2">
                   {DESIGN_STYLES.map((ds) => (
                     <button
