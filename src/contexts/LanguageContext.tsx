@@ -508,7 +508,7 @@ const translations: Record<Language, Record<string, string>> = {
     "furniture.name": "Tên đối tượng",
     "furniture.category": "Danh mục",
     "furniture.material": "Chất liệu",
-    "furniture.dimensions": "Kích thước (cm)",
+    "furniture.dimensions": "Kích thước",
     "furniture.shape": "Hình dạng cơ bản",
     "furniture.generate": "Tạo đối tượng 3D",
     "furniture.generating": "Đang tạo…",
