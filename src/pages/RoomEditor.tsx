@@ -116,7 +116,7 @@ const RoomEditor = () => {
         onSave={handleSave}
         onUndo={() => {}}
         onRedo={() => {}}
-        onARPreview={() => navigate("/ar-demo")}
+        onARPreview={() => setShowARModal(true)}
         onAISuggest={() => toast({ title: "AI Suggest", description: "Analyzing room layout…" })}
         objectCount={objects.length}
       />
