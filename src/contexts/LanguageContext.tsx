@@ -193,6 +193,12 @@ const translations: Record<Language, Record<string, string>> = {
     "billing.subtitle": "Manage your subscription and payments",
     "billing.upgrade": "Upgrade Plan",
     "billing.cancel": "Cancel Subscription",
+    "billing.creditUsage": "AI Credit Usage",
+    "billing.creditsUsedLabel": "used",
+    "billing.creditsRemaining": "credits remaining",
+    "billing.buyMore": "Buy more credits",
+    "billing.aiRequests": "AI Requests",
+    "billing.remaining": "Remaining",
 
     // Settings
     "settings.title": "Settings",
