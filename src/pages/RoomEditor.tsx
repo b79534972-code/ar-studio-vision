@@ -8,6 +8,7 @@ import EditorPropertiesPanel from "@/components/editor/EditorPropertiesPanel";
 import EditorToolbar from "@/components/editor/EditorToolbar";
 import RoomCanvas3D from "@/components/editor/RoomCanvas3D";
 import ARPreviewModal from "@/components/editor/ARPreviewModal";
+import { roomStore } from "@/stores/roomStore";
 import type { PlacedObject, RoomConfig, FurnitureItem } from "@/types/editor";
 
 const DEFAULT_ROOM: RoomConfig = {
@@ -30,6 +31,30 @@ const RoomEditor = () => {
   const [viewMode, setViewMode] = useState<"3d" | "top">("3d");
   const [showARModal, setShowARModal] = useState(false);
 
+  // Room/layout context
+  const roomId = searchParams.get("roomId");
+  const layoutId = searchParams.get("layoutId");
+  const [currentRoomId, setCurrentRoomId] = useState<string | null>(roomId);
+  const [roomName, setRoomName] = useState("Untitled Room");
+
+  // ─── Load existing room / layout ───
+  useEffect(() => {
+    if (roomId) {
+      const room = roomStore.getRooms().find((r) => r.id === roomId);
+      if (room) {
+        setRoomConfig(room.config);
+        setRoomName(room.name);
+        setCurrentRoomId(room.id);
+      }
+    }
+    if (layoutId) {
+      const layout = roomStore.getLayouts().find((l) => l.id === layoutId);
+      if (layout) {
+        setObjects(layout.objects);
+      }
+    }
+  }, [roomId, layoutId]);
+
   // ─── Undo / Redo ───
   const historyRef = useRef<PlacedObject[][]>([[]]);
   const historyIndexRef = useRef(0);
@@ -44,7 +69,6 @@ const RoomEditor = () => {
   }, []);
 
   const pushHistory = useCallback((newObjects: PlacedObject[]) => {
-    // Trim any redo states
     historyRef.current = historyRef.current.slice(0, historyIndexRef.current + 1);
     historyRef.current.push(newObjects);
     if (historyRef.current.length > MAX_HISTORY) {
@@ -58,8 +82,7 @@ const RoomEditor = () => {
   const handleUndo = useCallback(() => {
     if (historyIndexRef.current <= 0) return;
     historyIndexRef.current--;
-    const prev = historyRef.current[historyIndexRef.current];
-    setObjects(prev);
+    setObjects(historyRef.current[historyIndexRef.current]);
     setSelectedId(null);
     updateUndoRedoState();
   }, [updateUndoRedoState]);
@@ -67,28 +90,20 @@ const RoomEditor = () => {
   const handleRedo = useCallback(() => {
     if (historyIndexRef.current >= historyRef.current.length - 1) return;
     historyIndexRef.current++;
-    const next = historyRef.current[historyIndexRef.current];
-    setObjects(next);
+    setObjects(historyRef.current[historyIndexRef.current]);
     updateUndoRedoState();
   }, [updateUndoRedoState]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
-        e.preventDefault();
-        handleUndo();
-      }
-      if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) {
-        e.preventDefault();
-        handleRedo();
-      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) { e.preventDefault(); handleUndo(); }
+      if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) { e.preventDefault(); handleRedo(); }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [handleUndo, handleRedo]);
 
-  // Load scanned room config if coming from Room Scan AI
+  // Load scanned room config
   useEffect(() => {
     if (searchParams.get("source") === "scan") {
       try {
@@ -131,15 +146,11 @@ const RoomEditor = () => {
   const handleUpdateObject = useCallback((id: string, updates: Partial<PlacedObject>) => {
     setObjects((prev) => {
       const next = prev.map((o) => (o.id === id ? { ...o, ...updates } : o));
-      // Only push history on pointer up (not every drag frame)
-      if (!isDraggingRef.current) {
-        pushHistory(next);
-      }
+      if (!isDraggingRef.current) pushHistory(next);
       return next;
     });
   }, [pushHistory]);
 
-  // Called when drag ends to commit to history
   const handleDragEnd = useCallback(() => {
     isDraggingRef.current = false;
     pushHistory(objects);
@@ -173,8 +184,25 @@ const RoomEditor = () => {
   }, [objects, toast, pushHistory]);
 
   const handleSave = useCallback(() => {
-    toast({ title: "Layout Saved", description: `${objects.length} objects in room` });
-  }, [objects, toast]);
+    // Create or update room
+    let rId = currentRoomId;
+    if (!rId) {
+      const room = roomStore.addRoom(roomName, roomConfig);
+      rId = room.id;
+      setCurrentRoomId(rId);
+    } else {
+      roomStore.updateRoom(rId, { config: roomConfig });
+    }
+
+    // Save layout
+    const layoutName = `${roomName} Layout`;
+    const saved = roomStore.saveLayout(rId, layoutName, objects);
+
+    toast({
+      title: "Layout Saved",
+      description: `${objects.length} objects · v${saved.version}`,
+    });
+  }, [objects, roomConfig, currentRoomId, roomName, toast]);
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
@@ -184,7 +212,7 @@ const RoomEditor = () => {
           <ArrowLeft className="w-3.5 h-3.5" /> Back
         </Button>
         <div className="h-5 w-px bg-border/40" />
-        <h1 className="font-display text-sm font-bold text-foreground">Room Editor</h1>
+        <h1 className="font-display text-sm font-bold text-foreground">{roomName}</h1>
         <span className="text-[10px] text-muted-foreground">
           {roomConfig.width}m × {roomConfig.depth}m
         </span>
