@@ -301,7 +301,7 @@ const MyRooms = () => {
                 <Input type="number" value={newRoom.width} onChange={(e) => setNewRoom((p) => ({ ...p, width: e.target.value }))} min="1" max="20" step="0.5" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Depth (m)</Label>
+                <Label className="text-xs">{t("rooms.depth")}</Label>
                 <Input type="number" value={newRoom.depth} onChange={(e) => setNewRoom((p) => ({ ...p, depth: e.target.value }))} min="1" max="20" step="0.5" />
               </div>
               <div className="space-y-1.5">
