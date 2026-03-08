@@ -28,7 +28,7 @@ const EditorToolbar = ({
   objectCount,
 }: EditorToolbarProps) => {
   return (
-    <div className="h-11 bg-card border-b border-border/40 flex items-center px-3 gap-1.5">
+    <div className="h-11 bg-card border-b border-border/40 flex items-center px-3 gap-1.5 overflow-x-auto scrollbar-hide">
       <div className="flex items-center gap-1">
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onUndo} disabled={!canUndo} title="Undo (Ctrl+Z)">
           <Undo className="w-3.5 h-3.5" />
