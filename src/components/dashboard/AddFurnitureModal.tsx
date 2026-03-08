@@ -164,9 +164,9 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
   };
 
   const dims = {
-    width: parseFloat(form.width) / 100 || 0.5,
-    height: parseFloat(form.height) / 100 || 0.5,
-    depth: parseFloat(form.depth) / 100 || 0.5,
+    width: toCm(form.width) / 100 || 0.5,
+    height: toCm(form.height) / 100 || 0.5,
+    depth: toCm(form.depth) / 100 || 0.5,
   };
 
   const activeStepIndex = STEPS.indexOf(step);
