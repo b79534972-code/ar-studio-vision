@@ -37,6 +37,23 @@ export function useSubscription() {
 
   const upgradePlan = useCallback((plan: SubscriptionPlan) => {
     setUser((prev) => ({ ...prev, subscriptionPlan: plan }));
+    const newCredits = PLAN_CONFIG[plan].limits.aiCredits ?? 5;
+    setUsage((prev) => ({ ...prev, aiCreditsTotal: newCredits, aiCreditsUsed: 0 }));
+  }, []);
+
+  const useCredit = useCallback((amount: number = 1): boolean => {
+    let success = false;
+    setUsage((prev) => {
+      const remaining = prev.aiCreditsTotal - prev.aiCreditsUsed;
+      if (remaining < amount) return prev;
+      success = true;
+      return {
+        ...prev,
+        aiCreditsUsed: prev.aiCreditsUsed + amount,
+        aiRequestsCount: prev.aiRequestsCount + 1,
+      };
+    });
+    return success;
   }, []);
 
   const logout = useCallback(() => {
