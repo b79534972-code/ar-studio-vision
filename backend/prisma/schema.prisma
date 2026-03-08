@@ -99,6 +99,7 @@ model User {
   layouts              Layout[]
   furnitureModels      FurnitureModel[]
   arSessions           ARSession[]
+  aiRequests           AIRequest[]
   auditLogs            AuditLog[]
 }
 
