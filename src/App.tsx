@@ -47,10 +47,15 @@ const App = () => (
             <Route path="models" element={<MyModels />} />
             <Route path="rooms" element={<MyRooms />} />
             <Route path="layouts" element={<SavedLayouts />} />
+            <Route path="furniture" element={<FurnitureLibrary />} />
+            <Route path="ai-generator" element={<AILayoutGenerator />} />
             <Route path="profile" element={<Profile />} />
             <Route path="billing" element={<Billing />} />
             <Route path="settings" element={<DashboardSettings />} />
           </Route>
+
+          {/* Full-screen editor (outside dashboard layout) */}
+          <Route path="/dashboard/editor" element={<RoomEditor />} />
 
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />
