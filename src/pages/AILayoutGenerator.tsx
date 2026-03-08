@@ -154,20 +154,20 @@ const AILayoutGenerator = () => {
               {/* Room Type */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Room Type</Label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                   {ROOM_TYPES.map((rt) => (
                     <button
                       key={rt.value}
                       onClick={() => setRoomType(rt.value)}
                       className={cn(
-                        "flex flex-col items-center gap-2 p-4 rounded-xl border transition-all",
+                        "flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all",
                         roomType === rt.value
                           ? "border-primary bg-primary/5 shadow-sm"
                           : "border-border/40 hover:border-border"
                       )}
                     >
-                      <rt.icon className={cn("w-6 h-6", roomType === rt.value ? "text-primary" : "text-muted-foreground")} />
-                      <span className="text-xs font-medium">{rt.label}</span>
+                      <rt.icon className={cn("w-5 h-5", roomType === rt.value ? "text-primary" : "text-muted-foreground")} />
+                      <span className="text-[11px] font-medium">{rt.label}</span>
                     </button>
                   ))}
                 </div>
@@ -216,6 +216,132 @@ const AILayoutGenerator = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Advanced Options Toggle */}
+              <button
+                onClick={() => setShowAdvanced((v) => !v)}
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full"
+              >
+                <ChevronDown className={cn("w-4 h-4 transition-transform", showAdvanced && "rotate-180")} />
+                Advanced Options
+                {(purposes.length > 0 || furniturePrefs.length > 0) && (
+                  <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">
+                    {purposes.length + furniturePrefs.length} selected
+                  </Badge>
+                )}
+              </button>
+
+              <AnimatePresence>
+                {showAdvanced && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="space-y-5 overflow-hidden"
+                  >
+                    {/* Occupants */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-muted-foreground" />
+                        <Label className="text-sm font-medium">Number of Occupants</Label>
+                        <span className="text-xs font-bold text-primary ml-auto">{occupants[0]}</span>
+                      </div>
+                      <Slider value={occupants} onValueChange={setOccupants} min={1} max={8} step={1} className="w-full" />
+                      <div className="flex justify-between text-[10px] text-muted-foreground">
+                        <span>1 person</span>
+                        <span>8 people</span>
+                      </div>
+                    </div>
+
+                    {/* Budget */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-muted-foreground" />
+                        <Label className="text-sm font-medium">Budget Range</Label>
+                      </div>
+                      <div className="flex gap-2">
+                        {[
+                          { value: "low", label: "Budget", desc: "Essential items only" },
+                          { value: "medium", label: "Mid-range", desc: "Balanced quality" },
+                          { value: "high", label: "Premium", desc: "High-end pieces" },
+                          { value: "luxury", label: "Luxury", desc: "No limits" },
+                        ].map((b) => (
+                          <button
+                            key={b.value}
+                            onClick={() => setBudget(b.value)}
+                            className={cn(
+                              "flex-1 p-2.5 rounded-xl border text-center transition-all",
+                              budget === b.value
+                                ? "border-primary bg-primary/5"
+                                : "border-border/40 hover:border-border"
+                            )}
+                          >
+                            <p className="text-xs font-medium">{b.label}</p>
+                            <p className="text-[9px] text-muted-foreground mt-0.5">{b.desc}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Purpose */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Target className="w-4 h-4 text-muted-foreground" />
+                        <Label className="text-sm font-medium">Primary Purpose</Label>
+                        <span className="text-[10px] text-muted-foreground">(select multiple)</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {PURPOSES.map((p) => {
+                          const active = purposes.includes(p.value);
+                          return (
+                            <button
+                              key={p.value}
+                              onClick={() => setPurposes((prev) =>
+                                active ? prev.filter((v) => v !== p.value) : [...prev, p.value]
+                              )}
+                              className={cn(
+                                "px-3 py-1.5 rounded-lg border text-xs font-medium transition-all",
+                                active
+                                  ? "border-primary bg-primary/5 text-primary"
+                                  : "border-border/40 hover:border-border text-muted-foreground"
+                              )}
+                            >
+                              {p.label}
+                              {active && <Check className="w-3 h-3 inline ml-1.5" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Furniture Preferences */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Must-Have Furniture</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {FURNITURE_PREFS.map((f) => {
+                          const active = furniturePrefs.includes(f.value);
+                          return (
+                            <button
+                              key={f.value}
+                              onClick={() => setFurniturePrefs((prev) =>
+                                active ? prev.filter((v) => v !== f.value) : [...prev, f.value]
+                              )}
+                              className={cn(
+                                "px-3 py-1.5 rounded-lg border text-xs font-medium transition-all",
+                                active
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-border/40 hover:border-border text-muted-foreground"
+                              )}
+                            >
+                              {f.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* AI Prompt */}
               <div className="space-y-3">
