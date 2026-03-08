@@ -26,6 +26,9 @@ const DEFAULT_ROOM: RoomConfig = {
 
 const MAX_HISTORY = 50;
 
+const PANEL_MIN_H = 35; // vh
+const PANEL_MAX_H = 85; // vh
+
 const RoomEditor = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -38,6 +41,10 @@ const RoomEditor = () => {
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [showOutOfCredits, setShowOutOfCredits] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<"furniture" | "properties" | null>(null);
+  const [panelHeight, setPanelHeight] = useState(45); // vh
+  const [aiPanelHeight, setAiPanelHeight] = useState(60); // vh
+  const panelDragStartY = useRef(0);
+  const panelDragStartH = useRef(0);
   const { usage, useCredit, user } = useSubscription();
   // Room/layout context
   const roomId = searchParams.get("roomId");
