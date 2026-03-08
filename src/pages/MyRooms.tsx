@@ -259,7 +259,7 @@ const MyRooms = () => {
                                 className="text-destructive"
                                 onClick={(e) => { e.stopPropagation(); handleDeleteRoom(room.id, room.name); }}
                               >
-                                <Trash2 className="w-3.5 h-3.5 mr-2" /> Delete
+                                <Trash2 className="w-3.5 h-3.5 mr-2" /> {t("rooms.delete")}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
