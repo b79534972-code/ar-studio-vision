@@ -190,29 +190,21 @@ const Profile = () => {
                 <option>{t("profile.theme.light")}</option>
               </select>
             </div>
-            {/* Currency */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-foreground">{t("profile.currency")}</p>
-                <p className="text-xs text-muted-foreground">{t("profile.currencyDesc")}</p>
-              </div>
-              <select className="bg-secondary/40 border border-border/50 rounded-lg px-3 py-1.5 text-sm text-foreground">
-                <option value="USD">USD ($)</option>
-                <option value="VND">VND (₫)</option>
-              </select>
-            </div>
             {/* Toggles */}
             {[
-              { label: t("profile.autoSave"), desc: t("profile.autoSaveDesc"), defaultOn: true },
-              { label: t("profile.emailNotif"), desc: t("profile.emailNotifDesc"), defaultOn: false },
-            ].map((toggle) => (
-              <div key={toggle.label} className="flex items-center justify-between">
+              { label: t("profile.autoSave"), desc: t("profile.autoSaveDesc"), on: autoSave, toggle: () => setAutoSave(!autoSave) },
+              { label: t("profile.emailNotif"), desc: t("profile.emailNotifDesc"), on: emailNotif, toggle: () => setEmailNotif(!emailNotif) },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-foreground">{toggle.label}</p>
-                  <p className="text-xs text-muted-foreground">{toggle.desc}</p>
+                  <p className="text-sm font-medium text-foreground">{item.label}</p>
+                  <p className="text-xs text-muted-foreground">{item.desc}</p>
                 </div>
-                <button className={`w-10 h-6 rounded-full relative transition-colors ${toggle.defaultOn ? 'bg-primary' : 'bg-muted'}`}>
-                  <span className={`absolute top-1 w-4 h-4 bg-primary-foreground rounded-full transition-all ${toggle.defaultOn ? 'right-1' : 'left-1'}`} />
+                <button
+                  onClick={item.toggle}
+                  className={`w-10 h-6 rounded-full relative transition-colors ${item.on ? 'bg-primary' : 'bg-muted'}`}
+                >
+                  <span className={`absolute top-1 w-4 h-4 bg-primary-foreground rounded-full transition-all ${item.on ? 'right-1' : 'left-1'}`} />
                 </button>
               </div>
             ))}
