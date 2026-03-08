@@ -9,7 +9,6 @@ import {
 import { ApplicationService } from "@/services/ApplicationService";
 import type { User, UserUsage, Currency } from "@/types/subscription";
 import { useLanguage } from "@/contexts/LanguageContext";
-import arWorkspaceHero from "@/assets/ar-workspace-hero.png";
 
 interface DashboardContext {
   user: User;
@@ -155,7 +154,7 @@ const DashboardOverview = () => {
 
   return (
     <div className="space-y-6 lg:space-y-8">
-      {/* ── Hero Banner — split layout ── */}
+      {/* ── Hero Banner — action-focused ── */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -165,71 +164,53 @@ const DashboardOverview = () => {
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary-foreground/[0.04] rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-primary-foreground/[0.03] rounded-full blur-2xl translate-y-1/2 pointer-events-none" />
 
-        <div className="relative p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center lg:gap-8">
-          {/* Left — text + actions */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="px-2.5 py-1 rounded-full bg-primary-foreground/10 text-[10px] font-semibold text-primary-foreground/80 uppercase tracking-wider">
-                {t("plan.plan")}
-              </div>
-            </div>
-            <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-primary-foreground mb-2 leading-tight">
-              {t("overview.title")}
-            </h1>
-            <p className="text-primary-foreground/65 text-sm sm:text-base mb-6 max-w-xl leading-relaxed">
-              {t("overview.subtitle")}
-            </p>
-
-            <div className="flex flex-wrap gap-2.5">
-              <Button
-                variant="secondary"
-                size="default"
-                className="gap-2 min-h-[44px] rounded-xl font-medium"
-                onClick={() => navigate("/dashboard/layouts")}
-              >
-                <Plus className="w-4 h-4" /> {t("overview.createLayout")}
-              </Button>
-              <Button
-                variant="secondary"
-                size="default"
-                className="gap-2 min-h-[44px] rounded-xl font-medium"
-                onClick={() => navigate("/dashboard/models")}
-              >
-                <ImagePlus className="w-4 h-4" /> {t("overview.addFurniture")}
-              </Button>
-              <Button
-                variant="secondary"
-                size="default"
-                className="gap-2 min-h-[44px] rounded-xl font-medium"
-                onClick={() => navigate("/ar-demo")}
-              >
-                <Smartphone className="w-4 h-4" /> {t("overview.startAR")}
-              </Button>
-              <Button
-                variant="secondary"
-                size="default"
-                className="gap-2 min-h-[44px] rounded-xl font-medium"
-                onClick={() => featureGate.canUseAI() && navigate("/dashboard/layouts")}
-              >
-                <Sparkles className="w-4 h-4" /> {t("overview.aiLayout")}
-              </Button>
+        <div className="relative p-6 sm:p-8">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="px-2.5 py-1 rounded-full bg-primary-foreground/10 text-[10px] font-semibold text-primary-foreground/80 uppercase tracking-wider">
+              {t("plan.plan")}
             </div>
           </div>
+          <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-primary-foreground mb-2 leading-tight">
+            {t("overview.title")}
+          </h1>
+          <p className="text-primary-foreground/65 text-sm sm:text-base mb-6 max-w-xl leading-relaxed">
+            {t("overview.subtitle")}
+          </p>
 
-          {/* Right — AR workspace illustration */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
-            className="hidden lg:flex items-center justify-center shrink-0 w-[280px] xl:w-[340px]"
-          >
-            <img
-              src={arWorkspaceHero}
-              alt="AR interior design workspace — isometric 3D room preview"
-              className="w-full h-auto drop-shadow-2xl"
-              loading="eager"
-            />
-          </motion.div>
+          <div className="flex flex-wrap gap-2.5">
+            <Button
+              variant="secondary"
+              size="default"
+              className="gap-2 min-h-[44px] rounded-xl font-medium"
+              onClick={() => navigate("/dashboard/layouts")}
+            >
+              <Plus className="w-4 h-4" /> {t("overview.createLayout")}
+            </Button>
+            <Button
+              variant="secondary"
+              size="default"
+              className="gap-2 min-h-[44px] rounded-xl font-medium"
+              onClick={() => navigate("/dashboard/models")}
+            >
+              <ImagePlus className="w-4 h-4" /> {t("overview.addFurniture")}
+            </Button>
+            <Button
+              variant="secondary"
+              size="default"
+              className="gap-2 min-h-[44px] rounded-xl font-medium"
+              onClick={() => navigate("/ar-demo")}
+            >
+              <Smartphone className="w-4 h-4" /> {t("overview.startAR")}
+            </Button>
+            <Button
+              variant="secondary"
+              size="default"
+              className="gap-2 min-h-[44px] rounded-xl font-medium"
+              onClick={() => featureGate.canUseAI() && navigate("/dashboard/layouts")}
+            >
+              <Sparkles className="w-4 h-4" /> {t("overview.aiLayout")}
+            </Button>
+          </div>
         </div>
       </motion.div>
 
