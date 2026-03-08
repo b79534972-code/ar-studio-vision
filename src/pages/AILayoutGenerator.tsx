@@ -140,8 +140,8 @@ const AILayoutGenerator = () => {
             <Sparkles className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-2xl font-bold text-foreground">AI Layout Generator</h1>
-            <p className="text-sm text-muted-foreground">Generate optimized room layouts powered by AI</p>
+            <h1 className="font-display text-2xl font-bold text-foreground">{t("aiGen.title")}</h1>
+            <p className="text-sm text-muted-foreground">{t("aiGen.subtitle")}</p>
           </div>
         </div>
       </motion.div>
