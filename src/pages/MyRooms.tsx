@@ -208,6 +208,50 @@ const MyRooms = () => {
                           </Button>
                         </div>
                       </motion.div>
+                      {/* History panel */}
+                      <AnimatePresence>
+                        {historyLayout?.id === layout.id && layout.history.length > 0 && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden bg-accent/20 border-t border-border/20"
+                          >
+                            <div className="px-5 py-3 space-y-2">
+                              <div className="flex items-center gap-2 mb-2">
+                                <History className="w-3.5 h-3.5 text-muted-foreground" />
+                                <span className="text-xs font-medium text-muted-foreground">{t("rooms.history") || "Save History"}</span>
+                              </div>
+                              {[...layout.history].reverse().map((snap, si) => (
+                                <div key={snap.id} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-card/60 border border-border/20">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] text-foreground font-medium">
+                                      {snap.objects.length} {t("rooms.objects")}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                      <Clock className="w-2.5 h-2.5" />
+                                      {new Date(snap.savedAt).toLocaleString()}
+                                    </p>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-7 px-2 text-xs gap-1 text-primary"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      roomStore.restoreSnapshot(layout.id, snap.id);
+                                      toast({ title: t("rooms.restored") || "Restored", description: new Date(snap.savedAt).toLocaleString() });
+                                    }}
+                                  >
+                                    <RotateCcw className="w-3 h-3" /> {t("rooms.restore") || "Restore"}
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </React.Fragment>
                     ))}
                 </div>
               )}
