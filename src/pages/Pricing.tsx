@@ -242,6 +242,8 @@ const Pricing = () => {
                 <>
                   <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> Processing...
                 </>
+              ) : confirmPlan === currentPlan ? (
+                "Buy Credits"
               ) : (
                 "Confirm Upgrade"
               )}
