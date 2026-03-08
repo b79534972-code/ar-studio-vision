@@ -26,6 +26,22 @@ const RoomEditor = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [roomConfig, setRoomConfig] = useState<RoomConfig>(DEFAULT_ROOM);
   const [viewMode, setViewMode] = useState<"3d" | "top">("3d");
+  const [showARModal, setShowARModal] = useState(false);
+
+  // Load scanned room config if coming from Room Scan AI
+  useEffect(() => {
+    if (searchParams.get("source") === "scan") {
+      try {
+        const stored = sessionStorage.getItem("scanned-room");
+        if (stored) {
+          const scanned = JSON.parse(stored);
+          setRoomConfig((prev) => ({ ...prev, ...scanned }));
+          sessionStorage.removeItem("scanned-room");
+          toast({ title: "Room Loaded", description: "Scanned room structure applied" });
+        }
+      } catch { /* ignore */ }
+    }
+  }, [searchParams, toast]);
 
   const selectedObject = objects.find((o) => o.id === selectedId) || null;
 
