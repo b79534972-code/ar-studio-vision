@@ -13,6 +13,7 @@ export function useRoomStore() {
     removeRoom: roomStore.removeRoom,
     saveLayout: roomStore.saveLayout,
     removeLayout: roomStore.removeLayout,
+    restoreSnapshot: roomStore.restoreSnapshot,
     getLayoutsForRoom: roomStore.getLayoutsForRoom,
   };
 }
