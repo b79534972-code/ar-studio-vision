@@ -24,7 +24,7 @@ const FurnitureLibrary = () => {
   const [showFavOnly, setShowFavOnly] = useState(false);
   const [arItem, setArItem] = useState<FurnitureItem | null>(null);
 
-  const filtered = FURNITURE_CATALOG.filter((item) => {
+  const filtered = allFurniture.filter((item) => {
     const matchSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
       item.tags.some((t) => t.includes(search.toLowerCase()));
     const matchCat = category === "all" || item.category === category;
