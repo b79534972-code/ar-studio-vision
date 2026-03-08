@@ -641,6 +641,24 @@ const translations: Record<Language, Record<string, string>> = {
     "roomScan.uploadAnother": "Tải ảnh khác",
     "roomScan.useLayout": "Sử dụng bố cục này",
 
+    // AI Credits
+    "ai.creditsLeft": "credit còn lại",
+    "ai.noCredits": "Không đủ credit",
+    "ai.noCreditsDesc": "Bạn không đủ AI credit. Vui lòng nâng cấp gói.",
+    "ai.notEnoughCredits": "Không đủ Credit — Nâng cấp gói",
+    "ai.feature.layoutSuggest": "AI Gợi ý bố cục",
+    "ai.feature.layoutSuggestDesc": "Tạo bố cục nội thất tối ưu cho mọi loại phòng",
+    "ai.feature.styleTransform": "AI Chuyển đổi phong cách",
+    "ai.feature.styleTransformDesc": "Chuyển đổi phòng sang phong cách thiết kế khác",
+    "ai.feature.productRecommend": "AI Gợi ý sản phẩm",
+    "ai.feature.productRecommendDesc": "Gợi ý nội thất phù hợp với phòng của bạn",
+    "ai.feature.budgetOptimize": "AI Tối ưu ngân sách",
+    "ai.feature.budgetOptimizeDesc": "Tối ưu thiết kế nội thất trong ngân sách",
+    "ai.feature.photoRender": "AI Render chân thực",
+    "ai.feature.photoRenderDesc": "Tạo ảnh chân thực từ thiết kế phòng của bạn",
+    "ai.feature.fullRedesign": "AI Thiết kế lại toàn bộ",
+    "ai.feature.fullRedesignDesc": "Thiết kế lại hoàn toàn phòng với gợi ý AI",
+
     // AI Layout Generator
     "aiGen.title": "AI Tạo bố cục",
     "aiGen.subtitle": "Tạo bố cục phòng tối ưu bằng AI",
