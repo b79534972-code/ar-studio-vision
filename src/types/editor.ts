@@ -11,6 +11,10 @@ export interface FurnitureItem {
   color: string;
   dimensions: { width: number; height: number; depth: number };
   thumbnail?: string;
+  /** URL to .glb/.gltf model for WebXR & Desktop viewer */
+  modelUrl?: string;
+  /** URL to .usdz model for iOS AR Quick Look */
+  usdzUrl?: string;
   tags: string[];
   favorited?: boolean;
 }

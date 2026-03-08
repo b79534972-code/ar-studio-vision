@@ -27,6 +27,10 @@ interface ModelMetadata {
   category?: string;
   material?: string;
   dimensions: { width: number; height: number; depth: number };
+  /** URL to .glb model — used by WebXR & Desktop viewer */
+  modelUrl?: string;
+  /** URL to .usdz model — used by iOS AR Quick Look */
+  usdzUrl?: string;
 }
 
 const DEFAULT_MODEL: ModelMetadata = {
@@ -35,6 +39,8 @@ const DEFAULT_MODEL: ModelMetadata = {
   category: "sofa",
   material: "Fabric",
   dimensions: { width: 1.8, height: 0.8, depth: 0.8 },
+  modelUrl: "/models/sofa.glb",
+  usdzUrl: "/models/sofa.usdz",
 };
 
 /** Encode model data to base64 for URL */
@@ -88,8 +94,8 @@ const ARDemo = () => {
     resetPlacement,
     containerRef,
   } = useAREngine({
-    glb: "/models/sofa.glb",
-    usdz: "/models/sofa.usdz",
+    glb: modelData.modelUrl || "/models/sofa.glb",
+    usdz: modelData.usdzUrl || "/models/sofa.usdz",
   });
 
   const isDesktop = platform === "desktop";
