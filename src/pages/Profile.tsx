@@ -179,7 +179,7 @@ const Profile = () => {
             </div>
             {[
               { label: t("profile.defaultUnit"), desc: t("profile.unitDesc"), options: ["cm", "m"] },
-              { label: t("profile.theme"), desc: t("profile.themeDesc"), options: ["Dark", "Light"] },
+              { label: t("profile.theme"), desc: t("profile.themeDesc"), options: [t("profile.theme.dark"), t("profile.theme.light")] },
             ].map((pref) => (
               <div key={pref.label} className="flex items-center justify-between">
                 <div>
