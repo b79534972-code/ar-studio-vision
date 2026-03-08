@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Search, Plus, Star } from "lucide-react";
+import { Search, Plus, Star, Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { FURNITURE_CATALOG, CATEGORIES } from "@/data/furnitureCatalog";
+import { useCustomFurniture } from "@/hooks/useCustomFurniture";
 import type { FurnitureItem } from "@/types/editor";
 import { cn } from "@/lib/utils";
 
@@ -14,8 +15,11 @@ interface EditorFurniturePanelProps {
 const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const { customItems } = useCustomFurniture();
 
-  const filtered = FURNITURE_CATALOG.filter((item) => {
+  const allItems = [...FURNITURE_CATALOG, ...customItems];
+
+  const filtered = allItems.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
       item.tags.some((t) => t.includes(search.toLowerCase()));
     const matchesCategory = activeCategory === "all" || item.category === activeCategory;
@@ -55,16 +59,29 @@ const EditorFurniturePanel = ({ onAddFurniture }: EditorFurniturePanelProps) => 
 
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1.5">
+          {/* Custom items section */}
+          {customItems.length > 0 && activeCategory === "all" && !search && (
+            <div className="mb-2">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2.5 mb-1.5 flex items-center gap-1">
+                <Upload className="w-3 h-3" /> My Furniture
+              </p>
+            </div>
+          )}
+
           {filtered.map((item) => (
             <button
               key={item.id}
               onClick={() => onAddFurniture(item)}
               className="w-full flex items-start gap-2.5 p-2.5 rounded-xl text-left hover:bg-accent/50 transition-colors group"
             >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border border-border/30"
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border border-border/30 overflow-hidden"
                 style={{ backgroundColor: item.color + "22" }}
               >
-                <div className="w-5 h-5 rounded-sm" style={{ backgroundColor: item.color }} />
+                {item.thumbnail ? (
+                  <img src={item.thumbnail} alt={item.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-5 h-5 rounded-sm" style={{ backgroundColor: item.color }} />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
