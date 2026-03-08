@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Home, Plus, Search, MoreHorizontal, Trash2, ArrowRight, ArrowLeft,
-  Layers, Clock, Edit, PenTool,
+  Layers, Clock, Edit, PenTool, History, RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
