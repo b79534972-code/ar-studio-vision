@@ -157,8 +157,8 @@ const MyRooms = () => {
                   {roomLayouts
                     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
                     .map((layout, i) => (
+                      <React.Fragment key={layout.id}>
                       <motion.div
-                        key={layout.id}
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05 }}
