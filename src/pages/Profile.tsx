@@ -177,32 +177,40 @@ const Profile = () => {
                 <option value="vi">Tiếng Việt</option>
               </select>
             </div>
-            {[
-              { label: t("profile.defaultUnit"), desc: t("profile.unitDesc"), options: ["cm", "m"] },
-              { label: t("profile.theme"), desc: t("profile.themeDesc"), options: [t("profile.theme.dark"), t("profile.theme.light")] },
-            ].map((pref) => (
-              <div key={pref.label} className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-foreground">{pref.label}</p>
-                  <p className="text-xs text-muted-foreground">{pref.desc}</p>
-                </div>
-                <select className="bg-secondary/40 border border-border/50 rounded-lg px-3 py-1.5 text-sm text-foreground">
-                  {pref.options.map((opt) => <option key={opt}>{opt}</option>)}
-                </select>
+            {/* Theme */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">{t("profile.theme")}</p>
+                <p className="text-xs text-muted-foreground">{t("profile.themeDesc")}</p>
               </div>
-            ))}
+              <select className="bg-secondary/40 border border-border/50 rounded-lg px-3 py-1.5 text-sm text-foreground">
+                <option>{t("profile.theme.dark")}</option>
+                <option>{t("profile.theme.light")}</option>
+              </select>
+            </div>
+            {/* Currency */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">{t("profile.currency")}</p>
+                <p className="text-xs text-muted-foreground">{t("profile.currencyDesc")}</p>
+              </div>
+              <select className="bg-secondary/40 border border-border/50 rounded-lg px-3 py-1.5 text-sm text-foreground">
+                <option value="USD">USD ($)</option>
+                <option value="VND">VND (₫)</option>
+              </select>
+            </div>
+            {/* Toggles */}
             {[
-              { label: t("profile.autoSave"), desc: t("profile.autoSaveDesc") },
-              { label: t("profile.arGrid"), desc: t("profile.arGridDesc") },
-              { label: t("profile.aiSuggest"), desc: t("profile.aiSuggestDesc") },
+              { label: t("profile.autoSave"), desc: t("profile.autoSaveDesc"), defaultOn: true },
+              { label: t("profile.emailNotif"), desc: t("profile.emailNotifDesc"), defaultOn: false },
             ].map((toggle) => (
               <div key={toggle.label} className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-foreground">{toggle.label}</p>
                   <p className="text-xs text-muted-foreground">{toggle.desc}</p>
                 </div>
-                <button className="w-10 h-6 bg-primary rounded-full relative">
-                  <span className="absolute right-1 top-1 w-4 h-4 bg-primary-foreground rounded-full" />
+                <button className={`w-10 h-6 rounded-full relative transition-colors ${toggle.defaultOn ? 'bg-primary' : 'bg-muted'}`}>
+                  <span className={`absolute top-1 w-4 h-4 bg-primary-foreground rounded-full transition-all ${toggle.defaultOn ? 'right-1' : 'left-1'}`} />
                 </button>
               </div>
             ))}
