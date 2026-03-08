@@ -276,7 +276,7 @@ const RoomScan = () => {
                       </div>
                       <div className="bg-card/80 backdrop-blur-md rounded-lg px-3 py-1.5">
                         <span className="text-xs font-semibold text-foreground">
-                          {detectedRoom.confidence}% confidence
+                          {detectedRoom.confidence}% {t("roomScan.confidence")}
                         </span>
                       </div>
                     </div>
