@@ -113,6 +113,25 @@ const HeroSection = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-transparent to-transparent pointer-events-none transition-opacity duration-500 group-hover:opacity-80" />
             </div>
 
+            {/* Reflective floor effect */}
+            <div
+              className="mt-1 h-16 md:h-24 rounded-b-2xl overflow-hidden opacity-40"
+              style={{
+                background: "linear-gradient(180deg, hsl(var(--border) / 0.3), transparent)",
+                maskImage: "linear-gradient(180deg, rgba(0,0,0,0.4), transparent)",
+                WebkitMaskImage: "linear-gradient(180deg, rgba(0,0,0,0.4), transparent)",
+                transform: "scaleY(-1) translateY(-1px)",
+              }}
+            >
+              <img
+                src={heroImage}
+                alt=""
+                className="w-full h-auto blur-[2px] opacity-50"
+                style={{ filter: "brightness(0.9) blur(2px)" }}
+                aria-hidden="true"
+              />
+            </div>
+
             {/* Floating label - glassmorphism */}
             <motion.div
               className="absolute -bottom-3 -left-2 md:-bottom-4 md:-left-4 rounded-xl p-2.5 md:p-3 border border-primary/15"
@@ -148,6 +167,19 @@ const HeroSection = () => {
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
                 <span className="text-[10px] font-medium text-foreground">AI Active</span>
+              </div>
+            </motion.div>
+
+            {/* Spatial coordinates label */}
+            <motion.div
+              className="absolute top-3 left-3 md:top-4 md:left-4"
+              animate={{ opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <div className="font-mono text-[8px] md:text-[9px] text-primary/40 space-y-0.5">
+                <div>x: 4.2m</div>
+                <div>y: 3.1m</div>
+                <div>z: 2.8m</div>
               </div>
             </motion.div>
           </motion.div>
