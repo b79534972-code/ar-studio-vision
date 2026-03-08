@@ -9,16 +9,10 @@ import FinalCTASection from "@/components/landing/FinalCTASection";
 import Footer from "@/components/landing/Footer";
 import SectionDivider from "@/components/landing/SectionDivider";
 import ParticleField from "@/components/landing/ParticleField";
-import AnimatedGradientBg from "@/components/landing/AnimatedGradientBg";
-import PerspectiveGrid from "@/components/landing/PerspectiveGrid";
-import NeuralNetwork from "@/components/landing/NeuralNetwork";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background relative">
-      <AnimatedGradientBg />
-      <PerspectiveGrid />
-      <NeuralNetwork />
       <ParticleField />
       <Navbar />
       <main className="relative z-10">
