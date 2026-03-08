@@ -113,7 +113,7 @@ const MyRooms = () => {
             {/* Back + Room info */}
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm" className="gap-1.5 h-8 text-xs" onClick={() => setSelectedRoom(null)}>
-                <ArrowLeft className="w-3.5 h-3.5" /> All Rooms
+                <ArrowLeft className="w-3.5 h-3.5" /> {t("rooms.allRooms")}
               </Button>
               <div className="h-5 w-px bg-border/40" />
               <div className="flex-1">
