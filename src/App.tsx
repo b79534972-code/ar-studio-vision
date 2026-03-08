@@ -25,6 +25,7 @@ import FurnitureLibrary from "./pages/FurnitureLibrary";
 import AILayoutGenerator from "./pages/AILayoutGenerator";
 import ARViewer from "./pages/ARViewer";
 import RoomScan from "./pages/RoomScan";
+import ARObjectViewer from "./pages/ARObjectViewer";
 
 const queryClient = new QueryClient();
 
