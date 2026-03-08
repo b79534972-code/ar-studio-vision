@@ -234,10 +234,10 @@ const RoomScan = () => {
                 {/* Analysis steps */}
                 <div className="mt-5 space-y-2 text-left">
                   {[
-                    { label: "Detecting floor plane", done: progress > 30 },
-                    { label: "Identifying wall boundaries", done: progress > 55 },
-                    { label: "Calculating dimensions", done: progress > 80 },
-                    { label: "Generating room model", done: progress >= 100 },
+                    { label: t("roomScan.stepFloor"), done: progress > 30 },
+                    { label: t("roomScan.stepWalls"), done: progress > 55 },
+                    { label: t("roomScan.stepDimensions"), done: progress > 80 },
+                    { label: t("roomScan.stepModel"), done: progress >= 100 },
                   ].map((step, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs">
                       {step.done ? (
