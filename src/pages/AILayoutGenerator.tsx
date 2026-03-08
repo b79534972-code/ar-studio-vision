@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, Wand2, Check, ArrowRight, Loader2,
   Home, BedDouble, Sofa, Monitor, LayoutGrid, Eye, Pencil,
+  ChefHat, Bath, UtensilsCrossed, Baby, TreePalm, Shirt,
+  ChevronDown, Users, DollarSign, Target,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import type { AILayoutSuggestion } from "@/types/editor";
@@ -18,8 +21,14 @@ import { cn } from "@/lib/utils";
 const ROOM_TYPES = [
   { value: "living", label: "Living Room", icon: Sofa },
   { value: "bedroom", label: "Bedroom", icon: BedDouble },
-  { value: "studio", label: "Studio Apartment", icon: Home },
+  { value: "studio", label: "Studio Apt", icon: Home },
   { value: "office", label: "Home Office", icon: Monitor },
+  { value: "kitchen", label: "Kitchen", icon: ChefHat },
+  { value: "dining", label: "Dining Room", icon: UtensilsCrossed },
+  { value: "bathroom", label: "Bathroom", icon: Bath },
+  { value: "kids", label: "Kids Room", icon: Baby },
+  { value: "balcony", label: "Balcony", icon: TreePalm },
+  { value: "closet", label: "Walk-in Closet", icon: Shirt },
 ];
 
 const DESIGN_STYLES = [
@@ -28,6 +37,35 @@ const DESIGN_STYLES = [
   { value: "modern", label: "Modern", color: "#93C5FD" },
   { value: "japanese", label: "Japanese", color: "#A7F3D0" },
   { value: "industrial", label: "Industrial", color: "#9CA3AF" },
+  { value: "bohemian", label: "Bohemian", color: "#F9A8D4" },
+  { value: "mid-century", label: "Mid-Century", color: "#FDBA74" },
+  { value: "coastal", label: "Coastal", color: "#67E8F9" },
+  { value: "rustic", label: "Rustic", color: "#D6B38C" },
+  { value: "art-deco", label: "Art Deco", color: "#C4B5FD" },
+  { value: "tropical", label: "Tropical", color: "#86EFAC" },
+  { value: "contemporary", label: "Contemporary", color: "#CBD5E1" },
+];
+
+const PURPOSES = [
+  { value: "relax", label: "Relaxation" },
+  { value: "work", label: "Productivity" },
+  { value: "entertain", label: "Entertaining" },
+  { value: "sleep", label: "Sleep & Rest" },
+  { value: "multi", label: "Multi-purpose" },
+  { value: "kids-play", label: "Kids Play" },
+];
+
+const FURNITURE_PREFS = [
+  { value: "sofa", label: "Sofa" },
+  { value: "desk", label: "Desk" },
+  { value: "bookshelf", label: "Bookshelf" },
+  { value: "tv-unit", label: "TV Unit" },
+  { value: "dining-table", label: "Dining Table" },
+  { value: "bed", label: "Bed" },
+  { value: "wardrobe", label: "Wardrobe" },
+  { value: "plants", label: "Plants" },
+  { value: "rug", label: "Rug" },
+  { value: "reading-nook", label: "Reading Nook" },
 ];
 
 const MOCK_SUGGESTIONS: AILayoutSuggestion[] = [
@@ -68,6 +106,11 @@ const AILayoutGenerator = () => {
   const [prompt, setPrompt] = useState("");
   const [progress, setProgress] = useState(0);
   const [suggestions, setSuggestions] = useState<AILayoutSuggestion[]>([]);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [occupants, setOccupants] = useState([2]);
+  const [budget, setBudget] = useState("medium");
+  const [purposes, setPurposes] = useState<string[]>([]);
+  const [furniturePrefs, setFurniturePrefs] = useState<string[]>([]);
 
   const handleGenerate = async () => {
     setStep("generating");
