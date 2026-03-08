@@ -100,7 +100,7 @@ const SavedLayouts = () => {
                           className="text-destructive"
                           onClick={(e) => { e.stopPropagation(); handleDelete(layout.id, layout.name); }}
                         >
-                          <Trash2 className="w-3.5 h-3.5 mr-2" /> Delete
+                          <Trash2 className="w-3.5 h-3.5 mr-2" /> {t("layouts.delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
