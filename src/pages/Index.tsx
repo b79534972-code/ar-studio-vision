@@ -9,12 +9,10 @@ import FinalCTASection from "@/components/landing/FinalCTASection";
 import Footer from "@/components/landing/Footer";
 import SectionDivider from "@/components/landing/SectionDivider";
 import ParticleField from "@/components/landing/ParticleField";
-import SpatialBackground from "@/components/landing/SpatialBackground";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background relative">
-      <SpatialBackground />
       <ParticleField />
       <Navbar />
       <main className="relative z-10">
