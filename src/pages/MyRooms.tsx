@@ -211,6 +211,9 @@ const MyRooms = () => {
                 <p className="text-sm font-medium text-foreground">
                   {rooms.length === 0 ? t("rooms.empty") : t("rooms.noResults")}
                 </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {rooms.length === 0 ? t("rooms.emptyDesc") : t("rooms.noResultsDesc")}
+                </p>
                 {rooms.length === 0 && (
                   <Button variant="outline" size="sm" className="mt-4 gap-1.5" onClick={() => setShowCreate(true)}>
                     <Plus className="w-3.5 h-3.5" /> {t("rooms.create")}
