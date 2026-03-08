@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Plus, Star, Upload, BookOpen } from "lucide-react";
+import { Search, Plus, Star, Upload, BookOpen, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
