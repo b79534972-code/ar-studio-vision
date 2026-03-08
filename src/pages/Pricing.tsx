@@ -179,10 +179,10 @@ const Pricing = () => {
                 </ul>
 
                 <Button
-                  variant={isHighlighted ? "hero" : "outline"}
+                  variant={isHighlighted ? "hero" : isCurrent ? "default" : "outline"}
                   size="lg"
                   className="w-full"
-                  disabled={isCurrent || isFree}
+                  disabled={isFree}
                   onClick={() => handleUpgrade(planKey)}
                 >
                   {getButtonLabel(planKey)}
