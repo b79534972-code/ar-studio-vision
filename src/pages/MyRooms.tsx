@@ -66,7 +66,7 @@ const MyRooms = () => {
 
   const handleDeleteLayout = (id: string, name: string) => {
     removeLayout(id);
-    toast({ title: "Deleted", description: `${name} removed` });
+    toast({ title: t("rooms.deleted"), description: `${name} ${t("rooms.removed")}` });
   };
 
   const handleOpenEditor = (roomId: string, layoutId?: string) => {
