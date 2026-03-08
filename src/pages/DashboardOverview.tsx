@@ -190,7 +190,7 @@ const DashboardOverview = () => {
               variant="secondary"
               size="default"
               className="gap-2 min-h-[44px] rounded-xl font-medium"
-              onClick={() => navigate("/dashboard/models")}
+              onClick={() => navigate("/dashboard/furniture")}
             >
               <ImagePlus className="w-4 h-4" /> {t("overview.addFurniture")}
             </Button>
