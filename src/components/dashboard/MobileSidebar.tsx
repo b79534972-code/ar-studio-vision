@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, Box, Home, Layers, User, CreditCard, Settings, Sparkles,
-  Armchair, Wand2, PenTool, ScanLine, X,
+  LayoutDashboard, Box, Home, User, CreditCard, Settings, Sparkles,
+  Armchair, Wand2, ScanLine,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
