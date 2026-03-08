@@ -20,12 +20,11 @@ const DashboardSidebar = ({ user, collapsed }: DashboardSidebarProps) => {
 
   const navItems = [
     { to: "/dashboard", label: t("nav.overview"), icon: LayoutDashboard, end: true },
-    { to: "/dashboard/editor", label: t("nav.editor"), icon: PenTool },
+    { to: "/dashboard/rooms", label: t("nav.rooms"), icon: Home },
     { to: "/dashboard/furniture", label: t("nav.furniture"), icon: Armchair },
+    { to: "/dashboard/models", label: t("nav.models"), icon: Box },
     { to: "/dashboard/ai-generator", label: t("nav.aiGenerator"), icon: Wand2 },
     { to: "/dashboard/room-scan", label: "Room Scan AI", icon: ScanLine },
-    { to: "/dashboard/models", label: t("nav.models"), icon: Box },
-    { to: "/dashboard/rooms", label: t("nav.rooms"), icon: Home },
   ];
 
   const bottomItems = [
