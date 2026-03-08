@@ -5,6 +5,7 @@ import { useOutletContext } from "react-router-dom";
 import { User as UserIcon, Package, CreditCard, Settings, Eye, EyeOff } from "lucide-react";
 import { PLAN_CONFIG, type User, type UserUsage, type Currency, formatPrice } from "@/types/subscription";
 import { FeatureService } from "@/services/FeatureService";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DashboardContext {
   user: User;
@@ -12,24 +13,25 @@ interface DashboardContext {
   currency: Currency;
 }
 
-const tabs = [
-  { id: "account", label: "Account", icon: UserIcon },
-  { id: "plan", label: "Plan & Usage", icon: Package },
-  { id: "billing", label: "Billing", icon: CreditCard },
-  { id: "preferences", label: "Preferences", icon: Settings },
-];
-
 const Profile = () => {
   const { user, usage, currency } = useOutletContext<DashboardContext>();
   const [activeTab, setActiveTab] = useState("account");
   const [showPassword, setShowPassword] = useState(false);
   const plan = PLAN_CONFIG[user.subscriptionPlan];
+  const { t, language, setLanguage } = useLanguage();
+
+  const tabs = [
+    { id: "account", label: t("profile.tab.account"), icon: UserIcon },
+    { id: "plan", label: t("profile.tab.plan"), icon: Package },
+    { id: "billing", label: t("profile.tab.billing"), icon: CreditCard },
+    { id: "preferences", label: t("profile.tab.preferences"), icon: Settings },
+  ];
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="font-display text-xl font-bold text-foreground">Profile</h1>
-        <p className="text-sm text-muted-foreground">Manage your account and preferences</p>
+        <h1 className="font-display text-xl font-bold text-foreground">{t("profile.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("profile.subtitle")}</p>
       </div>
 
       {/* Tabs */}
@@ -69,15 +71,15 @@ const Profile = () => {
             </div>
             <div className="grid gap-4">
               <label className="space-y-1.5">
-                <span className="text-sm font-medium text-foreground">Name</span>
+                <span className="text-sm font-medium text-foreground">{t("profile.name")}</span>
                 <input defaultValue={user.name} className="w-full px-4 py-2.5 bg-secondary/40 border border-border/50 rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
               </label>
               <label className="space-y-1.5">
-                <span className="text-sm font-medium text-foreground">Email</span>
+                <span className="text-sm font-medium text-foreground">{t("profile.email")}</span>
                 <input defaultValue={user.email} className="w-full px-4 py-2.5 bg-secondary/40 border border-border/50 rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
               </label>
               <label className="space-y-1.5">
-                <span className="text-sm font-medium text-foreground">Password</span>
+                <span className="text-sm font-medium text-foreground">{t("profile.password")}</span>
                 <div className="relative">
                   <input type={showPassword ? "text" : "password"} defaultValue="••••••••" className="w-full px-4 py-2.5 pr-10 bg-secondary/40 border border-border/50 rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                   <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -86,18 +88,18 @@ const Profile = () => {
                 </div>
               </label>
             </div>
-            <div className="flex gap-3">
-              <Button variant="hero" size="sm">Save Changes</Button>
-              <Button variant="destructive" size="sm">Delete Account</Button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button variant="hero" size="sm" className="w-full sm:w-auto">{t("profile.save")}</Button>
+              <Button variant="destructive" size="sm" className="w-full sm:w-auto">{t("profile.deleteAccount")}</Button>
             </div>
           </div>
         )}
 
         {activeTab === "plan" && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-accent/20 rounded-xl border border-primary/10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-accent/20 rounded-xl border border-primary/10">
               <div>
-                <p className="font-display font-bold text-foreground">{plan.name} Plan</p>
+                <p className="font-display font-bold text-foreground">{plan.name} {t("plan.plan")}</p>
                 <p className="text-sm text-muted-foreground">{plan.tagline}</p>
               </div>
               <p className="font-display text-xl font-bold text-primary">
@@ -108,14 +110,14 @@ const Profile = () => {
 
             <div className="space-y-4">
               {[
-                { label: "Models", current: usage.modelsCount, pct: FeatureService.getUsagePercentage(user, usage, "models") },
-                { label: "Layouts", current: usage.layoutsCount, pct: FeatureService.getUsagePercentage(user, usage, "layouts") },
+                { label: t("overview.stats.models"), current: usage.modelsCount, pct: FeatureService.getUsagePercentage(user, usage, "models") },
+                { label: t("overview.stats.layouts"), current: usage.layoutsCount, pct: FeatureService.getUsagePercentage(user, usage, "layouts") },
               ].map((item) => (
                 <div key={item.label}>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-muted-foreground">{item.label}</span>
                     <span className="text-foreground font-medium">
-                      {item.current} {item.pct !== null ? `/ ${PLAN_CONFIG[user.subscriptionPlan].limits[item.label === "Models" ? "maxModels" : "maxLayouts"]}` : "(unlimited)"}
+                      {item.current} {item.pct !== null ? `/ ${PLAN_CONFIG[user.subscriptionPlan].limits[item.label === t("overview.stats.models") ? "maxModels" : "maxLayouts"]}` : `(${t("profile.unlimited")})`}
                     </span>
                   </div>
                   {item.pct !== null && (
@@ -126,13 +128,13 @@ const Profile = () => {
                 </div>
               ))}
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">AI Requests</span>
+                <span className="text-muted-foreground">{t("overview.stats.ai")}</span>
                 <span className="text-foreground font-medium">{usage.aiRequestsCount}</span>
               </div>
             </div>
 
             <Button variant="hero" size="sm" onClick={() => window.location.href = "/pricing"}>
-              Upgrade Plan
+              {t("billing.upgrade")}
             </Button>
           </div>
         )}
@@ -140,19 +142,19 @@ const Profile = () => {
         {activeTab === "billing" && (
           <div className="space-y-6">
             <div className="p-4 bg-accent/20 rounded-xl border border-primary/10">
-              <p className="text-sm font-medium text-foreground mb-1">Current Plan</p>
+              <p className="text-sm font-medium text-foreground mb-1">{t("profile.currentPlan")}</p>
               <p className="text-muted-foreground text-sm">{plan.name} — {formatPrice(user.subscriptionPlan, currency)}/mo</p>
             </div>
             <div className="space-y-3">
-              <p className="text-sm font-medium text-foreground">Payment Method</p>
+              <p className="text-sm font-medium text-foreground">{t("profile.paymentMethod")}</p>
               <div className="p-3 bg-secondary/40 rounded-xl border border-border/30 text-sm text-muted-foreground">
-                No payment method on file
+                {t("profile.noPayment")}
               </div>
             </div>
             <div className="space-y-3">
-              <p className="text-sm font-medium text-foreground">Invoice History</p>
+              <p className="text-sm font-medium text-foreground">{t("profile.invoiceHistory")}</p>
               <div className="p-3 bg-secondary/40 rounded-xl border border-border/30 text-sm text-muted-foreground text-center">
-                No invoices yet
+                {t("profile.noInvoices")}
               </div>
             </div>
           </div>
@@ -160,9 +162,24 @@ const Profile = () => {
 
         {activeTab === "preferences" && (
           <div className="space-y-5">
+            {/* Language selector */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">{t("profile.language")}</p>
+                <p className="text-xs text-muted-foreground">{t("profile.languageDesc")}</p>
+              </div>
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as "en" | "vi")}
+                className="bg-secondary/40 border border-border/50 rounded-lg px-3 py-1.5 text-sm text-foreground"
+              >
+                <option value="en">English</option>
+                <option value="vi">Tiếng Việt</option>
+              </select>
+            </div>
             {[
-              { label: "Default Unit", desc: "Measurement unit for dimensions", options: ["cm", "m"] },
-              { label: "Theme", desc: "Application color theme", options: ["Dark", "Light"] },
+              { label: t("profile.defaultUnit"), desc: t("profile.unitDesc"), options: ["cm", "m"] },
+              { label: t("profile.theme"), desc: t("profile.themeDesc"), options: ["Dark", "Light"] },
             ].map((pref) => (
               <div key={pref.label} className="flex items-center justify-between">
                 <div>
@@ -175,9 +192,9 @@ const Profile = () => {
               </div>
             ))}
             {[
-              { label: "Auto-save layouts", desc: "Automatically save layout changes" },
-              { label: "AR grid overlay", desc: "Show measurement grid in AR" },
-              { label: "AI auto-suggest", desc: "Get AI suggestions while designing" },
+              { label: t("profile.autoSave"), desc: t("profile.autoSaveDesc") },
+              { label: t("profile.arGrid"), desc: t("profile.arGridDesc") },
+              { label: t("profile.aiSuggest"), desc: t("profile.aiSuggestDesc") },
             ].map((toggle) => (
               <div key={toggle.label} className="flex items-center justify-between">
                 <div>

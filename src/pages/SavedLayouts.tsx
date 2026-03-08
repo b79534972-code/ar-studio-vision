@@ -3,6 +3,7 @@ import { Layers, Plus, Search, Edit, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOutletContext } from "react-router-dom";
 import type { User, UserUsage } from "@/types/subscription";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DashboardContext {
   user: User;
@@ -18,28 +19,29 @@ const mockLayouts = [
 
 const SavedLayouts = () => {
   const { featureGate } = useOutletContext<DashboardContext>();
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-xl font-bold text-foreground">Saved Layouts</h1>
-          <p className="text-sm text-muted-foreground">Your saved AR room configurations</p>
+          <h1 className="font-display text-xl font-bold text-foreground">{t("layouts.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("layouts.subtitle")}</p>
         </div>
-        <Button variant="hero" size="sm" className="gap-1.5" onClick={() => featureGate.canCreateLayout()}>
-          <Plus className="w-3.5 h-3.5" /> New Layout
+        <Button variant="hero" size="sm" className="gap-1.5 w-full sm:w-auto" onClick={() => featureGate.canCreateLayout()}>
+          <Plus className="w-3.5 h-3.5" /> {t("layouts.new")}
         </Button>
       </div>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
-          placeholder="Search layouts…"
+          placeholder={t("layouts.search")}
           className="w-full pl-10 pr-4 py-2.5 bg-card border border-border/50 rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 xl:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 xl:gap-6">
         {mockLayouts.map((layout, i) => (
           <motion.div
             key={layout.id}
@@ -58,7 +60,7 @@ const SavedLayouts = () => {
                   <Edit className="w-3 h-3" />
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground">{layout.room} · {layout.objects} objects</p>
+              <p className="text-xs text-muted-foreground">{layout.room} · {layout.objects} {t("layouts.objects")}</p>
               <div className="flex items-center gap-1.5 mt-2">
                 <Clock className="w-3 h-3 text-muted-foreground/50" />
                 <span className="text-[10px] text-muted-foreground">{layout.date}</span>

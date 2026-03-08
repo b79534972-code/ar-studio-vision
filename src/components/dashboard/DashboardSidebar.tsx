@@ -12,28 +12,30 @@ import {
 import { cn } from "@/lib/utils";
 import type { User as UserType } from "@/types/subscription";
 import { PLAN_CONFIG } from "@/types/subscription";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DashboardSidebarProps {
   user: UserType;
   collapsed: boolean;
 }
 
-const navItems = [
-  { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/dashboard/models", label: "My Models", icon: Box },
-  { to: "/dashboard/rooms", label: "My Rooms", icon: Home },
-  { to: "/dashboard/layouts", label: "Saved Layouts", icon: Layers },
-];
-
-const bottomItems = [
-  { to: "/dashboard/profile", label: "Profile", icon: User },
-  { to: "/dashboard/billing", label: "Billing", icon: CreditCard },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings },
-];
-
 const DashboardSidebar = ({ user, collapsed }: DashboardSidebarProps) => {
   const location = useLocation();
+  const { t } = useLanguage();
   const planConfig = PLAN_CONFIG[user.subscriptionPlan];
+
+  const navItems = [
+    { to: "/dashboard", label: t("nav.overview"), icon: LayoutDashboard, end: true },
+    { to: "/dashboard/models", label: t("nav.models"), icon: Box },
+    { to: "/dashboard/rooms", label: t("nav.rooms"), icon: Home },
+    { to: "/dashboard/layouts", label: t("nav.layouts"), icon: Layers },
+  ];
+
+  const bottomItems = [
+    { to: "/dashboard/profile", label: t("nav.profile"), icon: User },
+    { to: "/dashboard/billing", label: t("nav.billing"), icon: CreditCard },
+    { to: "/dashboard/settings", label: t("nav.settings"), icon: Settings },
+  ];
 
   const linkClass = (isActive: boolean) =>
     cn(
@@ -77,7 +79,7 @@ const DashboardSidebar = ({ user, collapsed }: DashboardSidebarProps) => {
         <div className="mx-3 mb-3 p-3 rounded-xl bg-accent/30 border border-border/30">
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-semibold text-foreground">{planConfig.name} Plan</span>
+            <span className="text-xs font-semibold text-foreground">{planConfig.name} {t("plan.plan")}</span>
           </div>
           <p className="text-[10px] text-muted-foreground">{planConfig.tagline}</p>
         </div>
