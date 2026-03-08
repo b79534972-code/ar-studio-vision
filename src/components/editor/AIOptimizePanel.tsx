@@ -198,12 +198,7 @@ const AIOptimizePanel = ({
   if (!open) return null;
 
   return (
-    <motion.div
-      initial={{ x: 300, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: 300, opacity: 0 }}
-      className="w-72 bg-card border-l border-border/40 flex flex-col shrink-0 overflow-hidden"
-    >
+    <>
       {/* Header */}
       <div className="h-11 flex items-center justify-between px-4 border-b border-border/40 shrink-0">
         <div className="flex items-center gap-2">
@@ -330,7 +325,7 @@ const AIOptimizePanel = ({
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </>
   );
 };
 

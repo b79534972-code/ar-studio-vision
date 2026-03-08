@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Pencil, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -287,33 +288,43 @@ const RoomEditor = () => {
           />
         </div>
 
-        {/* Show either Properties or AI panel, not both */}
-        {showAIPanel ? (
-          <AIOptimizePanel
-            open={showAIPanel}
-            onClose={() => setShowAIPanel(false)}
-            objects={objects}
-            roomConfig={roomConfig}
-            creditsRemaining={usage.aiCreditsTotal - usage.aiCreditsUsed}
-            useCredit={useCredit}
-            onApplySuggestion={(updated) => {
-              setObjects(updated);
-              pushHistory(updated);
-              toast({ title: "AI Applied", description: "Suggestion applied to layout" });
-            }}
-            onOutOfCredits={() => setShowOutOfCredits(true)}
-          />
-        ) : (
-          <EditorPropertiesPanel
-            selectedObject={selectedObject}
-            roomConfig={roomConfig}
-            onUpdateObject={handleUpdateObject}
-            onDeleteObject={handleDeleteObject}
-            onDuplicateObject={handleDuplicateObject}
-            onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
-          />
-        )}
+        <EditorPropertiesPanel
+          selectedObject={selectedObject}
+          roomConfig={roomConfig}
+          onUpdateObject={handleUpdateObject}
+          onDeleteObject={handleDeleteObject}
+          onDuplicateObject={handleDuplicateObject}
+          onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
+        />
       </div>
+
+      {/* AI Optimize Panel — floating overlay on the right */}
+      <AnimatePresence>
+        {showAIPanel && (
+          <motion.div
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 300, opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed top-24 right-0 bottom-0 z-40 w-80 bg-card border-l border-border/40 shadow-elevated flex flex-col"
+          >
+            <AIOptimizePanel
+              open={showAIPanel}
+              onClose={() => setShowAIPanel(false)}
+              objects={objects}
+              roomConfig={roomConfig}
+              creditsRemaining={usage.aiCreditsTotal - usage.aiCreditsUsed}
+              useCredit={useCredit}
+              onApplySuggestion={(updated) => {
+                setObjects(updated);
+                pushHistory(updated);
+                toast({ title: "AI Applied", description: "Suggestion applied to layout" });
+              }}
+              onOutOfCredits={() => setShowOutOfCredits(true)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* AR Preview Modal */}
       <ARPreviewModal
