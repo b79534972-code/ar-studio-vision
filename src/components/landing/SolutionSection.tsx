@@ -39,9 +39,11 @@ const SolutionSection = () => {
                   transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.1 }}
                   whileHover={{
                     x: 4,
+                    scale: 1.02,
                     backgroundColor: "hsl(var(--accent) / 0.5)",
+                    boxShadow: "var(--shadow-soft), 0 0 16px hsl(235 60% 52% / 0.06)",
                   }}
-                  className="flex items-center gap-3 p-2.5 md:p-3 rounded-lg transition-colors cursor-default"
+                  className="flex items-center gap-3 p-2.5 md:p-3 rounded-lg transition-all duration-300 cursor-default"
                 >
                   <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg gradient-primary flex items-center justify-center shrink-0 shadow-soft">
                     <f.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary-foreground" />
@@ -58,13 +60,26 @@ const SolutionSection = () => {
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
           >
-            <div className="rounded-2xl overflow-hidden shadow-card border border-border/50 group">
+            <div
+              className="rounded-2xl overflow-hidden border border-border/50 relative group transition-all duration-500"
+              style={{
+                boxShadow: "var(--shadow-card), 0 0 0px hsl(235 60% 52% / 0)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "var(--shadow-elevated), 0 0 32px hsl(235 60% 52% / 0.12)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "var(--shadow-card), 0 0 0px hsl(235 60% 52% / 0)";
+              }}
+            >
               <img
                 src={solutionImage}
                 alt="3D furniture model with measurement annotations"
-                className="w-full h-auto transition-transform duration-700 group-hover:scale-[1.02]"
+                className="w-full h-auto transition-all duration-700 group-hover:scale-[1.04] group-hover:brightness-105"
+                style={{ filter: "brightness(1.02) contrast(1.01)" }}
                 loading="lazy"
               />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none transition-opacity duration-500 opacity-0 group-hover:opacity-100" />
             </div>
           </motion.div>
         </div>

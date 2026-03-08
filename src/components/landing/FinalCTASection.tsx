@@ -50,10 +50,12 @@ const FinalCTASection = () => {
                   viewport={{ once: false, amount: 0.3 }}
                   transition={{ duration: 0.5, ease: "easeOut", delay: index * 0.15 }}
                   whileHover={{
-                    y: -4,
-                    boxShadow: "var(--shadow-card), 0 0 16px hsl(235 60% 60% / 0.08)",
+                    y: -6,
+                    scale: 1.03,
+                    boxShadow: "var(--shadow-elevated), 0 0 28px hsl(235 60% 60% / 0.14)",
+                    borderColor: "hsl(235 60% 52% / 0.25)",
                   }}
-                  className="flex items-center gap-3 border border-primary/10 rounded-xl px-4 py-4 transition-colors"
+                  className="flex items-center gap-3 border border-primary/10 rounded-xl px-4 py-4 transition-all duration-300"
                   style={{
                     background: "hsl(var(--background) / 0.6)",
                     backdropFilter: "blur(12px)",

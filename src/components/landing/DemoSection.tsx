@@ -41,9 +41,15 @@ const DemoSection = () => {
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-          className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden border border-border/50 group cursor-pointer"
+          className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden border border-border/50 group cursor-pointer transition-all duration-500 hover:border-primary/20"
           style={{
             boxShadow: "var(--shadow-elevated), 0 0 40px hsl(235 60% 60% / 0.06)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = "var(--shadow-elevated), 0 0 50px hsl(235 60% 52% / 0.15)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = "var(--shadow-elevated), 0 0 40px hsl(235 60% 60% / 0.06)";
           }}
         >
           {/* AR corner markers */}

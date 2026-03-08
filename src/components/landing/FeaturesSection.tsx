@@ -56,17 +56,19 @@ const FeaturesSection = () => {
               viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.1 }}
               whileHover={{
-                y: -6,
-                boxShadow: "var(--shadow-elevated), 0 0 24px hsl(235 60% 60% / 0.08)",
+                y: -8,
+                scale: 1.03,
+                boxShadow: "var(--shadow-elevated), 0 0 32px hsl(235 60% 60% / 0.14)",
+                borderColor: "hsl(235 60% 52% / 0.25)",
               }}
-              className="p-4 md:p-6 rounded-2xl border border-border/50 group cursor-default transition-colors duration-300"
+              className="p-4 md:p-6 rounded-2xl border border-border/50 group cursor-default transition-all duration-300"
               style={{
                 background: "hsl(var(--card) / 0.6)",
                 backdropFilter: "blur(12px)",
               }}
             >
               <motion.div
-                className="w-10 h-10 md:w-12 md:h-12 rounded-xl gradient-primary flex items-center justify-center mb-3 md:mb-4"
+                className="w-10 h-10 md:w-12 md:h-12 rounded-xl gradient-primary flex items-center justify-center mb-3 md:mb-4 transition-shadow duration-300 group-hover:shadow-glow"
                 whileInView={f.anim}
                 viewport={{ once: false, amount: 0.5 }}
                 transition={{ duration: 2, delay: i * 0.2 + 0.3, repeat: Infinity, repeatDelay: 3 }}
