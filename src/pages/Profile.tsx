@@ -104,7 +104,7 @@ const Profile = () => {
               </div>
               <p className="font-display text-xl font-bold text-primary">
                 {formatPrice(user.subscriptionPlan, currency)}
-                {user.subscriptionPlan !== "free" && <span className="text-xs text-muted-foreground font-normal"> /mo</span>}
+                {user.subscriptionPlan !== "free" && <span className="text-xs text-muted-foreground font-normal"> {t("profile.perMonth")}</span>}
               </p>
             </div>
 
@@ -143,7 +143,7 @@ const Profile = () => {
           <div className="space-y-6">
             <div className="p-4 bg-accent/20 rounded-xl border border-primary/10">
               <p className="text-sm font-medium text-foreground mb-1">{t("profile.currentPlan")}</p>
-              <p className="text-muted-foreground text-sm">{plan.name} — {formatPrice(user.subscriptionPlan, currency)}/mo</p>
+              <p className="text-muted-foreground text-sm">{plan.name} — {formatPrice(user.subscriptionPlan, currency)}{t("profile.perMonth")}</p>
             </div>
             <div className="space-y-3">
               <p className="text-sm font-medium text-foreground">{t("profile.paymentMethod")}</p>
@@ -179,7 +179,7 @@ const Profile = () => {
             </div>
             {[
               { label: t("profile.defaultUnit"), desc: t("profile.unitDesc"), options: ["cm", "m"] },
-              { label: t("profile.theme"), desc: t("profile.themeDesc"), options: ["Dark", "Light"] },
+              { label: t("profile.theme"), desc: t("profile.themeDesc"), options: [t("profile.theme.dark"), t("profile.theme.light")] },
             ].map((pref) => (
               <div key={pref.label} className="flex items-center justify-between">
                 <div>
