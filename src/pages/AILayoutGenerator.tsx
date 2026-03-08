@@ -455,13 +455,13 @@ const AILayoutGenerator = () => {
               transition={{ delay: 0.4 }}
               className="bg-card rounded-2xl border border-border/40 shadow-card p-5"
             >
-              <h3 className="font-display text-sm font-bold text-foreground mb-3">Space Analysis</h3>
+              <h3 className="font-display text-sm font-bold text-foreground mb-3">{t("aiGen.spaceAnalysis")}</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                  { label: "Space Efficiency", value: "82%", color: "text-success" },
-                  { label: "Walking Paths", value: "Clear", color: "text-primary" },
-                  { label: "Unused Area", value: "18%", color: "text-warning" },
-                  { label: "Furniture Density", value: "Optimal", color: "text-success" },
+                  { label: t("aiGen.spaceEfficiency"), value: "82%", color: "text-success" },
+                  { label: t("aiGen.walkingPaths"), value: t("aiGen.clear"), color: "text-primary" },
+                  { label: t("aiGen.unusedArea"), value: "18%", color: "text-warning" },
+                  { label: t("aiGen.furnitureDensity"), value: t("aiGen.optimal"), color: "text-success" },
                 ].map((stat) => (
                   <div key={stat.label} className="text-center">
                     <p className={cn("text-lg font-bold", stat.color)}>{stat.value}</p>
