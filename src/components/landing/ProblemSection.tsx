@@ -14,8 +14,8 @@ const ProblemSection = () => {
       <div className="px-4 md:px-6 lg:px-12 xl:px-20 2xl:px-32 mx-auto">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: -30, filter: "blur(6px)" }}
+            whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
@@ -30,8 +30,8 @@ const ProblemSection = () => {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
           >
@@ -43,10 +43,22 @@ const ProblemSection = () => {
             </p>
             <div className="space-y-3 md:space-y-4">
               {problems.map((problem, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 md:p-4 rounded-xl bg-secondary border border-border/50">
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: false, amount: 0.3 }}
+                  transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
+                  whileHover={{ x: 4, boxShadow: "var(--shadow-soft)" }}
+                  className="flex items-start gap-3 p-3 md:p-4 rounded-xl border border-border/50 transition-colors"
+                  style={{
+                    background: "hsl(var(--secondary) / 0.6)",
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
                   <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 shrink-0" />
                   <span className="text-xs md:text-sm text-foreground font-medium">{problem}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
