@@ -303,13 +303,16 @@ const MyRooms = () => {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <Label className="text-xs">{t("furniture.dimensions")}</Label>
-                <button
-                  type="button"
-                  onClick={() => setRoomUnit(roomUnit === "m" ? "cm" : "m")}
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                >
-                  {roomUnit}
-                </button>
+                <div className="flex rounded-lg overflow-hidden border border-border/50">
+                  <button type="button" onClick={() => setRoomUnit("cm")}
+                    className={`text-[10px] font-semibold px-2.5 py-1 transition-colors ${roomUnit === "cm" ? "bg-primary text-primary-foreground" : "bg-secondary/40 text-muted-foreground hover:text-foreground"}`}>
+                    cm
+                  </button>
+                  <button type="button" onClick={() => setRoomUnit("m")}
+                    className={`text-[10px] font-semibold px-2.5 py-1 transition-colors ${roomUnit === "m" ? "bg-primary text-primary-foreground" : "bg-secondary/40 text-muted-foreground hover:text-foreground"}`}>
+                    m
+                  </button>
+                </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1.5">

@@ -247,13 +247,16 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                 <div>
                   <div className="flex items-center justify-between">
                     <Label className="text-xs">{t("furniture.dimensions")} *</Label>
-                    <button
-                      type="button"
-                      onClick={() => setUnit(unit === "cm" ? "m" : "cm")}
-                      className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                    >
-                      {unit}
-                    </button>
+                    <div className="flex rounded-lg overflow-hidden border border-border/50">
+                      <button type="button" onClick={() => setUnit("cm")}
+                        className={`text-[10px] font-semibold px-2.5 py-1 transition-colors ${unit === "cm" ? "bg-primary text-primary-foreground" : "bg-secondary/40 text-muted-foreground hover:text-foreground"}`}>
+                        cm
+                      </button>
+                      <button type="button" onClick={() => setUnit("m")}
+                        className={`text-[10px] font-semibold px-2.5 py-1 transition-colors ${unit === "m" ? "bg-primary text-primary-foreground" : "bg-secondary/40 text-muted-foreground hover:text-foreground"}`}>
+                        m
+                      </button>
+                    </div>
                   </div>
                   <div className="grid grid-cols-3 gap-2 mt-1">
                     <Input placeholder={t("rooms.width")} type="number" value={form.width} onChange={(e) => updateField("width", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
