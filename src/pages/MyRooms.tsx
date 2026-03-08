@@ -311,8 +311,8 @@ const MyRooms = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreate(false)}>Cancel</Button>
-            <Button onClick={handleCreate} disabled={!newRoom.name.trim()}>Create & Open Editor</Button>
+            <Button variant="outline" onClick={() => setShowCreate(false)}>{t("rooms.cancel")}</Button>
+            <Button onClick={handleCreate} disabled={!newRoom.name.trim()}>{t("rooms.createOpen")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
