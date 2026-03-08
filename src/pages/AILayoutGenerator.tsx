@@ -127,7 +127,7 @@ const AILayoutGenerator = () => {
   };
 
   const handleApply = (suggestion: AILayoutSuggestion) => {
-    toast({ title: "Layout Applied", description: `"${suggestion.name}" applied. Opening editor…` });
+    toast({ title: t("aiGen.layoutApplied"), description: `"${suggestion.name}"` });
     navigate("/dashboard/editor");
   };
 
