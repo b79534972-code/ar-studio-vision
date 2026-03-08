@@ -1,5 +1,6 @@
 // ============================================================
 // Prisma Schema — Interior AR SaaS Platform
+// Synced with frontend types: subscription.ts, editor.ts, roomStore.ts
 // ============================================================
 
 generator client {
@@ -10,6 +11,8 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// ─── Enums ───────────────────────────────────────────────────
 
 enum Role {
   user
@@ -30,6 +33,34 @@ enum SubscriptionStatus {
   trialing
 }
 
+enum FurnitureCategory {
+  sofa
+  chair
+  table
+  storage
+  bed
+  lamp
+  plant
+  rug
+  shelf
+}
+
+enum FurnitureStyle {
+  modern
+  scandinavian
+  minimalist
+  industrial
+  japanese
+}
+
+enum ModelFormat {
+  glb
+  gltf
+  usdz
+}
+
+// ─── User & Auth ─────────────────────────────────────────────
+
 model User {
   id                   String             @id @default(uuid())
   name                 String
@@ -48,14 +79,14 @@ model User {
   updatedAt            DateTime           @updatedAt
 
   usage                UserUsage?
-
   rooms                Room[]
   layouts              Layout[]
   furnitureModels      FurnitureModel[]
   arSessions           ARSession[]
-
   auditLogs            AuditLog[]
 }
+
+// ─── Usage & Credits ─────────────────────────────────────────
 
 model UserUsage {
   userId           String   @id
@@ -64,45 +95,60 @@ model UserUsage {
   aiRequestsCount  Int      @default(0)
   arSessionsCount  Int      @default(0)
 
+  // AI credit system (matches frontend UserUsage)
+  aiCreditsUsed    Int      @default(0)
+  aiCreditsTotal   Int      @default(5) // Free plan default
+
   updatedAt        DateTime @updatedAt
 
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// ─── Room ────────────────────────────────────────────────────
+
 model Room {
-  id        String   @id @default(uuid())
-  userId    String
-  name      String
+  id         String   @id @default(uuid())
+  userId     String
+  name       String
 
-  width     Float?
-  height    Float?
-  depth     Float?
+  // Dimensions in meters (matches RoomConfig)
+  width      Float    @default(6)
+  depth      Float    @default(5)
+  height     Float    @default(2.8)
 
-  createdAt DateTime @default(now())
+  // Room appearance (matches RoomConfig)
+  wallColor  String   @default("#F5F5F4")
+  floorColor String   @default("#D6D3D1")
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  layouts   Layout[]
+  thumbnail  String?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  layouts    Layout[]
 }
+
+// ─── Layout & Versioning ─────────────────────────────────────
 
 model Layout {
   id        String   @id @default(uuid())
   userId    String
   roomId    String
-
   name      String
   version   Int      @default(1)
 
-  // objects stored as JSON
-  // example:
-  // [{modelId, position, rotation, scale}]
+  // PlacedObject[] as JSON
+  // [{id, furnitureId, name, category, position:[x,y,z], rotation:[x,y,z], scale:[x,y,z], color, dimensions:{w,h,d}}]
   objects   Json     @default("[]")
+
+  thumbnail String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   room      Room            @relation(fields: [roomId], references: [id], onDelete: Cascade)
-
   versions  LayoutVersion[]
   sessions  ARSession[]
 }
@@ -110,6 +156,7 @@ model Layout {
 model LayoutVersion {
   id        String   @id @default(uuid())
   layoutId  String
+  version   Int
   snapshot  Json
 
   createdAt DateTime @default(now())
@@ -117,41 +164,58 @@ model LayoutVersion {
   layout    Layout   @relation(fields: [layoutId], references: [id], onDelete: Cascade)
 }
 
+// ─── Furniture Models ────────────────────────────────────────
+
 model FurnitureModel {
-  id          String   @id @default(uuid())
+  id          String            @id @default(uuid())
   name        String
-  category    String
+  category    FurnitureCategory
+  style       FurnitureStyle    @default(modern)
+  material    String            @default("Mixed")
+  color       String            @default("#6B7280")
 
-  width       Float?
-  height      Float?
-  depth       Float?
+  // Dimensions in meters (matches FurnitureItem.dimensions)
+  width       Float
+  height      Float
+  depth       Float
 
-  modelUrl    String
+  // 3D model files
+  modelUrl    String?
   textureUrl  String?
+  thumbnail   String?
+  format      ModelFormat?
 
+  // Tags for search/filter
+  tags        String[]          @default([])
+  favorited   Boolean           @default(false)
+
+  // null = system/catalog item, set = user-uploaded
   createdBy   String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime          @default(now())
 
-  user        User?    @relation(fields: [createdBy], references: [id])
+  user        User?             @relation(fields: [createdBy], references: [id], onDelete: SetNull)
 }
 
-model ARSession {
-  id        String   @id @default(uuid())
+// ─── AR Sessions ─────────────────────────────────────────────
 
+model ARSession {
+  id        String    @id @default(uuid())
   userId    String
   layoutId  String?
 
   device    String?
-  startedAt DateTime @default(now())
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  layout    Layout?  @relation(fields: [layoutId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  layout    Layout?   @relation(fields: [layoutId], references: [id])
 }
+
+// ─── Audit Log ───────────────────────────────────────────────
 
 model AuditLog {
   id        String   @id @default(uuid())
   userId    String
-
   action    String
   metadata  Json?
 
