@@ -51,6 +51,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [generateProgress, setGenerateProgress] = useState(0);
+  const [unit, setUnit] = useState<"cm" | "m">("cm");
   const [form, setForm] = useState<FurnitureForm>({
     name: "", category: "", width: "", height: "", depth: "",
     shape: "Auto (from image)", material: "",
@@ -66,6 +67,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
     setImagePreview(null);
     setGenerateProgress(0);
     setSavedItem(null);
+    setUnit("cm");
     setForm({ name: "", category: "", width: "", height: "", depth: "", shape: "Auto (from image)", material: "" });
   };
 
@@ -119,6 +121,12 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
     setTimeout(() => setStep("preview3d"), 2600);
   }, [canGenerate]);
 
+  const toCm = (val: string) => {
+    const n = parseFloat(val);
+    if (isNaN(n)) return 0;
+    return unit === "m" ? n * 100 : n;
+  };
+
   const buildFurnitureItem = useCallback((): FurnitureItem => {
     const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     return {
@@ -129,15 +137,15 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
       material: form.material || "Mixed",
       color: MATERIAL_COLORS[form.material] || "#6B7280",
       dimensions: {
-        width: parseFloat(form.width) / 100,
-        height: parseFloat(form.height) / 100,
-        depth: parseFloat(form.depth) / 100,
+        width: toCm(form.width) / 100,
+        height: toCm(form.height) / 100,
+        depth: toCm(form.depth) / 100,
       },
       tags: ["custom", "uploaded"],
       favorited: false,
       thumbnail: imagePreview || undefined,
     };
-  }, [form, imagePreview]);
+  }, [form, imagePreview, unit]);
 
   const handleSaveToLibrary = useCallback(() => {
     const item = buildFurnitureItem();
@@ -156,9 +164,9 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
   };
 
   const dims = {
-    width: parseFloat(form.width) / 100 || 0.5,
-    height: parseFloat(form.height) / 100 || 0.5,
-    depth: parseFloat(form.depth) / 100 || 0.5,
+    width: toCm(form.width) / 100 || 0.5,
+    height: toCm(form.height) / 100 || 0.5,
+    depth: toCm(form.depth) / 100 || 0.5,
   };
 
   const activeStepIndex = STEPS.indexOf(step);
@@ -237,11 +245,20 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs">{t("furniture.dimensions")} (cm) *</Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs">{t("furniture.dimensions")} *</Label>
+                    <button
+                      type="button"
+                      onClick={() => setUnit(unit === "cm" ? "m" : "cm")}
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      {unit}
+                    </button>
+                  </div>
                   <div className="grid grid-cols-3 gap-2 mt-1">
-                    <Input placeholder="Width" type="number" value={form.width} onChange={(e) => updateField("width", e.target.value)} />
-                    <Input placeholder="Height" type="number" value={form.height} onChange={(e) => updateField("height", e.target.value)} />
-                    <Input placeholder="Depth" type="number" value={form.depth} onChange={(e) => updateField("depth", e.target.value)} />
+                    <Input placeholder={t("rooms.width")} type="number" value={form.width} onChange={(e) => updateField("width", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
+                    <Input placeholder={t("rooms.height")} type="number" value={form.height} onChange={(e) => updateField("height", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
+                    <Input placeholder={t("rooms.depth")} type="number" value={form.depth} onChange={(e) => updateField("depth", e.target.value)} step={unit === "m" ? "0.01" : "1"} />
                   </div>
                 </div>
                 <div>
@@ -281,7 +298,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                   {generateProgress >= 60 && generateProgress < 85 && "Generating mesh…"}
                   {generateProgress >= 85 && "Finalizing model…"}
                 </p>
-                <p className="text-xs text-muted-foreground">{form.name} · {form.width} × {form.height} × {form.depth} cm</p>
+                <p className="text-xs text-muted-foreground">{form.name} · {form.width} × {form.height} × {form.depth} {unit}</p>
               </div>
               <div className="w-full max-w-xs">
                 <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
@@ -316,7 +333,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] text-muted-foreground">{t("furniture.dimensions")}</span>
-                  <span className="text-xs text-foreground">{form.width} × {form.height} × {form.depth} cm</span>
+                  <span className="text-xs text-foreground">{form.width} × {form.height} × {form.depth} {unit}</span>
                 </div>
                 {form.material && (
                   <div className="flex items-center justify-between">

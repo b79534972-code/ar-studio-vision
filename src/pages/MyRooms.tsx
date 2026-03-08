@@ -36,6 +36,7 @@ const MyRooms = () => {
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [newRoom, setNewRoom] = useState({ name: "", width: "6", depth: "5", height: "2.8" });
+  const [roomUnit, setRoomUnit] = useState<"m" | "cm">("m");
   const [selectedRoom, setSelectedRoom] = useState<SavedRoom | null>(null);
 
   const filtered = rooms.filter((r) =>
@@ -44,10 +45,11 @@ const MyRooms = () => {
 
   const handleCreate = () => {
     if (!newRoom.name.trim()) return;
+    const toM = (v: string) => { const n = parseFloat(v) || 0; return roomUnit === "cm" ? n / 100 : n; };
     const config: RoomConfig = {
-      width: parseFloat(newRoom.width) || 6,
-      depth: parseFloat(newRoom.depth) || 5,
-      height: parseFloat(newRoom.height) || 2.8,
+      width: toM(newRoom.width) || 6,
+      depth: toM(newRoom.depth) || 5,
+      height: toM(newRoom.height) || 2.8,
       wallColor: "#F5F5F4",
       floorColor: "#D6D3D1",
     };
@@ -298,18 +300,30 @@ const MyRooms = () => {
                 placeholder={t("rooms.roomNamePlaceholder")}
               />
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs">{t("rooms.width")}</Label>
-                <Input type="number" value={newRoom.width} onChange={(e) => setNewRoom((p) => ({ ...p, width: e.target.value }))} min="1" max="20" step="0.5" />
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label className="text-xs">{t("furniture.dimensions")}</Label>
+                <button
+                  type="button"
+                  onClick={() => setRoomUnit(roomUnit === "m" ? "cm" : "m")}
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                >
+                  {roomUnit}
+                </button>
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">{t("rooms.depth")}</Label>
-                <Input type="number" value={newRoom.depth} onChange={(e) => setNewRoom((p) => ({ ...p, depth: e.target.value }))} min="1" max="20" step="0.5" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">{t("rooms.height")}</Label>
-                <Input type="number" value={newRoom.height} onChange={(e) => setNewRoom((p) => ({ ...p, height: e.target.value }))} min="2" max="6" step="0.1" />
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">{t("rooms.width")}</Label>
+                  <Input type="number" value={newRoom.width} onChange={(e) => setNewRoom((p) => ({ ...p, width: e.target.value }))} min={roomUnit === "m" ? "0.5" : "50"} step={roomUnit === "m" ? "0.5" : "10"} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">{t("rooms.depth")}</Label>
+                  <Input type="number" value={newRoom.depth} onChange={(e) => setNewRoom((p) => ({ ...p, depth: e.target.value }))} min={roomUnit === "m" ? "0.5" : "50"} step={roomUnit === "m" ? "0.5" : "10"} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">{t("rooms.height")}</Label>
+                  <Input type="number" value={newRoom.height} onChange={(e) => setNewRoom((p) => ({ ...p, height: e.target.value }))} min={roomUnit === "m" ? "2" : "200"} step={roomUnit === "m" ? "0.1" : "10"} />
+                </div>
               </div>
             </div>
           </div>
