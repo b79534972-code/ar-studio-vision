@@ -290,8 +290,8 @@ const AILayoutGenerator = () => {
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <Target className="w-4 h-4 text-muted-foreground" />
-                        <Label className="text-sm font-medium">Primary Purpose</Label>
-                        <span className="text-[10px] text-muted-foreground">(select multiple)</span>
+                        <Label className="text-sm font-medium">{t("aiGen.purpose")}</Label>
+                        <span className="text-[10px] text-muted-foreground">{t("aiGen.selectMultiple")}</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {PURPOSES.map((p) => {
