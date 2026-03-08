@@ -47,12 +47,16 @@ export function useSubscription() {
 
   const upgradePlan = useCallback((plan: SubscriptionPlan) => {
     subscriptionStore.upgradePlan(plan);
-    const newCredits = PLAN_CONFIG[plan].limits.aiCredits ?? 5;
-    setUsage((prev) => ({
-      ...prev,
-      aiCreditsTotal: newCredits,
-      // Giữ nguyên số đã dùng, không reset — credit cộng dồn
-    }));
+    const newPlanCredits = PLAN_CONFIG[plan].limits.aiCredits ?? 5;
+    setUsage((prev) => {
+      const remaining = prev.aiCreditsTotal - prev.aiCreditsUsed;
+      // Cộng dồn: credit còn lại + credit gói mới
+      return {
+        ...prev,
+        aiCreditsTotal: remaining + newPlanCredits,
+        aiCreditsUsed: 0,
+      };
+    });
   }, []);
 
   const useCredit = useCallback((amount: number = 1): boolean => {
