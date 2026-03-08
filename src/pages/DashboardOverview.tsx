@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { ApplicationService } from "@/services/ApplicationService";
 import type { User, UserUsage, Currency } from "@/types/subscription";
+import { useRoomStore } from "@/hooks/useRoomStore";
+import { useCustomFurniture } from "@/hooks/useCustomFurniture";
 import { PLAN_CONFIG } from "@/types/subscription";
 import { useLanguage } from "@/contexts/LanguageContext";
 
