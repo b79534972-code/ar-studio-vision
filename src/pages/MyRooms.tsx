@@ -288,11 +288,11 @@ const MyRooms = () => {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label>Room Name</Label>
+              <Label>{t("rooms.roomName")}</Label>
               <Input
                 value={newRoom.name}
                 onChange={(e) => setNewRoom((p) => ({ ...p, name: e.target.value }))}
-                placeholder="e.g. Living Room"
+                placeholder={t("rooms.roomNamePlaceholder")}
               />
             </div>
             <div className="grid grid-cols-3 gap-3">
