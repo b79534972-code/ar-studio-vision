@@ -250,7 +250,7 @@ const MyRooms = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleOpenEditor(room.id); }}>
-                                <PenTool className="w-3.5 h-3.5 mr-2" /> Open Editor
+                                <PenTool className="w-3.5 h-3.5 mr-2" /> {t("rooms.openEditor")}
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setSelectedRoom(room); }}>
                                 <Layers className="w-3.5 h-3.5 mr-2" /> View Layouts
