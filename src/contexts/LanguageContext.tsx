@@ -207,7 +207,7 @@ const translations: Record<Language, Record<string, string>> = {
     "furniture.name": "Object Name",
     "furniture.category": "Category",
     "furniture.material": "Material",
-    "furniture.dimensions": "Dimensions (cm)",
+    "furniture.dimensions": "Dimensions",
     "furniture.shape": "Base Shape",
     "furniture.generate": "Generate 3D Object",
     "furniture.generating": "Generating…",
