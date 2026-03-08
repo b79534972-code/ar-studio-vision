@@ -420,7 +420,7 @@ const AILayoutGenerator = () => {
                     <LayoutGrid className="w-12 h-12 text-muted-foreground/20" />
                     {i === 0 && (
                       <Badge className="absolute top-2.5 left-2.5 text-[9px] bg-primary text-primary-foreground">
-                        Best Match
+                        {t("aiGen.bestMatch")}
                       </Badge>
                     )}
                     <div className="absolute top-2.5 right-2.5 bg-card/80 backdrop-blur-sm rounded-lg px-2 py-1">
