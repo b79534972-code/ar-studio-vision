@@ -4,10 +4,11 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import {
   Box, Home, Layers, Sparkles, Smartphone, Zap, Plus,
   Clock, ImagePlus, ArrowRight, TrendingUp, Upload,
-  Eye, Layout, Cuboid, Palette,
+  Eye, Layout, Cuboid, Palette, CreditCard, Crown,
 } from "lucide-react";
 import { ApplicationService } from "@/services/ApplicationService";
 import type { User, UserUsage, Currency } from "@/types/subscription";
+import { PLAN_CONFIG } from "@/types/subscription";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DashboardContext {
