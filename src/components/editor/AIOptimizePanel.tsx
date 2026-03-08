@@ -198,6 +198,7 @@ const AIOptimizePanel = ({
   if (!open) return null;
 
   return (
+    <>
       {/* Header */}
       <div className="h-11 flex items-center justify-between px-4 border-b border-border/40 shrink-0">
         <div className="flex items-center gap-2">
