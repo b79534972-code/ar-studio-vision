@@ -273,9 +273,12 @@ const RoomEditor = () => {
 
       {/* Main workspace */}
       <div className="flex-1 flex overflow-hidden">
-        <EditorFurniturePanel onAddFurniture={handleAddFurniture} />
+        {/* Furniture panel — hidden on mobile */}
+        <div className="hidden lg:block">
+          <EditorFurniturePanel onAddFurniture={handleAddFurniture} />
+        </div>
 
-        <div className="flex-1 p-2">
+        <div className="flex-1 p-1 sm:p-2">
           <RoomCanvas3D
             objects={objects}
             roomConfig={roomConfig}
@@ -288,41 +291,142 @@ const RoomEditor = () => {
           />
         </div>
 
-        <EditorPropertiesPanel
-          selectedObject={selectedObject}
-          roomConfig={roomConfig}
-          onUpdateObject={handleUpdateObject}
-          onDeleteObject={handleDeleteObject}
-          onDuplicateObject={handleDuplicateObject}
-          onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
-        />
+        {/* Properties panel — hidden on mobile/tablet */}
+        <div className="hidden lg:block">
+          <EditorPropertiesPanel
+            selectedObject={selectedObject}
+            roomConfig={roomConfig}
+            onUpdateObject={handleUpdateObject}
+            onDeleteObject={handleDeleteObject}
+            onDuplicateObject={handleDuplicateObject}
+            onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
+          />
+        </div>
       </div>
 
-      {/* AI Optimize Panel — floating overlay on the right */}
+      {/* Mobile bottom tabs for Furniture & Properties */}
+      <div className="lg:hidden flex border-t border-border/40 bg-card shrink-0">
+        <button
+          onClick={() => setMobilePanel(mobilePanel === "furniture" ? null : "furniture")}
+          className={cn(
+            "flex-1 py-2.5 text-[11px] font-medium flex flex-col items-center gap-0.5 transition-colors",
+            mobilePanel === "furniture" ? "text-primary" : "text-muted-foreground"
+          )}
+        >
+          <Plus className="w-4 h-4" />
+          Furniture
+        </button>
+        <button
+          onClick={() => setMobilePanel(mobilePanel === "properties" ? null : "properties")}
+          className={cn(
+            "flex-1 py-2.5 text-[11px] font-medium flex flex-col items-center gap-0.5 transition-colors",
+            mobilePanel === "properties" ? "text-primary" : "text-muted-foreground"
+          )}
+        >
+          <Settings2 className="w-4 h-4" />
+          Properties
+        </button>
+        <button
+          onClick={() => setShowAIPanel(!showAIPanel)}
+          className={cn(
+            "flex-1 py-2.5 text-[11px] font-medium flex flex-col items-center gap-0.5 transition-colors",
+            showAIPanel ? "text-primary" : "text-muted-foreground"
+          )}
+        >
+          <Sparkles className="w-4 h-4" />
+          AI
+        </button>
+      </div>
+
+      {/* Mobile slide-up panels */}
+      <AnimatePresence>
+        {mobilePanel && (
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed inset-x-0 bottom-[52px] z-40 h-[50vh] bg-card border-t border-border/40 shadow-elevated lg:hidden overflow-hidden flex flex-col"
+          >
+            <div className="h-8 flex items-center justify-center shrink-0">
+              <div className="w-8 h-1 rounded-full bg-border" />
+            </div>
+            {mobilePanel === "furniture" && (
+              <div className="flex-1 overflow-hidden">
+                <EditorFurniturePanel onAddFurniture={(item) => { handleAddFurniture(item); setMobilePanel(null); }} />
+              </div>
+            )}
+            {mobilePanel === "properties" && (
+              <div className="flex-1 overflow-y-auto">
+                <EditorPropertiesPanel
+                  selectedObject={selectedObject}
+                  roomConfig={roomConfig}
+                  onUpdateObject={handleUpdateObject}
+                  onDeleteObject={handleDeleteObject}
+                  onDuplicateObject={handleDuplicateObject}
+                  onUpdateRoom={(updates) => setRoomConfig((prev) => ({ ...prev, ...updates }))}
+                />
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* AI Optimize Panel — bottom sheet on mobile, floating sidebar on desktop */}
       <AnimatePresence>
         {showAIPanel && (
-          <motion.div
-            initial={{ x: 300, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 300, opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed top-24 right-0 bottom-0 z-40 w-80 bg-card border-l border-border/40 shadow-elevated flex flex-col"
-          >
-            <AIOptimizePanel
-              open={showAIPanel}
-              onClose={() => setShowAIPanel(false)}
-              objects={objects}
-              roomConfig={roomConfig}
-              creditsRemaining={usage.aiCreditsTotal - usage.aiCreditsUsed}
-              useCredit={useCredit}
-              onApplySuggestion={(updated) => {
-                setObjects(updated);
-                pushHistory(updated);
-                toast({ title: "AI Applied", description: "Suggestion applied to layout" });
-              }}
-              onOutOfCredits={() => setShowOutOfCredits(true)}
-            />
-          </motion.div>
+          <>
+            {/* Desktop: floating right sidebar */}
+            <motion.div
+              initial={{ x: 300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 300, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="hidden lg:flex fixed top-24 right-0 bottom-0 z-40 w-80 bg-card border-l border-border/40 shadow-elevated flex-col"
+            >
+              <AIOptimizePanel
+                open={showAIPanel}
+                onClose={() => setShowAIPanel(false)}
+                objects={objects}
+                roomConfig={roomConfig}
+                creditsRemaining={usage.aiCreditsTotal - usage.aiCreditsUsed}
+                useCredit={useCredit}
+                onApplySuggestion={(updated) => {
+                  setObjects(updated);
+                  pushHistory(updated);
+                  toast({ title: "AI Applied", description: "Suggestion applied to layout" });
+                }}
+                onOutOfCredits={() => setShowOutOfCredits(true)}
+              />
+            </motion.div>
+
+            {/* Mobile/Tablet: bottom sheet */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="lg:hidden fixed inset-x-0 bottom-[52px] z-40 h-[60vh] bg-card border-t border-border/40 shadow-elevated flex flex-col rounded-t-2xl"
+            >
+              <div className="h-8 flex items-center justify-center shrink-0">
+                <div className="w-8 h-1 rounded-full bg-border" />
+              </div>
+              <AIOptimizePanel
+                open={showAIPanel}
+                onClose={() => setShowAIPanel(false)}
+                objects={objects}
+                roomConfig={roomConfig}
+                creditsRemaining={usage.aiCreditsTotal - usage.aiCreditsUsed}
+                useCredit={useCredit}
+                onApplySuggestion={(updated) => {
+                  setObjects(updated);
+                  pushHistory(updated);
+                  toast({ title: "AI Applied", description: "Suggestion applied to layout" });
+                }}
+                onOutOfCredits={() => setShowOutOfCredits(true)}
+              />
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
