@@ -202,7 +202,7 @@ const RoomEditor = () => {
       rId = room.id;
       setCurrentRoomId(rId);
     } else {
-      roomStore.updateRoom(rId, { config: roomConfig });
+      roomStore.updateRoom(rId, { name: roomName, config: roomConfig });
     }
 
     // Save layout
