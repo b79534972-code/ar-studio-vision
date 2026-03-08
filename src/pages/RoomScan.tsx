@@ -323,9 +323,9 @@ const RoomScan = () => {
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-3 mb-6">
                     {[
-                      { label: "Width", value: `${detectedRoom.width}m` },
-                      { label: "Depth", value: `${detectedRoom.depth}m` },
-                      { label: "Height", value: `${detectedRoom.height}m` },
+                      { label: t("roomScan.width"), value: `${detectedRoom.width}m` },
+                      { label: t("roomScan.depth"), value: `${detectedRoom.depth}m` },
+                      { label: t("roomScan.height"), value: `${detectedRoom.height}m` },
                     ].map((stat) => (
                       <div key={stat.label} className="bg-accent/40 rounded-xl px-4 py-3 text-center">
                         <p className="text-[11px] text-muted-foreground">{stat.label}</p>
