@@ -48,6 +48,7 @@ const AIOptimizePanel = ({
   creditsRemaining,
   useCredit,
   onApplySuggestion,
+  onOutOfCredits,
 }: AIOptimizePanelProps) => {
   const { t } = useLanguage();
   const [step, setStep] = useState<"idle" | "analyzing" | "results">("idle");
