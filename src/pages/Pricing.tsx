@@ -33,28 +33,31 @@ const Pricing = () => {
   const [processing, setProcessing] = useState(false);
 
   const handleUpgrade = (planKey: SubscriptionPlan) => {
-    if (planKey === currentPlan || planKey === "free") return;
+    if (planKey === "free") return;
     setConfirmPlan(planKey);
   };
 
   const handleConfirm = async () => {
     if (!confirmPlan) return;
     setProcessing(true);
-    // Simulate payment processing
     await new Promise((r) => setTimeout(r, 1500));
     subscriptionStore.upgradePlan(confirmPlan);
     setProcessing(false);
     setConfirmPlan(null);
+
+    const isRepurchase = confirmPlan === currentPlan;
     toast({
-      title: "Upgrade Successful! 🎉",
-      description: `You're now on the ${PLAN_CONFIG[confirmPlan].name} plan with ${PLAN_CONFIG[confirmPlan].aiCredits} AI credits.`,
+      title: isRepurchase ? "Credits Added! 🎉" : "Upgrade Successful! 🎉",
+      description: isRepurchase
+        ? `${PLAN_CONFIG[confirmPlan].aiCredits} AI credits added to your account.`
+        : `You're now on the ${PLAN_CONFIG[confirmPlan].name} plan with ${PLAN_CONFIG[confirmPlan].aiCredits} AI credits.`,
     });
     navigate("/dashboard/billing");
   };
 
   const getButtonLabel = (planKey: SubscriptionPlan) => {
-    if (planKey === currentPlan) return "Current Plan";
     if (planKey === "free") return "Free Plan";
+    if (planKey === currentPlan) return `Buy ${PLAN_CONFIG[planKey].aiCredits} More Credits`;
     const planIndex = plans.indexOf(planKey);
     const currentIndex = plans.indexOf(currentPlan);
     return planIndex > currentIndex ? `Upgrade to ${PLAN_CONFIG[planKey].name}` : `Switch to ${PLAN_CONFIG[planKey].name}`;
