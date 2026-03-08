@@ -41,6 +41,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/ar-demo" element={<ARDemo />} />
           <Route path="/ar-viewer/:layoutId" element={<ARViewer />} />
+          <Route path="/ar-object/:furnitureId" element={<ARObjectViewer />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/pricing" element={<Pricing />} />
