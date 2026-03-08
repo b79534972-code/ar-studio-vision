@@ -59,8 +59,8 @@ const SavedLayouts = () => {
           <Layers className="w-12 h-12 text-muted-foreground/30 mx-auto" />
           <p className="text-sm text-muted-foreground">
             {layouts.length === 0
-              ? "No saved layouts yet. Save a layout from the Room Editor!"
-              : "No layouts match your search"}
+              ? t("layouts.empty")
+              : t("layouts.noResults")}
           </p>
         </div>
       ) : (
