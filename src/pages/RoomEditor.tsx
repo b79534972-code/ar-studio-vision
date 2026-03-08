@@ -223,7 +223,29 @@ const RoomEditor = () => {
           <ArrowLeft className="w-3.5 h-3.5" /> Back
         </Button>
         <div className="h-5 w-px bg-border/40" />
-        <h1 className="font-display text-sm font-bold text-foreground">{roomName}</h1>
+        {editingName ? (
+          <div className="flex items-center gap-1.5">
+            <input
+              autoFocus
+              value={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") setEditingName(false); }}
+              onBlur={() => setEditingName(false)}
+              className="font-display text-sm font-bold text-foreground bg-transparent border-b border-primary outline-none w-36"
+            />
+            <button onClick={() => setEditingName(false)} className="text-primary">
+              <Check className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setEditingName(true)}
+            className="flex items-center gap-1.5 hover:text-primary transition-colors group"
+          >
+            <h1 className="font-display text-sm font-bold text-foreground">{roomName}</h1>
+            <Pencil className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+        )}
         <span className="text-[10px] text-muted-foreground">
           {roomConfig.width}m × {roomConfig.depth}m
         </span>
