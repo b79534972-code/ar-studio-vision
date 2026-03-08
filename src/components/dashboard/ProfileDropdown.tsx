@@ -1,7 +1,3 @@
-/**
- * ProfileDropdown — Avatar dropdown with Profile, Billing, Settings, Logout.
- */
-
 import { useNavigate } from "react-router-dom";
 import { User, CreditCard, Settings, LogOut } from "lucide-react";
 import {
@@ -12,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { User as UserType } from "@/types/subscription";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ProfileDropdownProps {
   user: UserType;
@@ -20,6 +17,7 @@ interface ProfileDropdownProps {
 
 const ProfileDropdown = ({ user, onLogout }: ProfileDropdownProps) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <DropdownMenu>
@@ -38,20 +36,20 @@ const ProfileDropdown = ({ user, onLogout }: ProfileDropdownProps) => {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/dashboard/profile")}>
           <User className="w-4 h-4 mr-2" />
-          Profile
+          {t("nav.profile")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/dashboard/billing")}>
           <CreditCard className="w-4 h-4 mr-2" />
-          Billing
+          {t("nav.billing")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
           <Settings className="w-4 h-4 mr-2" />
-          Settings
+          {t("nav.settings")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onLogout} className="text-destructive focus:text-destructive">
           <LogOut className="w-4 h-4 mr-2" />
-          Log Out
+          {t("profile.logout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
