@@ -1,6 +1,5 @@
 import { Eye, Grid3X3, Undo, Redo, Save, Smartphone, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 
 interface EditorToolbarProps {
@@ -9,6 +8,8 @@ interface EditorToolbarProps {
   onSave: () => void;
   onUndo: () => void;
   onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
   onARPreview: () => void;
   onAISuggest: () => void;
   objectCount: number;
@@ -20,6 +21,8 @@ const EditorToolbar = ({
   onSave,
   onUndo,
   onRedo,
+  canUndo,
+  canRedo,
   onARPreview,
   onAISuggest,
   objectCount,
@@ -27,10 +30,10 @@ const EditorToolbar = ({
   return (
     <div className="h-11 bg-card border-b border-border/40 flex items-center px-3 gap-1.5">
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onUndo} title="Undo">
+        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onUndo} disabled={!canUndo} title="Undo (Ctrl+Z)">
           <Undo className="w-3.5 h-3.5" />
         </Button>
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onRedo} title="Redo">
+        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onRedo} disabled={!canRedo} title="Redo (Ctrl+Y)">
           <Redo className="w-3.5 h-3.5" />
         </Button>
       </div>
@@ -62,32 +65,17 @@ const EditorToolbar = ({
 
       <div className="flex-1" />
 
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-7 gap-1.5 text-[11px] px-2"
-        onClick={onAISuggest}
-      >
+      <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[11px] px-2" onClick={onAISuggest}>
         <Sparkles className="w-3 h-3 text-primary" /> AI Suggest
       </Button>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-7 gap-1.5 text-[11px] px-2"
-        onClick={onARPreview}
-      >
+      <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[11px] px-2" onClick={onARPreview}>
         <Smartphone className="w-3 h-3" /> AR Preview
       </Button>
 
       <Separator orientation="vertical" className="h-5" />
 
-      <Button
-        variant="default"
-        size="sm"
-        className="h-7 gap-1.5 text-[11px] px-3"
-        onClick={onSave}
-      >
+      <Button variant="default" size="sm" className="h-7 gap-1.5 text-[11px] px-3" onClick={onSave}>
         <Save className="w-3 h-3" /> Save
       </Button>
     </div>

@@ -166,21 +166,26 @@ interface RoomCanvas3DProps {
   selectedId: string | null;
   onSelectObject: (id: string | null) => void;
   onUpdateObject?: (id: string, updates: Partial<PlacedObject>) => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
   viewMode: "3d" | "top";
 }
 
-const RoomCanvas3D = ({ objects, roomConfig, selectedId, onSelectObject, onUpdateObject, viewMode }: RoomCanvas3DProps) => {
+const RoomCanvas3D = ({ objects, roomConfig, selectedId, onSelectObject, onUpdateObject, onDragStart, onDragEnd, viewMode }: RoomCanvas3DProps) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDrag = useCallback((id: string, position: [number, number, number]) => {
-    setIsDragging(true);
+    if (!isDragging) {
+      setIsDragging(true);
+      onDragStart?.();
+    }
     onUpdateObject?.(id, { position });
-  }, [onUpdateObject]);
+  }, [onUpdateObject, onDragStart, isDragging]);
 
   return (
     <div
       className="w-full h-full rounded-xl overflow-hidden bg-gradient-to-b from-accent/20 to-background border border-border/30"
-      onPointerUp={() => setIsDragging(false)}
+      onPointerUp={() => { if (isDragging) { setIsDragging(false); onDragEnd?.(); } }}
     >
       <Canvas
         shadows

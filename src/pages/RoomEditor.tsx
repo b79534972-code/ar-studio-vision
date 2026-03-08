@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ const DEFAULT_ROOM: RoomConfig = {
   floorColor: "#D6D3D1",
 };
 
+const MAX_HISTORY = 50;
+
 const RoomEditor = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -27,6 +29,64 @@ const RoomEditor = () => {
   const [roomConfig, setRoomConfig] = useState<RoomConfig>(DEFAULT_ROOM);
   const [viewMode, setViewMode] = useState<"3d" | "top">("3d");
   const [showARModal, setShowARModal] = useState(false);
+
+  // ─── Undo / Redo ───
+  const historyRef = useRef<PlacedObject[][]>([[]]);
+  const historyIndexRef = useRef(0);
+  const isDraggingRef = useRef(false);
+
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+
+  const updateUndoRedoState = useCallback(() => {
+    setCanUndo(historyIndexRef.current > 0);
+    setCanRedo(historyIndexRef.current < historyRef.current.length - 1);
+  }, []);
+
+  const pushHistory = useCallback((newObjects: PlacedObject[]) => {
+    // Trim any redo states
+    historyRef.current = historyRef.current.slice(0, historyIndexRef.current + 1);
+    historyRef.current.push(newObjects);
+    if (historyRef.current.length > MAX_HISTORY) {
+      historyRef.current.shift();
+    } else {
+      historyIndexRef.current++;
+    }
+    updateUndoRedoState();
+  }, [updateUndoRedoState]);
+
+  const handleUndo = useCallback(() => {
+    if (historyIndexRef.current <= 0) return;
+    historyIndexRef.current--;
+    const prev = historyRef.current[historyIndexRef.current];
+    setObjects(prev);
+    setSelectedId(null);
+    updateUndoRedoState();
+  }, [updateUndoRedoState]);
+
+  const handleRedo = useCallback(() => {
+    if (historyIndexRef.current >= historyRef.current.length - 1) return;
+    historyIndexRef.current++;
+    const next = historyRef.current[historyIndexRef.current];
+    setObjects(next);
+    updateUndoRedoState();
+  }, [updateUndoRedoState]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [handleUndo, handleRedo]);
 
   // Load scanned room config if coming from Room Scan AI
   useEffect(() => {
@@ -61,22 +121,41 @@ const RoomEditor = () => {
       color: item.color,
       dimensions: item.dimensions,
     };
-    setObjects((prev) => [...prev, newObj]);
+    const newObjects = [...objects, newObj];
+    setObjects(newObjects);
+    pushHistory(newObjects);
     setSelectedId(newObj.id);
     toast({ title: "Added", description: `${item.name} placed in room` });
-  }, [roomConfig, toast]);
+  }, [roomConfig, toast, objects, pushHistory]);
 
   const handleUpdateObject = useCallback((id: string, updates: Partial<PlacedObject>) => {
-    setObjects((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, ...updates } : o))
-    );
+    setObjects((prev) => {
+      const next = prev.map((o) => (o.id === id ? { ...o, ...updates } : o));
+      // Only push history on pointer up (not every drag frame)
+      if (!isDraggingRef.current) {
+        pushHistory(next);
+      }
+      return next;
+    });
+  }, [pushHistory]);
+
+  // Called when drag ends to commit to history
+  const handleDragEnd = useCallback(() => {
+    isDraggingRef.current = false;
+    pushHistory(objects);
+  }, [objects, pushHistory]);
+
+  const handleDragStart = useCallback(() => {
+    isDraggingRef.current = true;
   }, []);
 
   const handleDeleteObject = useCallback((id: string) => {
-    setObjects((prev) => prev.filter((o) => o.id !== id));
+    const newObjects = objects.filter((o) => o.id !== id);
+    setObjects(newObjects);
+    pushHistory(newObjects);
     setSelectedId(null);
     toast({ title: "Deleted", description: "Object removed from room" });
-  }, [toast]);
+  }, [toast, objects, pushHistory]);
 
   const handleDuplicateObject = useCallback((id: string) => {
     const obj = objects.find((o) => o.id === id);
@@ -86,10 +165,12 @@ const RoomEditor = () => {
       id: `obj-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       position: [obj.position[0] + 0.5, obj.position[1], obj.position[2] + 0.5],
     };
-    setObjects((prev) => [...prev, dup]);
+    const newObjects = [...objects, dup];
+    setObjects(newObjects);
+    pushHistory(newObjects);
     setSelectedId(dup.id);
     toast({ title: "Duplicated", description: `${obj.name} duplicated` });
-  }, [objects, toast]);
+  }, [objects, toast, pushHistory]);
 
   const handleSave = useCallback(() => {
     toast({ title: "Layout Saved", description: `${objects.length} objects in room` });
@@ -114,8 +195,10 @@ const RoomEditor = () => {
         viewMode={viewMode}
         onToggleView={() => setViewMode((v) => (v === "3d" ? "top" : "3d"))}
         onSave={handleSave}
-        onUndo={() => {}}
-        onRedo={() => {}}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        canUndo={canUndo}
+        canRedo={canRedo}
         onARPreview={() => setShowARModal(true)}
         onAISuggest={() => toast({ title: "AI Suggest", description: "Analyzing room layout…" })}
         objectCount={objects.length}
@@ -132,6 +215,8 @@ const RoomEditor = () => {
             selectedId={selectedId}
             onSelectObject={setSelectedId}
             onUpdateObject={handleUpdateObject}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
             viewMode={viewMode}
           />
         </div>
