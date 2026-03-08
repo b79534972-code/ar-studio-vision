@@ -135,7 +135,12 @@ const Pricing = () => {
                   size="lg"
                   className="w-full"
                   disabled={isFree}
-                  onClick={() => !isFree && navigate("/signup")}
+                  onClick={() => {
+                    if (!isFree) {
+                      // TODO: Integrate Stripe checkout when backend is connected
+                      navigate("/dashboard/billing");
+                    }
+                  }}
                 >
                   {isFree ? "Current Plan" : `Upgrade to ${plan.name}`}
                 </Button>
