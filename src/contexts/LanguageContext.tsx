@@ -108,6 +108,8 @@ const translations: Record<Language, Record<string, string>> = {
     "rooms.layouts": "layouts",
     "rooms.empty": "No rooms yet. Create your first room to get started!",
     "rooms.noResults": "No rooms match your search",
+    "rooms.emptyDesc": "Design and manage your rooms with our 3D editor",
+    "rooms.noResultsDesc": "Try a different search term",
     "rooms.allRooms": "All Rooms",
     "rooms.openEditor": "Open Editor",
     "rooms.viewLayouts": "View Layouts",
