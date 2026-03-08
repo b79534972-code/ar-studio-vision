@@ -131,8 +131,8 @@ const RoomScan = () => {
               <ScanLine className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h1 className="font-display text-2xl font-bold text-foreground">Room Scan AI</h1>
-              <p className="text-sm text-muted-foreground">Upload a photo to auto-detect room structure</p>
+              <h1 className="font-display text-2xl font-bold text-foreground">{t("roomScan.title")}</h1>
+              <p className="text-sm text-muted-foreground">{t("roomScan.subtitle")}</p>
             </div>
           </div>
         </div>
