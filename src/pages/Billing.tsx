@@ -1,20 +1,26 @@
 import { motion } from "framer-motion";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { PLAN_CONFIG, formatPrice, type User, type Currency } from "@/types/subscription";
+import { PLAN_CONFIG, formatPrice, type User, type UserUsage, type Currency } from "@/types/subscription";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DashboardContext {
   user: User;
+  usage: UserUsage;
   currency: Currency;
 }
 
 const Billing = () => {
-  const { user, currency } = useOutletContext<DashboardContext>();
+  const { user, usage, currency } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
   const plan = PLAN_CONFIG[user.subscriptionPlan];
   const { t } = useLanguage();
+
+  const creditsRemaining = usage.aiCreditsTotal - usage.aiCreditsUsed;
+  const creditPercentage = usage.aiCreditsTotal > 0
+    ? Math.round((usage.aiCreditsUsed / usage.aiCreditsTotal) * 100)
+    : 0;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -23,6 +29,7 @@ const Billing = () => {
         <p className="text-sm text-muted-foreground">{t("billing.subtitle")}</p>
       </div>
 
+      {/* Current Plan */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -39,6 +46,60 @@ const Billing = () => {
           </p>
         </div>
 
+        {/* Credit Usage */}
+        <div className="p-4 bg-secondary/20 rounded-xl border border-border/30 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-foreground">{t("billing.creditUsage") || "AI Credit Usage"}</span>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {usage.aiCreditsUsed} / {usage.aiCreditsTotal} {t("billing.creditsUsedLabel") || "used"}
+            </span>
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-2.5 bg-secondary rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${creditPercentage}%` }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className={`h-full rounded-full ${
+                creditPercentage < 50 ? "bg-green-500" :
+                creditPercentage < 80 ? "bg-yellow-500" :
+                "bg-red-500"
+              }`}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">
+              {creditsRemaining} {t("billing.creditsRemaining") || "credits remaining"}
+            </p>
+            {creditPercentage >= 80 && (
+              <button
+                onClick={() => navigate("/pricing")}
+                className="text-xs text-primary font-medium flex items-center gap-1 hover:underline"
+              >
+                <Zap className="w-3 h-3" /> {t("billing.buyMore") || "Buy more credits"}
+              </button>
+            )}
+          </div>
+
+          {/* Credit breakdown */}
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border/20">
+            <div className="text-center p-3 bg-card rounded-lg border border-border/20">
+              <p className="font-display text-lg font-bold text-foreground">{usage.aiRequestsCount}</p>
+              <p className="text-[10px] text-muted-foreground">{t("billing.aiRequests") || "AI Requests"}</p>
+            </div>
+            <div className="text-center p-3 bg-card rounded-lg border border-border/20">
+              <p className="font-display text-lg font-bold text-foreground">{creditsRemaining}</p>
+              <p className="text-[10px] text-muted-foreground">{t("billing.remaining") || "Remaining"}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment method */}
         <div>
           <p className="text-sm font-medium text-foreground mb-2">{t("profile.paymentMethod")}</p>
           <div className="p-4 bg-secondary/40 rounded-xl border border-border/30 flex items-center gap-3">
@@ -47,6 +108,7 @@ const Billing = () => {
           </div>
         </div>
 
+        {/* Invoice history */}
         <div>
           <p className="text-sm font-medium text-foreground mb-2">{t("profile.invoiceHistory")}</p>
           <div className="p-4 bg-secondary/40 rounded-xl border border-border/30 text-center text-sm text-muted-foreground">
