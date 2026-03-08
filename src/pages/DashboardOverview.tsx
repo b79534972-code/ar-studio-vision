@@ -127,11 +127,10 @@ const DashboardOverview = () => {
   const { customItems } = useCustomFurniture();
 
   // Override mock usage with real store data
-  const totalFurniture = FURNITURE_CATALOG.length + customItems.length;
   const usage: UserUsage = {
     ...baseUsage,
     modelsCount: customItems.length,
-    layoutsCount: totalFurniture,
+    layoutsCount: customItems.length,
     arSessionsCount: rooms.length,
   };
 
