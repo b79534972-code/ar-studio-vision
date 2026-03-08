@@ -361,7 +361,7 @@ const AILayoutGenerator = () => {
               </div>
 
               <Button className="w-full gap-2 h-11" onClick={handleGenerate}>
-                <Wand2 className="w-4 h-4" /> Generate AI Layouts
+                <Wand2 className="w-4 h-4" /> {t("aiGen.generate")}
               </Button>
             </div>
           </motion.div>
