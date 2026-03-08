@@ -127,7 +127,10 @@ const AIOptimizePanel = ({
   };
 
   const handleAnalyze = async () => {
-    if (creditsRemaining < CREDIT_COST) return;
+    if (creditsRemaining < CREDIT_COST) {
+      onOutOfCredits?.();
+      return;
+    }
     if (!useCredit(CREDIT_COST)) return;
 
     setStep("analyzing");
