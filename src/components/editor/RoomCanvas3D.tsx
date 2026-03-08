@@ -1,22 +1,64 @@
 import { useRef, useState, useCallback } from "react";
-import { Canvas, useThree, useFrame } from "@react-three/fiber";
+import { Canvas, useThree, useFrame, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Grid, Environment, ContactShadows, Html } from "@react-three/drei";
 import type { PlacedObject, RoomConfig } from "@/types/editor";
 import * as THREE from "three";
 
-/* ─── Furniture mesh by category ─── */
-const FurnitureMesh = ({ obj, selected, onSelect }: {
+/* ─── Draggable Furniture mesh ─── */
+const FurnitureMesh = ({ obj, selected, onSelect, onDrag }: {
   obj: PlacedObject;
   selected: boolean;
   onSelect: (id: string) => void;
+  onDrag: (id: string, position: [number, number, number]) => void;
 }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const floorPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0));
+  const dragOffset = useRef(new THREE.Vector3());
 
   const { width, height, depth } = obj.dimensions;
   const scaledW = width * obj.scale[0];
   const scaledH = height * obj.scale[1];
   const scaledD = depth * obj.scale[2];
+
+  const handlePointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation();
+    onSelect(obj.id);
+
+    // Calculate drag offset
+    const intersect = new THREE.Vector3();
+    e.ray.intersectPlane(floorPlane.current, intersect);
+    dragOffset.current.set(
+      intersect.x - obj.position[0],
+      0,
+      intersect.z - obj.position[2]
+    );
+
+    setDragging(true);
+    (e.target as HTMLElement)?.setPointerCapture?.(e.pointerId);
+    document.body.style.cursor = "grabbing";
+  }, [obj.id, obj.position, onSelect]);
+
+  const handlePointerMove = useCallback((e: ThreeEvent<PointerEvent>) => {
+    if (!dragging) return;
+    e.stopPropagation();
+
+    const intersect = new THREE.Vector3();
+    e.ray.intersectPlane(floorPlane.current, intersect);
+
+    const newX = intersect.x - dragOffset.current.x;
+    const newZ = intersect.z - dragOffset.current.z;
+
+    onDrag(obj.id, [newX, obj.position[1], newZ]);
+  }, [dragging, obj.id, obj.position, onDrag]);
+
+  const handlePointerUp = useCallback((e: ThreeEvent<PointerEvent>) => {
+    if (!dragging) return;
+    e.stopPropagation();
+    setDragging(false);
+    document.body.style.cursor = "default";
+  }, [dragging]);
 
   return (
     <group
@@ -25,9 +67,11 @@ const FurnitureMesh = ({ obj, selected, onSelect }: {
     >
       <mesh
         ref={meshRef}
-        onClick={(e) => { e.stopPropagation(); onSelect(obj.id); }}
-        onPointerOver={(e) => { e.stopPropagation(); setHovered(true); document.body.style.cursor = "pointer"; }}
-        onPointerOut={() => { setHovered(false); document.body.style.cursor = "default"; }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerOver={(e) => { e.stopPropagation(); setHovered(true); document.body.style.cursor = dragging ? "grabbing" : "grab"; }}
+        onPointerOut={() => { if (!dragging) { setHovered(false); document.body.style.cursor = "default"; } }}
         position={[0, scaledH / 2, 0]}
         castShadow
         receiveShadow
@@ -77,22 +121,41 @@ const RoomWalls = ({ config }: { config: RoomConfig }) => {
 
   return (
     <group>
-      {/* Back wall */}
       <mesh position={[0, height / 2, -depth / 2]} receiveShadow>
         <boxGeometry args={[width, height, wallThickness]} />
         <meshStandardMaterial color={config.wallColor} roughness={0.9} />
       </mesh>
-      {/* Left wall */}
       <mesh position={[-width / 2, height / 2, 0]} receiveShadow>
         <boxGeometry args={[wallThickness, height, depth]} />
         <meshStandardMaterial color={config.wallColor} roughness={0.9} />
       </mesh>
-      {/* Right wall */}
       <mesh position={[width / 2, height / 2, 0]} receiveShadow>
         <boxGeometry args={[wallThickness, height, depth]} />
         <meshStandardMaterial color={config.wallColor} roughness={0.9} />
       </mesh>
     </group>
+  );
+};
+
+/* ─── Disable OrbitControls while dragging ─── */
+const SceneControls = ({ viewMode, isDragging }: { viewMode: "3d" | "top"; isDragging: boolean }) => {
+  const { camera } = useThree();
+
+  useFrame(() => {
+    if (viewMode === "top") {
+      camera.position.lerp(new THREE.Vector3(0, 8, 0.01), 0.05);
+    }
+  });
+
+  return (
+    <OrbitControls
+      makeDefault
+      enabled={!isDragging}
+      maxPolarAngle={viewMode === "top" ? 0.1 : Math.PI / 2.1}
+      minDistance={2}
+      maxDistance={15}
+      enablePan
+    />
   );
 };
 
@@ -102,30 +165,29 @@ interface RoomCanvas3DProps {
   roomConfig: RoomConfig;
   selectedId: string | null;
   onSelectObject: (id: string | null) => void;
+  onUpdateObject?: (id: string, updates: Partial<PlacedObject>) => void;
   viewMode: "3d" | "top";
 }
 
-const CameraController = ({ viewMode }: { viewMode: "3d" | "top" }) => {
-  const { camera } = useThree();
+const RoomCanvas3D = ({ objects, roomConfig, selectedId, onSelectObject, onUpdateObject, viewMode }: RoomCanvas3DProps) => {
+  const [isDragging, setIsDragging] = useState(false);
 
-  useFrame(() => {
-    if (viewMode === "top") {
-      camera.position.lerp(new THREE.Vector3(0, 8, 0.01), 0.05);
-    }
-  });
+  const handleDrag = useCallback((id: string, position: [number, number, number]) => {
+    setIsDragging(true);
+    onUpdateObject?.(id, { position });
+  }, [onUpdateObject]);
 
-  return null;
-};
-
-const RoomCanvas3D = ({ objects, roomConfig, selectedId, onSelectObject, viewMode }: RoomCanvas3DProps) => {
   return (
-    <div className="w-full h-full rounded-xl overflow-hidden bg-gradient-to-b from-accent/20 to-background border border-border/30">
+    <div
+      className="w-full h-full rounded-xl overflow-hidden bg-gradient-to-b from-accent/20 to-background border border-border/30"
+      onPointerUp={() => setIsDragging(false)}
+    >
       <Canvas
         shadows
         camera={{ position: [4, 4, 4], fov: 50 }}
-        onPointerMissed={() => onSelectObject(null)}
+        onPointerMissed={() => { onSelectObject(null); setIsDragging(false); }}
       >
-        <CameraController viewMode={viewMode} />
+        <SceneControls viewMode={viewMode} isDragging={isDragging} />
         <ambientLight intensity={0.5} />
         <directionalLight
           position={[5, 8, 3]}
@@ -172,19 +234,12 @@ const RoomCanvas3D = ({ objects, roomConfig, selectedId, onSelectObject, viewMod
             obj={obj}
             selected={selectedId === obj.id}
             onSelect={onSelectObject}
+            onDrag={handleDrag}
           />
         ))}
 
         <ContactShadows position={[0, 0, 0]} opacity={0.3} blur={2} />
         <Environment preset="apartment" />
-
-        <OrbitControls
-          makeDefault
-          maxPolarAngle={viewMode === "top" ? 0.1 : Math.PI / 2.1}
-          minDistance={2}
-          maxDistance={15}
-          enablePan
-        />
       </Canvas>
     </div>
   );
