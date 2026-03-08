@@ -142,10 +142,10 @@ const MyRooms = () => {
               {roomLayouts.length === 0 ? (
                 <div className="text-center py-12 space-y-3">
                   <Layers className="w-10 h-10 text-muted-foreground/20 mx-auto" />
-                  <p className="text-sm text-muted-foreground">No layouts saved yet</p>
-                  <p className="text-xs text-muted-foreground/70">Open the editor and hit Save to create your first layout</p>
+                  <p className="text-sm text-muted-foreground">{t("rooms.noLayouts")}</p>
+                  <p className="text-xs text-muted-foreground/70">{t("rooms.noLayoutsDesc")}</p>
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => handleOpenEditor(selectedRoom.id)}>
-                    <PenTool className="w-3 h-3" /> Open Editor
+                    <PenTool className="w-3 h-3" /> {t("rooms.openEditor")}
                   </Button>
                 </div>
               ) : (
