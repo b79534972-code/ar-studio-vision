@@ -51,6 +51,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [generateProgress, setGenerateProgress] = useState(0);
+  const [unit, setUnit] = useState<"cm" | "m">("cm");
   const [form, setForm] = useState<FurnitureForm>({
     name: "", category: "", width: "", height: "", depth: "",
     shape: "Auto (from image)", material: "",
