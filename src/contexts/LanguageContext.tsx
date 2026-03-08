@@ -284,8 +284,20 @@ const translations: Record<Language, Record<string, string>> = {
     "aiGen.optimal": "Optimal",
     "aiGen.layoutApplied": "Layout Applied",
 
-    // Plan
+    // Plan & Credits
     "plan.plan": "Plan",
+    "plan.credits": "AI Credits",
+    "plan.creditsRemaining": "remaining",
+    "plan.creditsUsed": "used",
+    "plan.currentPlan": "Current Plan",
+    "plan.viewPlans": "View Plans",
+    "plan.free": "Free",
+    "plan.basic": "Basic",
+    "plan.advanced": "Advanced",
+    "plan.pro": "Pro",
+    "plan.perDay": "/day",
+    "plan.noCredits": "No credits left",
+    "plan.buyMore": "Get More Credits",
 
     // Mobile nav
     "mobile.home": "Home",
@@ -568,8 +580,20 @@ const translations: Record<Language, Record<string, string>> = {
     "aiGen.optimal": "Tối ưu",
     "aiGen.layoutApplied": "Đã áp dụng bố cục",
 
-    // Plan
+    // Plan & Credits
     "plan.plan": "Gói",
+    "plan.credits": "Credit AI",
+    "plan.creditsRemaining": "còn lại",
+    "plan.creditsUsed": "đã dùng",
+    "plan.currentPlan": "Gói hiện tại",
+    "plan.viewPlans": "Xem các gói",
+    "plan.free": "Miễn phí",
+    "plan.basic": "Cơ bản",
+    "plan.advanced": "Nâng cao",
+    "plan.pro": "Chuyên nghiệp",
+    "plan.perDay": "/ngày",
+    "plan.noCredits": "Hết credit",
+    "plan.buyMore": "Mua thêm Credit",
 
     // Mobile nav
     "mobile.home": "Trang chủ",

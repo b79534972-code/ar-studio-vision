@@ -61,6 +61,7 @@ const DashboardLayout = () => {
               context={{
                 ...subscription,
                 featureGate,
+                useCredit: subscription.useCredit,
               }}
             />
           </div>

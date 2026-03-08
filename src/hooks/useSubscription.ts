@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback } from "react";
-import type { User, UserUsage, SubscriptionPlan, Currency } from "@/types/subscription";
+import { PLAN_CONFIG, type User, type UserUsage, type SubscriptionPlan, type Currency } from "@/types/subscription";
 
 const MOCK_USER: User = {
   id: "usr_demo_001",
@@ -25,6 +25,8 @@ const MOCK_USAGE: UserUsage = {
   layoutsCount: 2,
   arSessionsCount: 7,
   aiRequestsCount: 0,
+  aiCreditsUsed: 0,
+  aiCreditsTotal: 5, // Free plan = 5 credits
 };
 
 export function useSubscription() {
@@ -35,6 +37,23 @@ export function useSubscription() {
 
   const upgradePlan = useCallback((plan: SubscriptionPlan) => {
     setUser((prev) => ({ ...prev, subscriptionPlan: plan }));
+    const newCredits = PLAN_CONFIG[plan].limits.aiCredits ?? 5;
+    setUsage((prev) => ({ ...prev, aiCreditsTotal: newCredits, aiCreditsUsed: 0 }));
+  }, []);
+
+  const useCredit = useCallback((amount: number = 1): boolean => {
+    let success = false;
+    setUsage((prev) => {
+      const remaining = prev.aiCreditsTotal - prev.aiCreditsUsed;
+      if (remaining < amount) return prev;
+      success = true;
+      return {
+        ...prev,
+        aiCreditsUsed: prev.aiCreditsUsed + amount,
+        aiRequestsCount: prev.aiRequestsCount + 1,
+      };
+    });
+    return success;
   }, []);
 
   const logout = useCallback(() => {
@@ -51,5 +70,6 @@ export function useSubscription() {
     logout,
     setUser,
     setUsage,
+    useCredit,
   };
 }

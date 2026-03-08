@@ -25,6 +25,8 @@ export interface UserUsage {
   layoutsCount: number;
   arSessionsCount: number;
   aiRequestsCount: number;
+  aiCreditsUsed: number;
+  aiCreditsTotal: number;
 }
 
 export interface Layout {
