@@ -154,7 +154,7 @@ const DashboardOverview = () => {
 
   return (
     <div className="space-y-6 lg:space-y-8">
-      {/* ── Hero Banner — action-focused ── */}
+      {/* ── Hero Banner — welcome + status ── */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -173,44 +173,9 @@ const DashboardOverview = () => {
           <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-primary-foreground mb-2 leading-tight">
             {t("overview.title")}
           </h1>
-          <p className="text-primary-foreground/65 text-sm sm:text-base mb-6 max-w-xl leading-relaxed">
+          <p className="text-primary-foreground/65 text-sm sm:text-base max-w-xl leading-relaxed">
             {t("overview.subtitle")}
           </p>
-
-          <div className="flex flex-wrap gap-2.5">
-            <Button
-              variant="secondary"
-              size="default"
-              className="gap-2 min-h-[44px] rounded-xl font-medium"
-              onClick={() => navigate("/dashboard/editor")}
-            >
-              <Plus className="w-4 h-4" /> {t("overview.createLayout")}
-            </Button>
-            <Button
-              variant="secondary"
-              size="default"
-              className="gap-2 min-h-[44px] rounded-xl font-medium"
-              onClick={() => navigate("/dashboard/furniture")}
-            >
-              <ImagePlus className="w-4 h-4" /> {t("overview.addFurniture")}
-            </Button>
-            <Button
-              variant="secondary"
-              size="default"
-              className="gap-2 min-h-[44px] rounded-xl font-medium"
-              onClick={() => navigate("/ar-demo")}
-            >
-              <Smartphone className="w-4 h-4" /> {t("overview.startAR")}
-            </Button>
-            <Button
-              variant="secondary"
-              size="default"
-              className="gap-2 min-h-[44px] rounded-xl font-medium"
-              onClick={() => featureGate.canUseAI() && navigate("/dashboard/ai-generator")}
-            >
-              <Sparkles className="w-4 h-4" /> {t("overview.aiLayout")}
-            </Button>
-          </div>
         </div>
       </motion.div>
 
@@ -250,11 +215,12 @@ const DashboardOverview = () => {
           <h2 className="font-display text-lg font-bold text-foreground">{t("overview.quickActions")}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <QuickActionCard
-              icon={Smartphone}
-              title={t("overview.launchAR")}
-              description={t("overview.launchAR.desc")}
-              onClick={() => navigate("/ar-demo")}
+              icon={Plus}
+              title={t("overview.createLayout")}
+              description="Start a new room layout in the editor"
+              onClick={() => navigate("/dashboard/rooms")}
               delay={0.1}
+              accent
             />
             <QuickActionCard
               icon={ImagePlus}
@@ -264,19 +230,18 @@ const DashboardOverview = () => {
               delay={0.16}
             />
             <QuickActionCard
-              icon={Zap}
-              title={t("overview.aiOptimizer")}
+              icon={Sparkles}
+              title={t("overview.aiLayout")}
               description={t("overview.aiOptimizer.desc")}
-              onClick={() => { featureGate.canUseAdvancedAI(); }}
+              onClick={() => { featureGate.canUseAI() && navigate("/dashboard/ai-generator"); }}
               delay={0.22}
             />
             <QuickActionCard
-              icon={Sparkles}
+              icon={Zap}
               title={t("overview.upgradePlan")}
               description={t("overview.upgradePlan.desc")}
               onClick={() => navigate("/pricing")}
               delay={0.28}
-              accent
             />
           </div>
         </section>
