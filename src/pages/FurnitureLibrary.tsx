@@ -118,7 +118,7 @@ const FurnitureLibrary = () => {
       </motion.div>
 
       {/* Results count */}
-      <p className="text-xs text-muted-foreground">{filtered.length} items</p>
+      <p className="text-xs text-muted-foreground">{filtered.length} {t("furnitureLib.items")}</p>
 
       {/* Grid view */}
       {viewMode === "grid" ? (
