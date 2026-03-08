@@ -375,17 +375,17 @@ const AILayoutGenerator = () => {
               <Loader2 className="w-8 h-8 text-primary-foreground animate-spin" />
             </div>
             <div>
-              <h2 className="font-display text-lg font-bold text-foreground">Generating Layouts</h2>
-              <p className="text-sm text-muted-foreground mt-1">AI is analyzing your room and creating optimal furniture arrangements…</p>
+              <h2 className="font-display text-lg font-bold text-foreground">{t("aiGen.generating")}</h2>
+              <p className="text-sm text-muted-foreground mt-1">{t("aiGen.generatingDesc")}</p>
             </div>
             <div className="max-w-sm mx-auto space-y-2">
               <Progress value={progress} className="h-2" />
-              <p className="text-xs text-muted-foreground">{progress}% complete</p>
+              <p className="text-xs text-muted-foreground">{progress}% {t("roomScan.complete")}</p>
             </div>
             <div className="flex justify-center gap-6 text-[10px] text-muted-foreground">
-              <span>🔍 Analyzing dimensions</span>
-              <span>🪑 Selecting furniture</span>
-              <span>📐 Optimizing placement</span>
+              <span>{t("aiGen.analyzingDim")}</span>
+              <span>{t("aiGen.selectingFurn")}</span>
+              <span>{t("aiGen.optimizing")}</span>
             </div>
           </motion.div>
         )}
