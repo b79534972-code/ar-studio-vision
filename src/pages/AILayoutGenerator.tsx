@@ -198,14 +198,14 @@ const AILayoutGenerator = () => {
 
               {/* Dimensions */}
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Room Dimensions</Label>
+                <Label className="text-sm font-medium">{t("aiGen.dimensions")}</Label>
                 <div className="flex gap-4">
                   <div className="flex-1 space-y-1.5">
-                    <Label className="text-xs text-muted-foreground">Width (m)</Label>
+                    <Label className="text-xs text-muted-foreground">{t("aiGen.widthLabel")}</Label>
                     <Input value={width} onChange={(e) => setWidth(e.target.value)} type="number" min={2} max={20} step={0.5} className="h-9" />
                   </div>
                   <div className="flex-1 space-y-1.5">
-                    <Label className="text-xs text-muted-foreground">Depth (m)</Label>
+                    <Label className="text-xs text-muted-foreground">{t("aiGen.depthLabel")}</Label>
                     <Input value={depth} onChange={(e) => setDepth(e.target.value)} type="number" min={2} max={20} step={0.5} className="h-9" />
                   </div>
                   <div className="flex-1 flex items-end">
