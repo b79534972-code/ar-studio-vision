@@ -56,6 +56,7 @@ export function useSubscription() {
     try { localStorage.setItem("user-usage", JSON.stringify(usage)); } catch { /* ignore */ }
   }, [usage]);
 
+  const upgradePlan = useCallback((plan: SubscriptionPlan) => {
     subscriptionStore.upgradePlan(plan);
     const newPlanCredits = PLAN_CONFIG[plan].limits.aiCredits ?? 5;
     setUsage((prev) => {
