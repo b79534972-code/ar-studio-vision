@@ -39,6 +39,7 @@ const MyRooms = () => {
   const [newRoom, setNewRoom] = useState({ name: "", width: "6", depth: "5", height: "2.8" });
   const [roomUnit, setRoomUnit] = useState<"m" | "cm">("m");
   const [selectedRoom, setSelectedRoom] = useState<SavedRoom | null>(null);
+  const [historyLayout, setHistoryLayout] = useState<SavedLayout | null>(null);
 
   const filtered = rooms.filter((r) =>
     r.name.toLowerCase().includes(search.toLowerCase())
