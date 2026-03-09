@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Check, Sparkles, Flame, ArrowLeft, Zap, Crown, CreditCard, Loader2 } from "lucide-react";
 import { PLAN_CONFIG, formatPrice, formatPerCredit, type SubscriptionPlan, type Currency } from "@/types/subscription";
 import { subscriptionStore } from "@/stores/subscriptionStore";
+import { creditBatchStore } from "@/stores/creditBatchStore";
 import { useSyncExternalStore } from "react";
 import {
   Dialog,
@@ -42,6 +43,9 @@ const Pricing = () => {
     setProcessing(true);
     await new Promise((r) => setTimeout(r, 1500));
     subscriptionStore.upgradePlan(confirmPlan);
+    if (confirmPlan !== "free") {
+      creditBatchStore.addBatch(confirmPlan as Exclude<SubscriptionPlan, "free">);
+    }
     setProcessing(false);
     setConfirmPlan(null);
 
