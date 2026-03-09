@@ -29,6 +29,19 @@ export interface UserUsage {
   aiCreditsTotal: number;
 }
 
+/**
+ * CreditBatch — A purchased credit pack with expiration.
+ * Credits are consumed FIFO (earliest expiry first).
+ */
+export interface CreditBatch {
+  id: string;
+  plan: SubscriptionPlan;
+  creditsPurchased: number;
+  creditsRemaining: number;
+  purchasedAt: string;
+  expiresAt: string;
+}
+
 export interface Layout {
   id: string;
   name: string;
