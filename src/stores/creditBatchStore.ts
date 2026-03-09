@@ -33,26 +33,26 @@ function notify() {
   listeners.forEach((l) => l());
 }
 
-/** Remove expired batches */
-function pruneExpired(): void {
+/** Remove expired batches (silent = no notify, safe for use during render) */
+function pruneExpired(silent = false): void {
   const now = new Date().toISOString();
   const before = batches.length;
   batches = batches.filter((b) => b.expiresAt > now && b.creditsRemaining > 0);
   if (batches.length !== before) {
     persist();
-    notify();
+    if (!silent) notify();
   }
 }
 
 export const creditBatchStore = {
   getBatches: (): CreditBatch[] => {
-    pruneExpired();
+    pruneExpired(true); // silent — safe for useSyncExternalStore snapshot
     return batches;
   },
 
   /** Total remaining credits across all non-expired batches */
   getTotalRemaining: (): number => {
-    pruneExpired();
+    pruneExpired(true); // silent — safe for useSyncExternalStore snapshot
     return batches.reduce((sum, b) => sum + b.creditsRemaining, 0);
   },
 
