@@ -1,42 +1,21 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { CreditCard, Sparkles, Zap, ShoppingCart, Check, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { CreditCard, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { PLAN_CONFIG, formatPrice, formatPerCredit, type User, type UserUsage, type Currency, type SubscriptionPlan } from "@/types/subscription";
+import { PLAN_CONFIG, formatPrice, type User, type UserUsage, type Currency } from "@/types/subscription";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { toast } from "sonner";
 
 interface DashboardContext {
   user: User;
   usage: UserUsage;
   currency: Currency;
-  upgradePlan: (plan: SubscriptionPlan) => void;
 }
 
-const TOP_UP_PACKS: { plan: Exclude<SubscriptionPlan, "free">; credits: number }[] = [
-  { plan: "basic", credits: 20 },
-  { plan: "advanced", credits: 50 },
-  { plan: "pro", credits: 120 },
-];
-
 const Billing = () => {
-  const { user, usage, currency, upgradePlan } = useOutletContext<DashboardContext>();
+  const { user, usage, currency } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
   const plan = PLAN_CONFIG[user.subscriptionPlan];
   const { t } = useLanguage();
-  const [buyingPlan, setBuyingPlan] = useState<string | null>(null);
-
-  const handleTopUp = async (packPlan: Exclude<SubscriptionPlan, "free">) => {
-    setBuyingPlan(packPlan);
-    // Mock payment delay — will be replaced by Stripe
-    await new Promise((r) => setTimeout(r, 1500));
-    upgradePlan(packPlan);
-    setBuyingPlan(null);
-    toast.success(`${PLAN_CONFIG[packPlan].aiCredits} credits added!`, {
-      description: `Your ${PLAN_CONFIG[packPlan].name} credit pack is now active.`,
-    });
-  };
   // Mock invoice history — will be replaced by real Stripe data
   const invoiceHistory = user.subscriptionPlan !== "free"
     ? [
