@@ -17,6 +17,14 @@ const Billing = () => {
   const plan = PLAN_CONFIG[user.subscriptionPlan];
   const { t } = useLanguage();
 
+  // Mock invoice history — will be replaced by real Stripe data
+  const invoiceHistory = user.subscriptionPlan !== "free"
+    ? [
+        { date: "2026-03-01", plan: plan.name, credits: String(plan.limits.aiCredits ?? 0), amount: formatPrice(user.subscriptionPlan, currency) },
+        { date: "2026-02-01", plan: plan.name, credits: String(plan.limits.aiCredits ?? 0), amount: formatPrice(user.subscriptionPlan, currency) },
+      ]
+    : [];
+
   const creditsRemaining = usage.aiCreditsTotal - usage.aiCreditsUsed;
   const creditPercentage = usage.aiCreditsTotal > 0
     ? Math.round((usage.aiCreditsUsed / usage.aiCreditsTotal) * 100)
