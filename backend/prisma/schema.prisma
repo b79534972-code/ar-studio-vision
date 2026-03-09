@@ -144,25 +144,27 @@ model UserUsage {
 // ─── Credit Purchases (one-time buy, use until depleted) ─────
 
 model CreditPurchase {
-  id              String           @id @default(uuid())
-  userId          String
+  id               String           @id @default(uuid())
+  userId           String
 
-  plan            SubscriptionPlan // which plan pack was purchased
-  creditAmount    Int              // number of credits purchased
-  priceAmount     Int              // price in smallest currency unit (cents/dong)
-  currency        Currency         @default(VND)
+  plan             SubscriptionPlan // which plan pack was purchased
+  creditAmount     Int              // number of credits purchased
+  creditsRemaining Int              // remaining credits (decremented via FIFO)
+  priceAmount      Int              // price in smallest currency unit (cents/dong)
+  currency         Currency         @default(VND)
 
   // Stripe payment tracking
-  stripePaymentId String?          @unique
-  stripeInvoiceId String?
+  stripePaymentId  String?          @unique
+  stripeInvoiceId  String?
 
-  status          PurchaseStatus   @default(pending)
+  status           PurchaseStatus   @default(pending)
 
-  purchasedAt     DateTime         @default(now())
-  expiresAt       DateTime?        // credit validity window
+  purchasedAt      DateTime         @default(now())
+  expiresAt        DateTime?        // credit validity window
 
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, expiresAt])
   @@index([userId, purchasedAt])
   @@index([stripePaymentId])
 }

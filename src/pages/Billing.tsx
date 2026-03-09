@@ -1,33 +1,47 @@
 import { motion } from "framer-motion";
-import { CreditCard, Sparkles, Zap } from "lucide-react";
+import { CreditCard, Sparkles, Zap, Clock, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { PLAN_CONFIG, formatPrice, type User, type UserUsage, type Currency } from "@/types/subscription";
+import { PLAN_CONFIG, formatPrice, type User, type UserUsage, type Currency, type CreditBatch } from "@/types/subscription";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DashboardContext {
   user: User;
   usage: UserUsage;
   currency: Currency;
+  creditBatches: CreditBatch[];
+  totalCreditsRemaining: number;
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
+
+function daysUntil(iso: string): number {
+  return Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
 }
 
 const Billing = () => {
-  const { user, usage, currency } = useOutletContext<DashboardContext>();
+  const { user, usage, currency, creditBatches, totalCreditsRemaining } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
   const plan = PLAN_CONFIG[user.subscriptionPlan];
   const { t } = useLanguage();
-  // Mock invoice history — will be replaced by real Stripe data
-  const invoiceHistory = user.subscriptionPlan !== "free"
-    ? [
-        { date: "2026-03-01", plan: plan.name, credits: String(plan.limits.aiCredits ?? 0), amount: formatPrice(user.subscriptionPlan, currency) },
-        { date: "2026-02-01", plan: plan.name, credits: String(plan.limits.aiCredits ?? 0), amount: formatPrice(user.subscriptionPlan, currency) },
-      ]
-    : [];
 
-  const creditsRemaining = usage.aiCreditsTotal - usage.aiCreditsUsed;
-  const creditPercentage = usage.aiCreditsTotal > 0
-    ? Math.round((usage.aiCreditsUsed / usage.aiCreditsTotal) * 100)
+  const totalPurchased = creditBatches.reduce((s, b) => s + b.creditsPurchased, 0);
+  const totalUsed = totalPurchased - totalCreditsRemaining;
+  const creditPercentage = totalPurchased > 0
+    ? Math.round((totalUsed / totalPurchased) * 100)
     : 0;
+
+  // Invoice history from credit batches
+  const invoiceHistory = creditBatches.length > 0
+    ? creditBatches.map((b) => ({
+        date: formatDate(b.purchasedAt),
+        plan: PLAN_CONFIG[b.plan].name,
+        credits: String(b.creditsPurchased),
+        amount: formatPrice(b.plan, currency),
+      })).reverse()
+    : [];
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -53,7 +67,7 @@ const Billing = () => {
           </p>
         </div>
 
-        {/* Credit Usage */}
+        {/* Credit Usage Overview */}
         <div className="p-4 bg-secondary/20 rounded-xl border border-border/30 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -61,7 +75,7 @@ const Billing = () => {
               <span className="text-sm font-medium text-foreground">{t("billing.creditUsage") || "AI Credit Usage"}</span>
             </div>
             <span className="text-xs text-muted-foreground">
-              {usage.aiCreditsUsed} / {usage.aiCreditsTotal} {t("billing.creditsUsedLabel") || "used"}
+              {totalUsed} / {totalPurchased} {t("billing.creditsUsedLabel") || "used"}
             </span>
           </div>
 
@@ -81,7 +95,7 @@ const Billing = () => {
 
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
-              {creditsRemaining} {t("billing.creditsRemaining") || "credits remaining"}
+              {totalCreditsRemaining} {t("billing.creditsRemaining") || "credits remaining"}
             </p>
             {creditPercentage >= 80 && (
               <button
@@ -93,18 +107,95 @@ const Billing = () => {
             )}
           </div>
 
-          {/* Credit breakdown */}
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border/20">
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border/20">
             <div className="text-center p-3 bg-card rounded-lg border border-border/20">
               <p className="font-display text-lg font-bold text-foreground">{usage.aiRequestsCount}</p>
               <p className="text-[10px] text-muted-foreground">{t("billing.aiRequests") || "AI Requests"}</p>
             </div>
             <div className="text-center p-3 bg-card rounded-lg border border-border/20">
-              <p className="font-display text-lg font-bold text-foreground">{creditsRemaining}</p>
+              <p className="font-display text-lg font-bold text-foreground">{totalCreditsRemaining}</p>
               <p className="text-[10px] text-muted-foreground">{t("billing.remaining") || "Remaining"}</p>
+            </div>
+            <div className="text-center p-3 bg-card rounded-lg border border-border/20">
+              <p className="font-display text-lg font-bold text-foreground">{creditBatches.length}</p>
+              <p className="text-[10px] text-muted-foreground">Active Packs</p>
             </div>
           </div>
         </div>
+
+        {/* Credit Batches (FIFO) */}
+        {creditBatches.length > 0 && (
+          <div>
+            <p className="text-sm font-medium text-foreground mb-2">Credit Packs</p>
+            <div className="space-y-2">
+              {creditBatches.map((batch, i) => {
+                const days = daysUntil(batch.expiresAt);
+                const isExpiringSoon = days <= 14;
+                const usedPercent = Math.round(((batch.creditsPurchased - batch.creditsRemaining) / batch.creditsPurchased) * 100);
+                return (
+                  <div
+                    key={batch.id}
+                    className={`p-3 rounded-xl border transition-colors ${
+                      isExpiringSoon
+                        ? "border-destructive/30 bg-destructive/5"
+                        : "border-border/30 bg-secondary/10"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary">
+                          {PLAN_CONFIG[batch.plan].name}
+                        </span>
+                        {i === 0 && (
+                          <span className="text-[9px] text-muted-foreground font-medium">← next consumed</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        {isExpiringSoon ? (
+                          <AlertTriangle className="w-3 h-3 text-destructive" />
+                        ) : (
+                          <Clock className="w-3 h-3" />
+                        )}
+                        <span className={isExpiringSoon ? "text-destructive font-medium" : ""}>
+                          {days}d left
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <span className="text-foreground font-medium">
+                        {batch.creditsRemaining}/{batch.creditsPurchased} credits
+                      </span>
+                      <span className="text-muted-foreground">
+                        Expires {formatDate(batch.expiresAt)}
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          isExpiringSoon ? "bg-destructive" : "bg-primary"
+                        }`}
+                        style={{ width: `${100 - usedPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* No credits state */}
+        {creditBatches.length === 0 && (
+          <div className="p-6 bg-secondary/20 rounded-xl border border-border/30 text-center">
+            <Sparkles className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm font-medium text-foreground mb-1">No credit packs</p>
+            <p className="text-xs text-muted-foreground mb-3">Purchase a plan to get AI credits</p>
+            <Button variant="hero" size="sm" onClick={() => navigate("/pricing")}>
+              Get Credits
+            </Button>
+          </div>
+        )}
 
         {/* Payment method */}
         <div>
