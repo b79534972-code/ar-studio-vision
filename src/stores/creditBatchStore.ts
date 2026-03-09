@@ -46,13 +46,13 @@ function pruneExpired(silent = false): void {
 
 export const creditBatchStore = {
   getBatches: (): CreditBatch[] => {
-    pruneExpired();
+    pruneExpired(true); // silent — safe for useSyncExternalStore snapshot
     return batches;
   },
 
   /** Total remaining credits across all non-expired batches */
   getTotalRemaining: (): number => {
-    pruneExpired();
+    pruneExpired(true); // silent — safe for useSyncExternalStore snapshot
     return batches.reduce((sum, b) => sum + b.creditsRemaining, 0);
   },
 
