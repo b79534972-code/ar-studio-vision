@@ -12,9 +12,11 @@ const prisma_service_1 = require("./prisma.service");
 const prisma_user_repository_1 = require("./prisma-user.repository");
 const prisma_layout_repository_1 = require("./prisma-layout.repository");
 const prisma_audit_repository_1 = require("./prisma-audit.repository");
+const prisma_credit_repository_1 = require("./prisma-credit.repository");
 const user_repository_1 = require("../../domain/repositories/user.repository");
 const layout_repository_1 = require("../../domain/repositories/layout.repository");
 const audit_repository_1 = require("../../domain/repositories/audit.repository");
+const credit_repository_1 = require("../../domain/repositories/credit.repository");
 let DatabaseModule = class DatabaseModule {
 };
 exports.DatabaseModule = DatabaseModule;
@@ -25,8 +27,9 @@ exports.DatabaseModule = DatabaseModule = __decorate([
             { provide: user_repository_1.USER_REPOSITORY, useClass: prisma_user_repository_1.PrismaUserRepository },
             { provide: layout_repository_1.LAYOUT_REPOSITORY, useClass: prisma_layout_repository_1.PrismaLayoutRepository },
             { provide: audit_repository_1.AUDIT_REPOSITORY, useClass: prisma_audit_repository_1.PrismaAuditRepository },
+            { provide: credit_repository_1.CREDIT_REPOSITORY, useClass: prisma_credit_repository_1.PrismaCreditRepository },
         ],
-        exports: [user_repository_1.USER_REPOSITORY, layout_repository_1.LAYOUT_REPOSITORY, audit_repository_1.AUDIT_REPOSITORY],
+        exports: [user_repository_1.USER_REPOSITORY, layout_repository_1.LAYOUT_REPOSITORY, audit_repository_1.AUDIT_REPOSITORY, credit_repository_1.CREDIT_REPOSITORY],
     })
 ], DatabaseModule);
 //# sourceMappingURL=database.module.js.map
