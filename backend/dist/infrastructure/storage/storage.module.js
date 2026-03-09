@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StorageModule = void 0;
 const common_1 = require("@nestjs/common");
 const storage_interface_1 = require("./storage.interface");
-const local_storage_adapter_1 = require("./local-storage.adapter");
+const s3_storage_adapter_1 = require("./s3-storage.adapter");
 let StorageModule = class StorageModule {
 };
 exports.StorageModule = StorageModule;
@@ -18,7 +18,7 @@ exports.StorageModule = StorageModule = __decorate([
         providers: [
             {
                 provide: storage_interface_1.STORAGE_SERVICE,
-                useClass: local_storage_adapter_1.LocalStorageAdapter,
+                useClass: s3_storage_adapter_1.S3StorageAdapter,
             },
         ],
         exports: [storage_interface_1.STORAGE_SERVICE],

@@ -15,6 +15,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { AuthService } from "@/services/AuthService";
+import { apiRequest } from "@/lib/api";
 
 const plans: SubscriptionPlan[] = ["free", "basic", "advanced", "pro"];
 
@@ -41,22 +43,44 @@ const Pricing = () => {
   const handleConfirm = async () => {
     if (!confirmPlan) return;
     setProcessing(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    subscriptionStore.upgradePlan(confirmPlan);
-    if (confirmPlan !== "free") {
-      creditBatchStore.addBatch(confirmPlan as Exclude<SubscriptionPlan, "free">);
-    }
-    setProcessing(false);
-    setConfirmPlan(null);
+    try {
+      await apiRequest<{ success: true; plan: Exclude<SubscriptionPlan, "free">; creditsAdded: number }>("/stripe/purchase-demo", {
+        method: "POST",
+        body: JSON.stringify({ plan: confirmPlan, currency }),
+      });
 
-    const isRepurchase = confirmPlan === currentPlan;
-    toast({
-      title: isRepurchase ? "Credits Added! 🎉" : "Upgrade Successful! 🎉",
-      description: isRepurchase
-        ? `${PLAN_CONFIG[confirmPlan].aiCredits} AI credits added to your account.`
-        : `You're now on the ${PLAN_CONFIG[confirmPlan].name} plan with ${PLAN_CONFIG[confirmPlan].aiCredits} AI credits.`,
-    });
-    navigate("/dashboard/billing");
+      subscriptionStore.upgradePlan(confirmPlan);
+      if (confirmPlan !== "free") {
+        creditBatchStore.addBatch(confirmPlan as Exclude<SubscriptionPlan, "free">);
+      }
+
+      const storedUser = AuthService.getStoredUser();
+      if (storedUser) {
+        AuthService.setStoredUser({
+          ...storedUser,
+          subscriptionPlan: confirmPlan,
+          subscriptionStatus: "active",
+        });
+      }
+
+      const isRepurchase = confirmPlan === currentPlan;
+      toast({
+        title: isRepurchase ? "Credits Added! 🎉" : "Upgrade Successful! 🎉",
+        description: isRepurchase
+          ? `${PLAN_CONFIG[confirmPlan].aiCredits} AI credits added to your account.`
+          : `You're now on the ${PLAN_CONFIG[confirmPlan].name} plan with ${PLAN_CONFIG[confirmPlan].aiCredits} AI credits.`,
+      });
+      navigate("/dashboard/billing");
+    } catch (error) {
+      toast({
+        title: "Purchase failed",
+        description: error instanceof Error ? error.message : "Unable to save credit purchase",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+      setConfirmPlan(null);
+    }
   };
 
   const getButtonLabel = (planKey: SubscriptionPlan) => {
@@ -74,7 +98,7 @@ const Pricing = () => {
         <div className="container mx-auto flex items-center justify-between h-14 px-6">
           <button
             onClick={() => {
-              const hasSession = Boolean(localStorage.getItem("subscription-plan") && localStorage.getItem("subscription-plan") !== "free") || Boolean(localStorage.getItem("credit-batches"));
+              const hasSession = Boolean(AuthService.getStoredUser());
               navigate(hasSession ? "/dashboard" : "/");
             }}
             className="font-display text-lg font-bold text-foreground tracking-tight"
@@ -238,7 +262,7 @@ const Pricing = () => {
               <div className="p-3 bg-secondary/40 rounded-lg border border-border/20 flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-muted-foreground shrink-0" />
                 <p className="text-xs text-muted-foreground">
-                  Payment will be processed via Stripe when connected. This is a demo upgrade.
+                  This demo purchase now persists the credit batch in the backend database.
                 </p>
               </div>
             </div>

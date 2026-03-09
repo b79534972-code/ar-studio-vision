@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RateLimitMiddleware = void 0;
 const common_1 = require("@nestjs/common");
 const ioredis_1 = require("ioredis");
+const redis_config_1 = require("../redis.config");
 const TIER_LIMITS = {
     free: { requests: 30, windowSeconds: 60 },
     basic: { requests: 60, windowSeconds: 60 },
@@ -20,16 +21,7 @@ const TIER_LIMITS = {
 };
 let RateLimitMiddleware = class RateLimitMiddleware {
     constructor() {
-        if (process.env.REDIS_URL) {
-            this.redis = new ioredis_1.default(process.env.REDIS_URL);
-        }
-        else {
-            this.redis = new ioredis_1.default({
-                host: process.env.REDIS_HOST || 'redis',
-                port: Number(process.env.REDIS_PORT) || 6379,
-                password: process.env.REDIS_PASSWORD || undefined,
-            });
-        }
+        this.redis = new ioredis_1.default((0, redis_config_1.getRedisConnectionOptions)());
     }
     async use(req, res, next) {
         const userId = req.user?.sub;

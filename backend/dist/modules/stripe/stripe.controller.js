@@ -29,6 +29,9 @@ let StripeController = class StripeController {
     async subscribe(user, body) {
         return this.stripeService.createSubscription(user.id, body.plan, body.paymentMethodId);
     }
+    async purchaseDemo(user, body) {
+        return this.stripeService.purchaseDemoCredits(user.id, body.plan, body.currency || 'VND');
+    }
     async cancel(user) {
         await this.stripeService.cancelSubscription(user.id);
         return { success: true };
@@ -57,6 +60,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], StripeController.prototype, "subscribe", null);
+__decorate([
+    (0, common_1.Post)('purchase-demo'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], StripeController.prototype, "purchaseDemo", null);
 __decorate([
     (0, common_1.Post)('cancel'),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),

@@ -12,6 +12,7 @@ import { Injectable, Inject, Logger } from '@nestjs/common';
 import Redis from 'ioredis';
 import { USER_REPOSITORY, IUserRepository } from '../../domain/repositories/user.repository';
 import { AUDIT_REPOSITORY, IAuditRepository } from '../../domain/repositories/audit.repository';
+import { getRedisConnectionOptions } from '../../common/redis.config';
 import { FeatureGuardService } from '../feature-guard/feature-guard.service';
 import { UserEntity } from '../../domain/entities/user.entity';
 import {
@@ -58,7 +59,7 @@ export class AIService {
     @Inject(AI_PROVIDER) private readonly aiProvider: IAIProvider,
     private readonly featureGuard: FeatureGuardService,
   ) {
-    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+    this.redis = new Redis(getRedisConnectionOptions());
     this.logger.log(`AI Provider initialized: ${this.aiProvider.name}`);
   }
 

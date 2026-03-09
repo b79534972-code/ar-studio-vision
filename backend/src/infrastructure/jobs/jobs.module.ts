@@ -5,17 +5,14 @@
 
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
+import { getRedisConnectionOptions } from '../../common/redis.config';
 import { AIJobProcessor } from './processors/ai-job.processor';
 import { ConversionJobProcessor } from './processors/conversion-job.processor';
 
 @Module({
   imports: [
     BullModule.forRoot({
-      connection: {
-        // host: process.env.REDIS_HOST || 'localhost',
-        host: process.env.REDIS_HOST || 'redis',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-      },
+      connection: getRedisConnectionOptions(),
     }),
     BullModule.registerQueue(
       { name: 'ai-processing' },

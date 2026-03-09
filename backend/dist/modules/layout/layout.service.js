@@ -47,7 +47,7 @@ let LayoutService = class LayoutService {
             throw new common_1.NotFoundException('Layout not found');
         try {
             this.featureGuard.canCreateVersion(user);
-            await this.layoutRepo.createVersion(layoutId, { objects: layout.objects, version: layout.version });
+            await this.layoutRepo.createVersion(layoutId, layout.version, { objects: layout.objects });
         }
         catch {
         }

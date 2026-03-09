@@ -18,6 +18,7 @@ const common_1 = require("@nestjs/common");
 const ioredis_1 = require("ioredis");
 const user_repository_1 = require("../../domain/repositories/user.repository");
 const audit_repository_1 = require("../../domain/repositories/audit.repository");
+const redis_config_1 = require("../../common/redis.config");
 const feature_guard_service_1 = require("../feature-guard/feature-guard.service");
 const ai_provider_interface_1 = require("./providers/ai-provider.interface");
 const CREDIT_COSTS = {
@@ -36,7 +37,7 @@ let AIService = AIService_1 = class AIService {
         this.aiProvider = aiProvider;
         this.featureGuard = featureGuard;
         this.logger = new common_1.Logger(AIService_1.name);
-        this.redis = new ioredis_1.default(process.env.REDIS_URL || 'redis://localhost:6379');
+        this.redis = new ioredis_1.default((0, redis_config_1.getRedisConnectionOptions)());
         this.logger.log(`AI Provider initialized: ${this.aiProvider.name}`);
     }
     async execute(user, feature, operation, metadata) {
@@ -58,14 +59,28 @@ let AIService = AIService_1 = class AIService {
             await this.auditRepo.create({
                 userId: user.id,
                 action: `ai.${feature}`,
-                metadata: { provider: this.aiProvider.name, creditCost, creditsRemaining: totalRemaining, processingMs, ...metadata },
+                metadata: {
+                    provider: this.aiProvider.name,
+                    creditCost,
+                    creditsRemaining: totalRemaining,
+                    processingMs,
+                    ...metadata,
+                },
             });
             this.logger.log(`AI [${feature}] completed for user ${user.id} in ${processingMs}ms (credits: -${creditCost}, remaining: ${totalRemaining})`);
-            return { success: true, data: result, creditsUsed: creditCost, creditsRemaining: totalRemaining };
+            return {
+                success: true,
+                data: result,
+                creditsUsed: creditCost,
+                creditsRemaining: totalRemaining,
+            };
         }
         catch (error) {
             this.logger.error(`AI [${feature}] failed for user ${user.id}: ${error}`);
-            return { success: false, error: error instanceof Error ? error.message : 'AI processing failed' };
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'AI processing failed',
+            };
         }
         finally {
             await this.redis.del(lockKey);
@@ -73,34 +88,48 @@ let AIService = AIService_1 = class AIService {
     }
     async suggestLayouts(user, context) {
         const ctx = { ...context, userId: user.id };
-        return this.execute(user, 'layout_suggest', () => this.aiProvider.suggestLayouts(ctx), { roomConfig: context.roomConfig });
+        return this.execute(user, 'layout_suggest', () => this.aiProvider.suggestLayouts(ctx), {
+            roomConfig: context.roomConfig,
+        });
     }
     async optimizeLayout(user, context) {
         const ctx = { ...context, userId: user.id };
-        return this.execute(user, 'layout_optimize', () => this.aiProvider.optimizeLayout(ctx), { objectCount: context.objects?.length });
+        return this.execute(user, 'layout_optimize', () => this.aiProvider.optimizeLayout(ctx), {
+            objectCount: context.objects?.length,
+        });
     }
     async transformStyle(user, context, targetStyle) {
         const ctx = { ...context, userId: user.id };
         this.featureGuard.canUseAdvancedAI(user);
-        return this.execute(user, 'style_transform', () => this.aiProvider.transformStyle(ctx, targetStyle), { targetStyle });
+        return this.execute(user, 'style_transform', () => this.aiProvider.transformStyle(ctx, targetStyle), {
+            targetStyle,
+        });
     }
     async recommendProducts(user, context, count) {
         const ctx = { ...context, userId: user.id };
-        return this.execute(user, 'product_recommend', () => this.aiProvider.recommendProducts(ctx, count), { requestedCount: count });
+        return this.execute(user, 'product_recommend', () => this.aiProvider.recommendProducts(ctx, count), {
+            requestedCount: count,
+        });
     }
     async optimizeBudget(user, context) {
         const ctx = { ...context, userId: user.id };
-        return this.execute(user, 'budget_optimize', () => this.aiProvider.optimizeBudget(ctx), { budget: context.budget });
+        return this.execute(user, 'budget_optimize', () => this.aiProvider.optimizeBudget(ctx), {
+            budget: context.budget,
+        });
     }
     async renderPhotorealistic(user, context, cameraAngle) {
         const ctx = { ...context, userId: user.id };
         this.featureGuard.canUseAdvancedAI(user);
-        return this.execute(user, 'photorealistic_render', () => this.aiProvider.renderPhotorealistic(ctx, cameraAngle), { cameraAngle });
+        return this.execute(user, 'photorealistic_render', () => this.aiProvider.renderPhotorealistic(ctx, cameraAngle), {
+            cameraAngle,
+        });
     }
     async fullRedesign(user, context, preferences) {
         const ctx = { ...context, userId: user.id };
         this.featureGuard.canUseAdvancedAI(user);
-        return this.execute(user, 'full_room_redesign', () => this.aiProvider.fullRedesign(ctx, preferences), { preferences });
+        return this.execute(user, 'full_room_redesign', () => this.aiProvider.fullRedesign(ctx, preferences), {
+            preferences,
+        });
     }
     getProviderName() {
         return this.aiProvider.name;

@@ -1,4 +1,3 @@
-import { SubscriptionPlan } from '../../../domain/entities/user.entity';
 export declare const AI_PROVIDER: unique symbol;
 export interface AIContext {
     userId: string;

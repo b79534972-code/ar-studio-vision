@@ -9,7 +9,7 @@ export declare class AuthService {
         user: UserEntity;
         token: string;
     }>;
-    login(email: string, password: string): Promise<{
+    login(identifier: string, password: string): Promise<{
         user: UserEntity;
         token: string;
     }>;

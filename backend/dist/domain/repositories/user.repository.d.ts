@@ -3,6 +3,7 @@ export declare const USER_REPOSITORY: unique symbol;
 export interface IUserRepository {
     findById(id: string): Promise<UserEntity | null>;
     findByEmail(email: string): Promise<UserEntity | null>;
+    findByLoginIdentifier(identifier: string): Promise<UserEntity | null>;
     findByStripeCustomerId(customerId: string): Promise<UserEntity | null>;
     create(data: Omit<UserEntity, 'id' | 'createdAt' | 'updatedAt'>): Promise<UserEntity>;
     update(id: string, data: Partial<UserEntity>): Promise<UserEntity>;

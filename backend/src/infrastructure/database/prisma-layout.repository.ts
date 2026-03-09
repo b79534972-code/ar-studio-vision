@@ -35,9 +35,9 @@ export class PrismaLayoutRepository implements ILayoutRepository {
     await this.prisma.layout.delete({ where: { id } });
   }
 
-  async createVersion(layoutId: string, snapshot: Record<string, unknown>): Promise<LayoutVersionEntity> {
+  async createVersion(layoutId: string, version: number, snapshot: Record<string, unknown>): Promise<LayoutVersionEntity> {
     return this.prisma.layoutVersion.create({
-      data: { layoutId, snapshot: snapshot as Prisma.InputJsonValue },
+      data: { layoutId, version, snapshot: snapshot as Prisma.InputJsonValue },
     }) as Promise<LayoutVersionEntity>;
   }
 

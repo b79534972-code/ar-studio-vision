@@ -3,25 +3,56 @@
  * Mock implementation for demo. Will be replaced by Stripe + backend.
  */
 
-import { PLAN_CONFIG, type SubscriptionPlan } from "@/types/subscription";
+import type { SubscriptionPlan } from "@/types/subscription";
+import { getAuthStorageScope, getScopedStorageKey } from "@/lib/authStorage";
+import { AuthService } from "@/services/AuthService";
 
 type Listener = () => void;
 
 const listeners = new Set<Listener>();
 let currentPlan: SubscriptionPlan = "free";
+let currentScope = getAuthStorageScope();
 
-// Load from localStorage
-try {
-  const stored = localStorage.getItem("subscription-plan");
-  if (stored && (stored === "free" || stored === "basic" || stored === "advanced" || stored === "pro")) {
-    currentPlan = stored as SubscriptionPlan;
+function loadPlan(scope = currentScope): SubscriptionPlan {
+  try {
+    const stored = localStorage.getItem(getScopedStorageKey("subscription-plan", scope));
+    if (stored === "free" || stored === "basic" || stored === "advanced" || stored === "pro") {
+      return stored;
+    }
+  } catch {
+    // Ignore storage errors and fall back to free plan.
   }
-} catch { /* ignore */ }
+
+  const authPlan = AuthService.getStoredUser()?.subscriptionPlan;
+  if (authPlan === "free" || authPlan === "basic" || authPlan === "advanced" || authPlan === "pro") {
+    return authPlan;
+  }
+
+  return "free";
+}
+
+currentPlan = loadPlan();
 
 function persist() {
   try {
-    localStorage.setItem("subscription-plan", currentPlan);
-  } catch { /* ignore */ }
+    localStorage.setItem(getScopedStorageKey("subscription-plan", currentScope), currentPlan);
+  } catch {
+    // Ignore storage errors.
+  }
+}
+
+function syncScope(): void {
+  const nextScope = getAuthStorageScope();
+  if (nextScope === currentScope) return;
+  currentScope = nextScope;
+  currentPlan = loadPlan(currentScope);
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("interiorar-auth-user-changed", () => {
+    syncScope();
+    notify();
+  });
 }
 
 function notify() {
@@ -29,9 +60,13 @@ function notify() {
 }
 
 export const subscriptionStore = {
-  getPlan: () => currentPlan,
+  getPlan: () => {
+    syncScope();
+    return currentPlan;
+  },
 
   upgradePlan: (plan: SubscriptionPlan) => {
+    syncScope();
     currentPlan = plan;
     persist();
     notify();

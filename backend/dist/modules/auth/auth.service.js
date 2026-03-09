@@ -23,13 +23,22 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async register(name, email, password) {
-        const existing = await this.userRepo.findByEmail(email);
-        if (existing)
+        const normalizedName = name.trim();
+        const normalizedEmail = email.trim().toLowerCase();
+        if (!normalizedName)
+            throw new common_1.ConflictException('Username is required');
+        const existingEmail = await this.userRepo.findByLoginIdentifier(normalizedEmail);
+        if (existingEmail && existingEmail.email.toLowerCase() === normalizedEmail) {
             throw new common_1.ConflictException('Email already registered');
+        }
+        const existingName = await this.userRepo.findByLoginIdentifier(normalizedName);
+        if (existingName && existingName.name.toLowerCase() === normalizedName.toLowerCase()) {
+            throw new common_1.ConflictException('Username already taken');
+        }
         const passwordHash = await bcrypt.hash(password, 12);
         const user = await this.userRepo.create({
-            name,
-            email,
+            name: normalizedName,
+            email: normalizedEmail,
             passwordHash,
             role: 'user',
             subscriptionPlan: 'free',
@@ -39,8 +48,8 @@ let AuthService = class AuthService {
         const token = this.jwtService.sign({ sub: user.id, role: user.role });
         return { user, token };
     }
-    async login(email, password) {
-        const user = await this.userRepo.findByEmail(email);
+    async login(identifier, password) {
+        const user = await this.userRepo.findByLoginIdentifier(identifier);
         if (!user)
             throw new common_1.UnauthorizedException('Invalid credentials');
         const valid = await bcrypt.compare(password, user.passwordHash);

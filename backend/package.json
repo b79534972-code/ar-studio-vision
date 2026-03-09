@@ -5,15 +5,19 @@
   "type": "commonjs",
   "scripts": {
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
-    "prisma:push": "prisma db push --schema prisma/schema.prisma --skip-generate",
-    "prestart": "npm run prisma:generate && npm run prisma:push",
+    "prisma:push": "prisma db push --schema prisma/schema.prisma --skip-generate --accept-data-loss",
+    "db:fix-duplicate-usernames": "node scripts/fix-duplicate-usernames.js",
+    "prestart": "npm run prisma:generate && npm run db:fix-duplicate-usernames && npm run prisma:push",
     "start": "node dist/main.js",
-    "build": "node -e \"console.log('Skip build: using prebuilt dist/')\""
+    "start:dev": "npm run start",
+    "build": "tsc -p tsconfig.json"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.888.0",
+    "@aws-sdk/s3-request-presigner": "^3.888.0",
     "@nestjs/bullmq": "10.2.3",
     "@nestjs/common": "10.4.22",
     "@nestjs/core": "10.4.22",
@@ -28,5 +32,12 @@
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",
     "stripe": "14.25.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/node": "^20.17.0",
+    "@types/express": "^4.17.21",
+    "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.7"
   }
 }

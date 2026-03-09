@@ -19,79 +19,29 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    getCookieOptions() {
-        return {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        };
-    }
-    getBearerToken(req) {
-        const authHeader = req.headers?.authorization;
-        if (!authHeader || typeof authHeader !== 'string')
-            return undefined;
-        const [scheme, value] = authHeader.split(' ');
-        if (scheme?.toLowerCase() !== 'bearer' || !value)
-            return undefined;
-        return value;
-    }
     async register(body, res) {
         const { user, token } = await this.authService.register(body.name, body.email, body.password);
-        res.cookie('token', token, this.getCookieOptions());
-        return {
-            token,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                subscriptionPlan: user.subscriptionPlan,
-                subscriptionStatus: user.subscriptionStatus,
-                createdAt: user.createdAt,
-            },
-        };
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+        return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role, subscriptionPlan: user.subscriptionPlan, subscriptionStatus: user.subscriptionStatus, createdAt: user.createdAt } };
     }
     async login(body, res) {
-        const { user, token } = await this.authService.login(body.email, body.password);
-        res.cookie('token', token, this.getCookieOptions());
-        return {
-            token,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                subscriptionPlan: user.subscriptionPlan,
-                subscriptionStatus: user.subscriptionStatus,
-                createdAt: user.createdAt,
-            },
-        };
-    }
-    async me(req) {
-        const token = req.cookies?.['token'] || this.getBearerToken(req);
-        if (!token)
-            throw new common_1.UnauthorizedException('Authentication required');
-        const user = await this.authService.validateToken(token);
-        return {
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                subscriptionPlan: user.subscriptionPlan,
-                subscriptionStatus: user.subscriptionStatus,
-                createdAt: user.createdAt,
-            },
-        };
+        const identifier = body.identifier ?? body.email ?? '';
+        const { user, token } = await this.authService.login(identifier, body.password);
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+        return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role, subscriptionPlan: user.subscriptionPlan, subscriptionStatus: user.subscriptionStatus, createdAt: user.createdAt } };
     }
     logout(res) {
-        const cookieOptions = this.getCookieOptions();
-        res.clearCookie('token', {
-            httpOnly: cookieOptions.httpOnly,
-            secure: cookieOptions.secure,
-            sameSite: cookieOptions.sameSite,
-        });
+        res.clearCookie('token');
         return { success: true };
     }
 };
@@ -113,14 +63,6 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
-__decorate([
-    (0, common_1.Get)('me'),
-    (0, common_1.HttpCode)(200),
-    __param(0, (0, common_1.Req)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "me", null);
 __decorate([
     (0, common_1.Post)('logout'),
     (0, common_1.HttpCode)(200),

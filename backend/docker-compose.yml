@@ -32,10 +32,16 @@ services:
       - redis
     env_file:
       - .env
+    environment:
+      # Force backend to use compose services in local Docker runs.
+      DATABASE_URL: postgresql://postgres:123456@postgres:5432/mydb
+      REDIS_URL: redis://redis:6379
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     volumes:
       - .:/app
       - /app/node_modules
-    command: sh -c "npx prisma migrate deploy && npm run start:dev"
+    command: sh -c "npx prisma db push --schema prisma/schema.prisma --skip-generate && npm run start"
 
 volumes:
   postgres_data:

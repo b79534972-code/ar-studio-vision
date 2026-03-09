@@ -9,26 +9,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JobsModule = void 0;
 const common_1 = require("@nestjs/common");
 const bullmq_1 = require("@nestjs/bullmq");
+const redis_config_1 = require("../../common/redis.config");
 const ai_job_processor_1 = require("./processors/ai-job.processor");
 const conversion_job_processor_1 = require("./processors/conversion-job.processor");
-const redisConnection = (() => {
-    const redisUrl = process.env.REDIS_URL;
-    if (redisUrl) {
-        const parsed = new URL(redisUrl);
-        return {
-            host: parsed.hostname,
-            port: Number(parsed.port || 6379),
-            username: parsed.username ? decodeURIComponent(parsed.username) : undefined,
-            password: parsed.password ? decodeURIComponent(parsed.password) : undefined,
-            tls: parsed.protocol === 'rediss:' ? {} : undefined,
-        };
-    }
-    return {
-        host: process.env.REDIS_HOST || 'redis',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-        password: process.env.REDIS_PASSWORD || undefined,
-    };
-})();
 let JobsModule = class JobsModule {
 };
 exports.JobsModule = JobsModule;
@@ -36,7 +19,7 @@ exports.JobsModule = JobsModule = __decorate([
     (0, common_1.Module)({
         imports: [
             bullmq_1.BullModule.forRoot({
-                connection: redisConnection,
+                connection: (0, redis_config_1.getRedisConnectionOptions)(),
             }),
             bullmq_1.BullModule.registerQueue({ name: 'ai-processing' }, { name: 'usdz-conversion' }, { name: 'email' }, { name: 'webhook-retry' }),
         ],

@@ -16,15 +16,51 @@ exports.StripeService = void 0;
 const common_1 = require("@nestjs/common");
 const stripe_1 = require("stripe");
 const user_repository_1 = require("../../domain/repositories/user.repository");
+const credit_repository_1 = require("../../domain/repositories/credit.repository");
+const audit_repository_1 = require("../../domain/repositories/audit.repository");
 const PLAN_PRICE_IDS = {
     basic: process.env.STRIPE_PRICE_BASIC || 'price_basic',
     advanced: process.env.STRIPE_PRICE_ADVANCED || 'price_advanced',
     pro: process.env.STRIPE_PRICE_PRO || 'price_pro',
 };
+const PLAN_CREDIT_CONFIG = {
+    basic: { credits: 20, validityMonths: 3, priceVND: 49000, priceUSD: 2 },
+    advanced: { credits: 50, validityMonths: 6, priceVND: 99000, priceUSD: 4 },
+    pro: { credits: 120, validityMonths: 12, priceVND: 199000, priceUSD: 8 },
+};
 let StripeService = class StripeService {
-    constructor(userRepo) {
+    constructor(userRepo, creditRepo, auditRepo) {
         this.userRepo = userRepo;
+        this.creditRepo = creditRepo;
+        this.auditRepo = auditRepo;
         this.stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
+    }
+    async purchaseDemoCredits(userId, plan, currency) {
+        const user = await this.userRepo.findById(userId);
+        if (!user)
+            throw new Error('User not found');
+        const config = PLAN_CREDIT_CONFIG[plan];
+        const expiresAt = new Date();
+        expiresAt.setMonth(expiresAt.getMonth() + config.validityMonths);
+        await this.creditRepo.createBatch({
+            userId,
+            plan,
+            creditAmount: config.credits,
+            priceAmount: currency === 'USD' ? config.priceUSD : config.priceVND,
+            currency,
+            expiresAt,
+            stripePaymentId: `demo_${userId}_${plan}_${Date.now()}`,
+        });
+        await this.userRepo.update(userId, {
+            subscriptionPlan: plan,
+            subscriptionStatus: 'active',
+        });
+        await this.auditRepo.create({
+            userId,
+            action: 'credit.purchase.demo',
+            metadata: { plan, currency, creditsAdded: config.credits },
+        });
+        return { success: true, plan, creditsAdded: config.credits };
     }
     async createSetupIntent(userId) {
         const user = await this.userRepo.findById(userId);
@@ -87,6 +123,8 @@ exports.StripeService = StripeService;
 exports.StripeService = StripeService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(user_repository_1.USER_REPOSITORY)),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)(credit_repository_1.CREDIT_REPOSITORY)),
+    __param(2, (0, common_1.Inject)(audit_repository_1.AUDIT_REPOSITORY)),
+    __metadata("design:paramtypes", [Object, Object, Object])
 ], StripeService);
 //# sourceMappingURL=stripe.service.js.map

@@ -45,6 +45,7 @@ export interface LayoutEntity {
 export interface LayoutVersionEntity {
   id: string;
   layoutId: string;
+  version: number;
   snapshot: Record<string, unknown>;
   createdAt: Date;
 }

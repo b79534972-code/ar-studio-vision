@@ -10,6 +10,8 @@ import { useSyncExternalStore } from "react";
 import { PLAN_CONFIG, type User, type UserUsage, type SubscriptionPlan, type Currency, type CreditBatch } from "@/types/subscription";
 import { subscriptionStore } from "@/stores/subscriptionStore";
 import { creditBatchStore } from "@/stores/creditBatchStore";
+import { AuthService } from "@/services/AuthService";
+import { getScopedStorageKey } from "@/lib/authStorage";
 
 const MOCK_USER_BASE: Omit<User, "subscriptionPlan"> = {
   id: "usr_demo_001",
@@ -25,38 +27,56 @@ export function useSubscription() {
   const currentPlan = useSyncExternalStore(subscriptionStore.subscribe, subscriptionStore.getPlan);
   const creditBatches = useSyncExternalStore(creditBatchStore.subscribe, creditBatchStore.getBatches);
   const totalCreditsRemaining = useSyncExternalStore(creditBatchStore.subscribe, creditBatchStore.getTotalRemaining);
+  const [storedUser, setStoredUser] = useState<User | null>(() => AuthService.getStoredUser());
+
+  useEffect(() => {
+    const handleAuthUserChanged = () => {
+      setStoredUser(AuthService.getStoredUser());
+    };
+
+    window.addEventListener("interiorar-auth-user-changed", handleAuthUserChanged);
+    return () => window.removeEventListener("interiorar-auth-user-changed", handleAuthUserChanged);
+  }, []);
 
   const user: User = useMemo(() => ({
-    ...MOCK_USER_BASE,
+    ...(storedUser ?? MOCK_USER_BASE),
     subscriptionPlan: currentPlan,
-  }), [currentPlan]);
+    subscriptionStatus: storedUser?.subscriptionStatus ?? "active",
+  }), [currentPlan, storedUser]);
 
-  const [aiRequestsCount, setAiRequestsCount] = useState(() => {
+  const [aiRequestsCount, setAiRequestsCount] = useState(0);
+
+  useEffect(() => {
     try {
-      const stored = localStorage.getItem("ai-requests-count");
-      if (stored) return parseInt(stored, 10);
-    } catch { /* ignore */ }
-    return 0;
-  });
+      const stored = localStorage.getItem(getScopedStorageKey("ai-requests-count", user.id));
+      setAiRequestsCount(stored ? parseInt(stored, 10) || 0 : 0);
+    } catch {
+      setAiRequestsCount(0);
+    }
+  }, [user.id]);
 
   // Persist AI requests count
   useEffect(() => {
-    try { localStorage.setItem("ai-requests-count", String(aiRequestsCount)); } catch { /* ignore */ }
-  }, [aiRequestsCount]);
+    try {
+      localStorage.setItem(getScopedStorageKey("ai-requests-count", user.id), String(aiRequestsCount));
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [aiRequestsCount, user.id]);
 
   // Compute usage from credit batches
   const totalCreditsPurchased = creditBatches.reduce((sum, b) => sum + b.creditsPurchased, 0);
   const totalCreditsUsed = totalCreditsPurchased - totalCreditsRemaining;
 
   const usage: UserUsage = useMemo(() => ({
-    userId: "usr_demo_001",
+    userId: user.id,
     modelsCount: 3,
     layoutsCount: 2,
     arSessionsCount: 7,
     aiRequestsCount,
     aiCreditsUsed: totalCreditsUsed,
     aiCreditsTotal: totalCreditsPurchased,
-  }), [aiRequestsCount, totalCreditsUsed, totalCreditsPurchased]);
+  }), [aiRequestsCount, totalCreditsUsed, totalCreditsPurchased, user.id]);
 
   const [currency, setCurrency] = useState<Currency>("USD");
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -78,6 +98,7 @@ export function useSubscription() {
 
   const logout = useCallback(() => {
     setIsAuthenticated(false);
+    AuthService.clearStoredUser();
   }, []);
 
   return {
@@ -88,7 +109,7 @@ export function useSubscription() {
     isAuthenticated,
     upgradePlan,
     logout,
-    setUser: () => {},
+    setUser: setStoredUser,
     setUsage: () => {},
     useCredit,
     creditBatches,

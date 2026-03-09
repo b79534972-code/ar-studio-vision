@@ -8,23 +8,9 @@ async function bootstrap() {
         rawBody: true,
     });
     app.use(cookieParser());
-    const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
-        .split(',')
-        .map(o => o.trim());
     app.enableCors({
-        origin: (origin, callback) => {
-            // Allow requests with no origin (mobile apps, Postman, server-to-server)
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                console.warn(`CORS blocked origin: ${origin}. Allowed: ${allowedOrigins.join(', ')}`);
-                callback(null, false);
-            }
-        },
+        origin: process.env.FRONTEND_URL || 'http://localhost:5173',
         credentials: true,
-        allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
-        exposedHeaders: ['Set-Cookie'],
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     });
     const port = process.env.PORT || 3000;
     await app.listen(port);

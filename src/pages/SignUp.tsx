@@ -5,11 +5,14 @@ import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { AuthService } from "@/services/AuthService";
+import { useToast } from "@/hooks/use-toast";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect");
+  const { toast } = useToast();
 
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -37,9 +40,18 @@ const SignUp = () => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    navigate(redirect === "ar" ? "/ar-demo" : "/dashboard");
+    try {
+      await AuthService.register(form.name.trim(), form.email.trim(), form.password);
+      navigate(redirect === "ar" ? "/ar-demo" : "/dashboard");
+    } catch (error) {
+      toast({
+        title: "Sign up failed",
+        description: error instanceof Error ? error.message : "Unable to create account",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fields = [

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { lazy, Suspense, useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Pencil, Check, Plus, Settings2, Sparkles } from "lucide-react";
@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import EditorFurniturePanel from "@/components/editor/EditorFurniturePanel";
 import EditorPropertiesPanel from "@/components/editor/EditorPropertiesPanel";
 import EditorToolbar from "@/components/editor/EditorToolbar";
-import RoomCanvas3D from "@/components/editor/RoomCanvas3D";
 import ARPreviewModal from "@/components/editor/ARPreviewModal";
 import AIOptimizePanel from "@/components/editor/AIOptimizePanel";
 import OutOfCreditsModal from "@/components/dashboard/OutOfCreditsModal";
@@ -15,6 +14,8 @@ import { roomStore } from "@/stores/roomStore";
 import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 import type { PlacedObject, RoomConfig, FurnitureItem } from "@/types/editor";
+
+const RoomCanvas3D = lazy(() => import("@/components/editor/RoomCanvas3D"));
 
 const DEFAULT_ROOM: RoomConfig = {
   width: 6,
@@ -288,16 +289,24 @@ const RoomEditor = () => {
         </div>
 
         <div className="flex-1 p-1 sm:p-2">
-          <RoomCanvas3D
-            objects={objects}
-            roomConfig={roomConfig}
-            selectedId={selectedId}
-            onSelectObject={setSelectedId}
-            onUpdateObject={handleUpdateObject}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            viewMode={viewMode}
-          />
+          <Suspense
+            fallback={
+              <div className="h-full min-h-[360px] rounded-2xl border border-border/40 bg-card/40 flex items-center justify-center text-sm text-muted-foreground">
+                Loading 3D editor…
+              </div>
+            }
+          >
+            <RoomCanvas3D
+              objects={objects}
+              roomConfig={roomConfig}
+              selectedId={selectedId}
+              onSelectObject={setSelectedId}
+              onUpdateObject={handleUpdateObject}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              viewMode={viewMode}
+            />
+          </Suspense>
         </div>
 
         {/* Properties panel — hidden on mobile/tablet */}

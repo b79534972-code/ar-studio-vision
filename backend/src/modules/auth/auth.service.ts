@@ -17,13 +17,25 @@ export class AuthService {
   ) {}
 
   async register(name: string, email: string, password: string): Promise<{ user: UserEntity; token: string }> {
-    const existing = await this.userRepo.findByEmail(email);
-    if (existing) throw new ConflictException('Email already registered');
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedName) throw new ConflictException('Username is required');
+
+    const existingEmail = await this.userRepo.findByLoginIdentifier(normalizedEmail);
+    if (existingEmail && existingEmail.email.toLowerCase() === normalizedEmail) {
+      throw new ConflictException('Email already registered');
+    }
+
+    const existingName = await this.userRepo.findByLoginIdentifier(normalizedName);
+    if (existingName && existingName.name.toLowerCase() === normalizedName.toLowerCase()) {
+      throw new ConflictException('Username already taken');
+    }
 
     const passwordHash = await bcrypt.hash(password, 12);
     const user = await this.userRepo.create({
-      name,
-      email,
+      name: normalizedName,
+      email: normalizedEmail,
       passwordHash,
       role: 'user',
       subscriptionPlan: 'free',
@@ -37,8 +49,8 @@ export class AuthService {
     return { user, token };
   }
 
-  async login(email: string, password: string): Promise<{ user: UserEntity; token: string }> {
-    const user = await this.userRepo.findByEmail(email);
+  async login(identifier: string, password: string): Promise<{ user: UserEntity; token: string }> {
+    const user = await this.userRepo.findByLoginIdentifier(identifier);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const valid = await bcrypt.compare(password, user.passwordHash);

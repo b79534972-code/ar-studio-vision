@@ -34,9 +34,9 @@ let PrismaLayoutRepository = class PrismaLayoutRepository {
     async delete(id) {
         await this.prisma.layout.delete({ where: { id } });
     }
-    async createVersion(layoutId, snapshot) {
+    async createVersion(layoutId, version, snapshot) {
         return this.prisma.layoutVersion.create({
-            data: { layoutId, snapshot: snapshot },
+            data: { layoutId, version, snapshot: snapshot },
         });
     }
     async getVersions(layoutId) {

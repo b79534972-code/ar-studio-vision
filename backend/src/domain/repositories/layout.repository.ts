@@ -14,6 +14,6 @@ export interface ILayoutRepository {
   delete(id: string): Promise<void>;
 
   // Version history
-  createVersion(layoutId: string, snapshot: Record<string, unknown>): Promise<LayoutVersionEntity>;
+  createVersion(layoutId: string, version: number, snapshot: Record<string, unknown>): Promise<LayoutVersionEntity>;
   getVersions(layoutId: string): Promise<LayoutVersionEntity[]>;
 }

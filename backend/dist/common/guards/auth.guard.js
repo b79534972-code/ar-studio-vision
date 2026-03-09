@@ -8,36 +8,33 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
+const user_repository_1 = require("../../domain/repositories/user.repository");
 let AuthGuard = class AuthGuard {
-    constructor(jwtService) {
+    constructor(jwtService, userRepo) {
         this.jwtService = jwtService;
+        this.userRepo = userRepo;
     }
-    extractToken(request) {
-        const cookieToken = request.cookies?.['token'];
-        if (cookieToken)
-            return cookieToken;
-        const authHeader = request.headers?.authorization;
-        if (!authHeader)
-            return undefined;
-        if (typeof authHeader !== 'string')
-            return undefined;
-        const [scheme, value] = authHeader.split(' ');
-        if (scheme?.toLowerCase() !== 'bearer' || !value)
-            return undefined;
-        return value;
-    }
-    canActivate(context) {
+    async canActivate(context) {
         const request = context.switchToHttp().getRequest();
-        const token = this.extractToken(request);
+        const authHeader = request.headers.authorization;
+        const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+        const token = request.cookies?.['token'] || bearerToken;
         if (!token)
             throw new common_1.UnauthorizedException('Authentication required');
         try {
             const payload = this.jwtService.verify(token);
+            const user = await this.userRepo.findById(payload.sub);
+            if (!user)
+                throw new common_1.UnauthorizedException('User not found');
             request.user = payload;
+            request.userEntity = user;
             return true;
         }
         catch {
@@ -48,6 +45,7 @@ let AuthGuard = class AuthGuard {
 exports.AuthGuard = AuthGuard;
 exports.AuthGuard = AuthGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [jwt_1.JwtService])
+    __param(1, (0, common_1.Inject)(user_repository_1.USER_REPOSITORY)),
+    __metadata("design:paramtypes", [jwt_1.JwtService, Object])
 ], AuthGuard);
 //# sourceMappingURL=auth.guard.js.map

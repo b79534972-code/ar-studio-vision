@@ -5,6 +5,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import Redis from 'ioredis';
+import { getRedisConnectionOptions } from '../redis.config';
 
 const TIER_LIMITS: Record<string, { requests: number; windowSeconds: number }> = {
   free: { requests: 30, windowSeconds: 60 },
@@ -17,14 +18,8 @@ const TIER_LIMITS: Record<string, { requests: number; windowSeconds: number }> =
 export class RateLimitMiddleware implements NestMiddleware {
   private redis: Redis;
 
-  // constructor() {
-  //   this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-  // }
   constructor() {
-    this.redis = new Redis({
-      host: process.env.REDIS_HOST || 'redis',
-      port: Number(process.env.REDIS_PORT) || 6379,
-    })
+    this.redis = new Redis(getRedisConnectionOptions());
   }
 
   async use(req: Request, res: Response, next: NextFunction) {

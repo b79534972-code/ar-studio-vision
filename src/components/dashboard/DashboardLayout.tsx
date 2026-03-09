@@ -9,6 +9,7 @@ import { useFeatureGate } from "@/hooks/useFeatureGate";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { AuthService } from "@/services/AuthService";
 
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -28,8 +29,14 @@ const DashboardLayout = () => {
     toast({ title: "Create Room", description: "Room creation will be available with Azure Cloud." });
   };
 
-  const handleLogout = () => {
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await AuthService.logout();
+    } catch {
+      subscription.logout();
+    } finally {
+      navigate("/");
+    }
   };
 
   return (

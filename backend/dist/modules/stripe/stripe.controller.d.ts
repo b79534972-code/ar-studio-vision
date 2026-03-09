@@ -18,6 +18,14 @@ export declare class StripeController {
         subscriptionId: string;
         status: string;
     }>;
+    purchaseDemo(user: UserEntity, body: {
+        plan: Exclude<SubscriptionPlan, 'free'>;
+        currency?: 'VND' | 'USD';
+    }): Promise<{
+        success: true;
+        plan: Exclude<SubscriptionPlan, "free">;
+        creditsAdded: number;
+    }>;
     cancel(user: UserEntity): Promise<{
         success: boolean;
     }>;

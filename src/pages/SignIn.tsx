@@ -5,22 +5,24 @@ import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { AuthService } from "@/services/AuthService";
+import { useToast } from "@/hooks/use-toast";
 
 const SignIn = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect");
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const validate = () => {
     const newErrors: typeof errors = {};
-    if (!email) newErrors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Invalid email format";
+    if (!identifier.trim()) newErrors.identifier = "Username or email is required";
     if (!password) newErrors.password = "Password is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -30,10 +32,18 @@ const SignIn = () => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    // Simulate login
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    navigate(redirect === "ar" ? "/ar-demo" : "/dashboard");
+    try {
+      await AuthService.login(identifier.trim(), password);
+      navigate(redirect === "ar" ? "/ar-demo" : "/dashboard");
+    } catch (error) {
+      toast({
+        title: "Sign in failed",
+        description: error instanceof Error ? error.message : "Invalid username/email or password",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,16 +70,16 @@ const SignIn = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="identifier">Username or Email</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => { setEmail(e.target.value); setErrors((p) => ({ ...p, email: undefined })); }}
-                className={errors.email ? "border-destructive" : ""}
+                id="identifier"
+                type="text"
+                placeholder="username or you@example.com"
+                value={identifier}
+                onChange={(e) => { setIdentifier(e.target.value); setErrors((p) => ({ ...p, identifier: undefined })); }}
+                className={errors.identifier ? "border-destructive" : ""}
               />
-              {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+              {errors.identifier && <p className="text-xs text-destructive">{errors.identifier}</p>}
             </div>
 
             <div className="space-y-2">

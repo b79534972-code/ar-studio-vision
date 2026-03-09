@@ -1,5 +1,8 @@
+import { IUserRepository } from '../../domain/repositories/user.repository';
+import { IAuditRepository } from '../../domain/repositories/audit.repository';
+import { FeatureGuardService } from '../feature-guard/feature-guard.service';
 import { UserEntity } from '../../domain/entities/user.entity';
-import { AIContext, LayoutSuggestion, StyleTransformResult, ProductRecommendation, BudgetOptimization, PhotoRenderResult, FullRedesignResult } from './providers/ai-provider.interface';
+import { IAIProvider, AIContext, LayoutSuggestion, StyleTransformResult, ProductRecommendation, BudgetOptimization, PhotoRenderResult, FullRedesignResult } from './providers/ai-provider.interface';
 export interface AIResult<T = unknown> {
     success: boolean;
     data?: T;
@@ -14,7 +17,7 @@ export declare class AIService {
     private readonly featureGuard;
     private readonly logger;
     private redis;
-    constructor(userRepo: any, auditRepo: any, aiProvider: any, featureGuard: any);
+    constructor(userRepo: IUserRepository, auditRepo: IAuditRepository, aiProvider: IAIProvider, featureGuard: FeatureGuardService);
     private execute;
     suggestLayouts(user: UserEntity, context: Omit<AIContext, 'userId'>): Promise<AIResult<LayoutSuggestion[]>>;
     optimizeLayout(user: UserEntity, context: Omit<AIContext, 'userId'>): Promise<AIResult<LayoutSuggestion>>;

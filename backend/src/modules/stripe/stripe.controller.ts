@@ -32,6 +32,15 @@ export class StripeController {
     return this.stripeService.createSubscription(user.id, body.plan, body.paymentMethodId);
   }
 
+  @Post('purchase-demo')
+  @UseGuards(AuthGuard)
+  async purchaseDemo(
+    @CurrentUser() user: UserEntity,
+    @Body() body: { plan: Exclude<SubscriptionPlan, 'free'>; currency?: 'VND' | 'USD' },
+  ) {
+    return this.stripeService.purchaseDemoCredits(user.id, body.plan, body.currency || 'VND');
+  }
+
   @Post('cancel')
   @UseGuards(AuthGuard)
   async cancel(@CurrentUser() user: UserEntity) {

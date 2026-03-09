@@ -5,12 +5,15 @@
  */
 
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment } from "@react-three/drei";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Smartphone, Loader2, AlertTriangle, RotateCcw, Move } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { QRCodeSVG } from "qrcode.react";
+import { useIsTouchDevice } from "@/hooks/use-touch-device";
+import { decodeSharePayload } from "@/lib/arShare";
 
 interface LayoutObject {
   id: string;
@@ -57,11 +60,15 @@ function RoomFloor({ w, d }: { w: number; d: number }) {
 const ARViewer = () => {
   const { layoutId } = useParams<{ layoutId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [layout, setLayout] = useState<LayoutData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [arMode, setArMode] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isTouchDevice = useIsTouchDevice();
+  const shareUrl = window.location.href;
+  const showDesktopQR = !isTouchDevice;
 
   useEffect(() => {
     if (!layoutId) {
@@ -70,19 +77,25 @@ const ARViewer = () => {
       return;
     }
 
-    // Try to load from localStorage (set by ARPreviewModal)
+    const sharedLayout = decodeSharePayload<LayoutData>(searchParams.get("payload"));
+
     try {
-      const stored = localStorage.getItem(`ar-layout-${layoutId}`);
-      if (stored) {
-        setLayout(JSON.parse(stored));
+      if (sharedLayout) {
+        setLayout(sharedLayout);
+        localStorage.setItem(`ar-layout-${layoutId}`, JSON.stringify(sharedLayout));
       } else {
-        setError("Layout not found. The QR code may have expired. Please generate a new one from the Room Editor.");
+        const stored = localStorage.getItem(`ar-layout-${layoutId}`);
+        if (stored) {
+          setLayout(JSON.parse(stored));
+        } else {
+          setError("Layout not found. The QR code may have expired. Please generate a new one from the Room Editor.");
+        }
       }
     } catch {
       setError("Failed to load layout data");
     }
     setLoading(false);
-  }, [layoutId]);
+  }, [layoutId, searchParams]);
 
   // Check WebXR support
   useEffect(() => {
@@ -123,6 +136,66 @@ const ARViewer = () => {
             Go Home
           </Button>
         </motion.div>
+      </div>
+    );
+  }
+
+  if (showDesktopQR) {
+    return (
+      <div className="fixed inset-0 bg-background flex flex-col">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="h-14 bg-card/90 backdrop-blur-md border-b border-border/40 flex items-center px-4 gap-3 shrink-0 z-10"
+        >
+          <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs" onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-3.5 h-3.5" /> Back
+          </Button>
+          <div className="h-5 w-px bg-border/40" />
+          <div className="flex items-center gap-2 min-w-0">
+            <Smartphone className="w-4 h-4 text-primary shrink-0" />
+            <h1 className="font-display text-sm font-bold text-foreground truncate">Open AR on phone or tablet</h1>
+          </div>
+          <span className="text-[10px] text-muted-foreground ml-auto">
+            {layout.room.w}m × {layout.room.d}m • {layout.objects.length} objects
+          </span>
+        </motion.div>
+
+        <div className="flex-1 flex items-center justify-center p-6 bg-gradient-to-b from-background to-accent/40">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-md w-full rounded-3xl border border-border/40 bg-card/90 backdrop-blur p-6 text-center shadow-elevated space-y-5"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Smartphone className="w-7 h-7 text-primary" />
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="font-display text-xl font-bold text-foreground">Scan to continue in AR</h2>
+              <p className="text-sm text-muted-foreground">
+                This room layout is meant to open on a phone or tablet. Scan the QR code below to view it on a mobile device.
+              </p>
+            </div>
+
+            <div className="mx-auto w-fit rounded-2xl border border-border/30 bg-white p-4 shadow-soft">
+              <QRCodeSVG
+                value={shareUrl}
+                size={220}
+                level="M"
+                includeMargin={false}
+                bgColor="#ffffff"
+                fgColor="hsl(var(--foreground))"
+              />
+            </div>
+
+            <div className="rounded-2xl bg-accent/50 px-4 py-3 text-left text-sm text-muted-foreground space-y-1">
+              <p><span className="font-semibold text-foreground">1.</span> Open the camera app on your phone or tablet.</p>
+              <p><span className="font-semibold text-foreground">2.</span> Scan this QR code.</p>
+              <p><span className="font-semibold text-foreground">3.</span> Open the link to launch the mobile AR viewer.</p>
+            </div>
+          </motion.div>
+        </div>
       </div>
     );
   }

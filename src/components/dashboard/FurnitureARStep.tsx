@@ -4,8 +4,9 @@
 
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
-import { Camera, QrCode, Eye, Ruler, ArrowLeft, Check } from "lucide-react";
+import { Camera, QrCode, Eye, Ruler, ArrowLeft, Check, Smartphone } from "lucide-react";
 import type { FurnitureItem } from "@/types/editor";
+import { useIsTouchDevice } from "@/hooks/use-touch-device";
 
 interface FurnitureARStepProps {
   item: FurnitureItem;
@@ -14,6 +15,7 @@ interface FurnitureARStepProps {
 }
 
 const FurnitureARStep = ({ item, onBack, onDone }: FurnitureARStepProps) => {
+  const isTouchDevice = useIsTouchDevice();
   const payload = {
     id: item.id,
     name: item.name,
@@ -31,25 +33,50 @@ const FurnitureARStep = ({ item, onBack, onDone }: FurnitureARStepProps) => {
     localStorage.setItem(`ar-object-${encodedId}`, JSON.stringify(payload));
   } catch { /* storage full */ }
 
-  const steps = [
-    { icon: Camera, text: "Open camera on your phone" },
-    { icon: QrCode, text: "Scan the QR code below" },
-    { icon: Eye, text: "View furniture in your space" },
-  ];
+  const handleOpenDirectAR = () => {
+    window.location.href = arUrl;
+  };
+
+  const steps = isTouchDevice
+    ? [
+        { icon: Smartphone, text: "Open the AR viewer directly on this device" },
+        { icon: Eye, text: "Inspect the furniture model in 3D / AR" },
+      ]
+    : [
+        { icon: Camera, text: "Open camera on your phone" },
+        { icon: QrCode, text: "Scan the QR code below" },
+        { icon: Eye, text: "View furniture in your space" },
+      ];
 
   return (
     <div className="flex flex-col items-center gap-5 py-2">
-      {/* QR Code */}
-      <div className="p-4 bg-white rounded-2xl shadow-soft border border-border/30">
-        <QRCodeSVG
-          value={arUrl}
-          size={180}
-          level="M"
-          includeMargin={false}
-          bgColor="#ffffff"
-          fgColor="hsl(235, 60%, 52%)"
-        />
-      </div>
+      {isTouchDevice ? (
+        <div className="w-full rounded-2xl border border-primary/20 bg-primary/5 p-5 text-center space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+            <Smartphone className="w-6 h-6 text-primary" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-foreground">Open AR directly on this device</p>
+            <p className="text-xs text-muted-foreground">
+              You are already on a phone or tablet, so you do not need to scan a QR code.
+            </p>
+          </div>
+          <Button className="w-full gap-2" onClick={handleOpenDirectAR}>
+            <Smartphone className="w-4 h-4" /> Open 3D / AR Preview
+          </Button>
+        </div>
+      ) : (
+        <div className="p-4 bg-white rounded-2xl shadow-soft border border-border/30">
+          <QRCodeSVG
+            value={arUrl}
+            size={180}
+            level="M"
+            includeMargin={false}
+            bgColor="#ffffff"
+            fgColor="hsl(235, 60%, 52%)"
+          />
+        </div>
+      )}
 
       {/* Furniture info */}
       <div className="flex items-center gap-3 text-xs text-muted-foreground bg-accent/40 rounded-xl px-4 py-2.5 w-full">
@@ -82,9 +109,15 @@ const FurnitureARStep = ({ item, onBack, onDone }: FurnitureARStepProps) => {
         <Button variant="outline" className="flex-1 gap-1.5" onClick={onBack}>
           <ArrowLeft className="w-3.5 h-3.5" /> Back to 3D
         </Button>
-        <Button className="flex-1 gap-1.5" onClick={onDone}>
-          <Check className="w-3.5 h-3.5" /> Done
-        </Button>
+        {isTouchDevice ? (
+          <Button className="flex-1 gap-1.5" onClick={handleOpenDirectAR}>
+            <Smartphone className="w-3.5 h-3.5" /> Open AR
+          </Button>
+        ) : (
+          <Button className="flex-1 gap-1.5" onClick={onDone}>
+            <Check className="w-3.5 h-3.5" /> Done
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -20,6 +20,18 @@ export class PrismaUserRepository implements IUserRepository {
     return this.prisma.user.findUnique({ where: { email } }) as Promise<UserEntity | null>;
   }
 
+  async findByLoginIdentifier(identifier: string): Promise<UserEntity | null> {
+    const trimmed = identifier.trim();
+    return this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: { equals: trimmed, mode: 'insensitive' } },
+          { name: { equals: trimmed, mode: 'insensitive' } },
+        ],
+      },
+    }) as Promise<UserEntity | null>;
+  }
+
   async findByStripeCustomerId(customerId: string): Promise<UserEntity | null> {
     return this.prisma.user.findUnique({ where: { stripeCustomerId: customerId } }) as Promise<UserEntity | null>;
   }

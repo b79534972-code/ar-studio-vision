@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { lazy, Suspense, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ImagePlus, Upload, Loader2, X, Sparkles, Smartphone, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import FurniturePreview3D from "./FurniturePreview3D";
 import FurnitureARStep from "./FurnitureARStep";
 import { customFurnitureStore } from "@/stores/customFurnitureStore";
 import type { FurnitureItem } from "@/types/editor";
+
+const FurniturePreview3D = lazy(() => import("./FurniturePreview3D"));
 
 interface AddFurnitureModalProps {
   open: boolean;
@@ -319,11 +320,19 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
           {/* STEP 4: Interactive 3D Preview */}
           {step === "preview3d" && (
             <motion.div key="preview3d" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-4">
-              <FurniturePreview3D
-                dimensions={dims}
-                color={MATERIAL_COLORS[form.material] || "#6B7280"}
-                material={form.material || "Mixed"}
-              />
+              <Suspense
+                fallback={
+                  <div className="aspect-[4/3] rounded-xl border border-border/50 bg-secondary/20 flex items-center justify-center text-sm text-muted-foreground">
+                    Loading 3D preview…
+                  </div>
+                }
+              >
+                <FurniturePreview3D
+                  dimensions={dims}
+                  color={MATERIAL_COLORS[form.material] || "#6B7280"}
+                  material={form.material || "Mixed"}
+                />
+              </Suspense>
 
               <div className="bg-accent/30 rounded-xl p-3 space-y-1.5">
                 <div className="flex items-center justify-between">

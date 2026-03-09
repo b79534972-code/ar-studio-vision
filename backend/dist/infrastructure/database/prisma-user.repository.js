@@ -22,6 +22,17 @@ let PrismaUserRepository = class PrismaUserRepository {
     async findByEmail(email) {
         return this.prisma.user.findUnique({ where: { email } });
     }
+    async findByLoginIdentifier(identifier) {
+        const trimmed = identifier.trim();
+        return this.prisma.user.findFirst({
+            where: {
+                OR: [
+                    { email: { equals: trimmed, mode: 'insensitive' } },
+                    { name: { equals: trimmed, mode: 'insensitive' } },
+                ],
+            },
+        });
+    }
     async findByStripeCustomerId(customerId) {
         return this.prisma.user.findUnique({ where: { stripeCustomerId: customerId } });
     }

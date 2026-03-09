@@ -45,7 +45,7 @@ export class LayoutService {
     // Save version snapshot before update (Pro/Advanced only)
     try {
       this.featureGuard.canCreateVersion(user);
-      await this.layoutRepo.createVersion(layoutId, { objects: layout.objects, version: layout.version });
+      await this.layoutRepo.createVersion(layoutId, layout.version, { objects: layout.objects });
     } catch {
       // Version history not available — skip silently
     }

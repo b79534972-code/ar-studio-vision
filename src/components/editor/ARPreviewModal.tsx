@@ -1,4 +1,5 @@
 import { QRCodeSVG } from "qrcode.react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Smartphone, Camera, QrCode, Eye } from "lucide-react";
 import type { PlacedObject, RoomConfig } from "@/types/editor";
+import { useIsTouchDevice } from "@/hooks/use-touch-device";
+import { encodeSharePayload } from "@/lib/arShare";
 
 interface ARPreviewModalProps {
   open: boolean;
@@ -17,6 +20,7 @@ interface ARPreviewModalProps {
 }
 
 const ARPreviewModal = ({ open, onClose, objects, roomConfig }: ARPreviewModalProps) => {
+  const isTouchDevice = useIsTouchDevice();
   // Encode layout data into a compact format for the QR URL
   const layoutPayload = {
     room: { w: roomConfig.width, d: roomConfig.depth, h: roomConfig.height },
@@ -32,8 +36,10 @@ const ARPreviewModal = ({ open, onClose, objects, roomConfig }: ARPreviewModalPr
     })),
   };
 
-  const layoutId = btoa(JSON.stringify(layoutPayload)).slice(0, 32);
-  const arViewerUrl = `${window.location.origin}/ar-viewer/${layoutId}`;
+  const encodedPayload = encodeSharePayload(layoutPayload);
+  const layoutId = encodedPayload.slice(0, 32);
+  const arViewerUrl = new URL(`/ar-viewer/${layoutId}`, window.location.origin);
+  arViewerUrl.searchParams.set("payload", encodedPayload);
 
   // Store layout in sessionStorage for the AR viewer to pick up
   if (open) {
@@ -45,10 +51,18 @@ const ARPreviewModal = ({ open, onClose, objects, roomConfig }: ARPreviewModalPr
   }
 
   const steps = [
-    { icon: Camera, text: "Open camera on your phone" },
-    { icon: QrCode, text: "Scan the QR code below" },
+    ...(isTouchDevice
+      ? [{ icon: Smartphone, text: "Open AR preview directly on this device" }]
+      : [
+          { icon: Camera, text: "Open camera on your phone" },
+          { icon: QrCode, text: "Scan the QR code below" },
+        ]),
     { icon: Eye, text: "View your design in AR" },
   ];
+
+  const handleOpenDirectAR = () => {
+    window.location.href = arViewerUrl.toString();
+  };
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -59,22 +73,38 @@ const ARPreviewModal = ({ open, onClose, objects, roomConfig }: ARPreviewModalPr
             Preview in AR
           </DialogTitle>
           <DialogDescription>
-            Scan this QR code with your phone to view your {objects.length}-object layout in augmented reality.
+            {isTouchDevice
+              ? `Open your ${objects.length}-object layout directly on this phone or tablet in augmented reality.`
+              : `Scan this QR code with your phone to view your ${objects.length}-object layout in augmented reality.`}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-5 py-4">
-          {/* QR Code */}
-          <div className="p-4 bg-white rounded-2xl shadow-soft border border-border/30">
-            <QRCodeSVG
-              value={arViewerUrl}
-              size={200}
-              level="M"
-              includeMargin={false}
-              bgColor="#ffffff"
-              fgColor="hsl(235, 60%, 52%)"
-            />
-          </div>
+          {isTouchDevice ? (
+            <div className="w-full rounded-2xl border border-primary/20 bg-primary/5 p-5 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+                <Smartphone className="w-6 h-6 text-primary" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-foreground">Launch AR directly</p>
+                <p className="text-xs text-muted-foreground">
+                  You are already using a touch device, so there is no need to scan a QR code.
+                </p>
+              </div>
+              <Button className="w-full" onClick={handleOpenDirectAR}>Open AR Preview</Button>
+            </div>
+          ) : (
+            <div className="p-4 bg-white rounded-2xl shadow-soft border border-border/30">
+              <QRCodeSVG
+                value={arViewerUrl.toString()}
+                size={200}
+                level="M"
+                includeMargin={false}
+                bgColor="#ffffff"
+                fgColor="hsl(235, 60%, 52%)"
+              />
+            </div>
+          )}
 
           {/* Layout summary */}
           <div className="flex items-center gap-3 text-xs text-muted-foreground bg-accent/40 rounded-xl px-4 py-2.5">
