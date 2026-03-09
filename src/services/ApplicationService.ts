@@ -7,7 +7,7 @@
  */
 
 import { FeatureService } from "./FeatureService";
-import { AIService } from "./AIService";
+import { AIService, type AIRoomContext } from "./AIService";
 import type { User, UserUsage } from "@/types/subscription";
 
 export class ApplicationService {
@@ -35,24 +35,37 @@ export class ApplicationService {
 
   // --- AI Delegates ---
 
-  static suggestPlacement(user: User, modelId: string, roomId: string) {
-    return AIService.suggestPlacement(user, modelId, roomId);
+  static suggestLayouts(user: User, context: AIRoomContext, token?: string) {
+    return AIService.suggestLayouts(user, context, token);
   }
 
-  static generateLayouts(user: User, roomId: string) {
-    return AIService.generateLayouts(user, roomId);
+  static optimizeLayout(user: User, context: AIRoomContext, token?: string) {
+    return AIService.optimizeLayout(user, context, token);
   }
 
-  static optimizeSpace(user: User, roomId: string) {
-    return AIService.optimizeSpace(user, roomId);
+  static transformStyle(user: User, context: AIRoomContext, targetStyle: string, token?: string) {
+    return AIService.transformStyle(user, context, targetStyle, token);
   }
 
-  static analyzeRoomImage(user: User, imageUrl: string) {
-    return AIService.analyzeRoomImage(user, imageUrl);
+  static recommendProducts(user: User, context: AIRoomContext, count?: number, token?: string) {
+    return AIService.recommendProducts(user, context, count, token);
   }
 
-  static chatAssistant(user: User, message: string) {
-    return AIService.chatInteriorAssistant(user, message);
+  static optimizeBudget(user: User, context: AIRoomContext, token?: string) {
+    return AIService.optimizeBudget(user, context, token);
+  }
+
+  static renderPhotorealistic(user: User, context: AIRoomContext, cameraAngle?: string, token?: string) {
+    return AIService.renderPhotorealistic(user, context, cameraAngle, token);
+  }
+
+  static fullRedesign(user: User, context: AIRoomContext, preferences?: Record<string, unknown>, token?: string) {
+    return AIService.fullRedesign(user, context, preferences, token);
+  }
+
+  /** Get remaining AI credits */
+  static getCreditsRemaining(token?: string) {
+    return AIService.getCreditsRemaining(token);
   }
 
   // --- Usage Helpers ---

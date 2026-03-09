@@ -11,13 +11,19 @@ const common_1 = require("@nestjs/common");
 const ai_service_1 = require("./ai.service");
 const feature_guard_service_1 = require("../feature-guard/feature-guard.service");
 const database_module_1 = require("../../infrastructure/database/database.module");
+const ai_provider_interface_1 = require("./providers/ai-provider.interface");
+const stub_ai_provider_1 = require("./providers/stub-ai.provider");
 let AIModule = class AIModule {
 };
 exports.AIModule = AIModule;
 exports.AIModule = AIModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
-        providers: [ai_service_1.AIService, feature_guard_service_1.FeatureGuardService],
+        providers: [
+            ai_service_1.AIService,
+            feature_guard_service_1.FeatureGuardService,
+            { provide: ai_provider_interface_1.AI_PROVIDER, useClass: stub_ai_provider_1.StubAIProvider },
+        ],
         exports: [ai_service_1.AIService],
     })
 ], AIModule);
