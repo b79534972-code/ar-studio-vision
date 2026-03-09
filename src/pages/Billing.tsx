@@ -11,21 +11,32 @@ interface DashboardContext {
   user: User;
   usage: UserUsage;
   currency: Currency;
+  upgradePlan: (plan: SubscriptionPlan) => void;
 }
 
+const TOP_UP_PACKS: { plan: Exclude<SubscriptionPlan, "free">; credits: number }[] = [
+  { plan: "basic", credits: 20 },
+  { plan: "advanced", credits: 50 },
+  { plan: "pro", credits: 120 },
+];
+
 const Billing = () => {
-  const { user, usage, currency } = useOutletContext<DashboardContext>();
+  const { user, usage, currency, upgradePlan } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
   const plan = PLAN_CONFIG[user.subscriptionPlan];
   const { t } = useLanguage();
+  const [buyingPlan, setBuyingPlan] = useState<string | null>(null);
 
-  // Mock invoice history — will be replaced by real Stripe data
-  const invoiceHistory = user.subscriptionPlan !== "free"
-    ? [
-        { date: "2026-03-01", plan: plan.name, credits: String(plan.limits.aiCredits ?? 0), amount: formatPrice(user.subscriptionPlan, currency) },
-        { date: "2026-02-01", plan: plan.name, credits: String(plan.limits.aiCredits ?? 0), amount: formatPrice(user.subscriptionPlan, currency) },
-      ]
-    : [];
+  const handleTopUp = async (packPlan: Exclude<SubscriptionPlan, "free">) => {
+    setBuyingPlan(packPlan);
+    // Mock payment delay — will be replaced by Stripe
+    await new Promise((r) => setTimeout(r, 1500));
+    upgradePlan(packPlan);
+    setBuyingPlan(null);
+    toast.success(`${PLAN_CONFIG[packPlan].aiCredits} credits added!`, {
+      description: `Your ${PLAN_CONFIG[packPlan].name} credit pack is now active.`,
+    });
+  };
 
   const creditsRemaining = usage.aiCreditsTotal - usage.aiCreditsUsed;
   const creditPercentage = usage.aiCreditsTotal > 0
