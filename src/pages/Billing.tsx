@@ -123,10 +123,10 @@ const Billing = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-secondary/40 text-muted-foreground text-xs">
-                  <th className="text-left px-4 py-2.5 font-medium">{t("billing.invoiceDate") || "Date"}</th>
-                  <th className="text-left px-4 py-2.5 font-medium">{t("billing.invoicePlan") || "Plan"}</th>
-                  <th className="text-left px-4 py-2.5 font-medium">{t("billing.invoiceCredits") || "Credits"}</th>
-                  <th className="text-right px-4 py-2.5 font-medium">{t("billing.invoiceAmount") || "Amount"}</th>
+                  <th className="text-left px-4 py-2.5 font-medium">Date</th>
+                  <th className="text-left px-4 py-2.5 font-medium">Plan</th>
+                  <th className="text-left px-4 py-2.5 font-medium">Credits</th>
+                  <th className="text-right px-4 py-2.5 font-medium">Amount</th>
                 </tr>
               </thead>
               <tbody>
