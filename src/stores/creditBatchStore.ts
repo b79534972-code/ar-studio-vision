@@ -36,9 +36,9 @@ function notify() {
 /** Remove expired batches (silent = no notify, safe for use during render) */
 function pruneExpired(silent = false): void {
   const now = new Date().toISOString();
-  const before = batches.length;
-  batches = batches.filter((b) => b.expiresAt > now && b.creditsRemaining > 0);
-  if (batches.length !== before) {
+  const filtered = batches.filter((b) => b.expiresAt > now && b.creditsRemaining > 0);
+  if (filtered.length !== batches.length) {
+    batches = filtered;
     persist();
     if (!silent) notify();
   }
