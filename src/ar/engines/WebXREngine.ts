@@ -62,6 +62,9 @@ export class WebXREngine implements IAREngine {
   private boundOnTouchMove: ((e: TouchEvent) => void) | null = null;
   private boundOnTouchEnd: ((e: TouchEvent) => void) | null = null;
 
+  // Model preloading
+  private preloadedModel: THREE.Group | null = null;
+
   // ─── IAREngine interface ───────────────────────────────
 
   async init(config: AREngineConfig): Promise<void> {
@@ -76,6 +79,18 @@ export class WebXREngine implements IAREngine {
     if (!supported) {
       throw new Error("WebXR immersive-ar sessions are not supported on this device.");
     }
+
+    // Pre-load GLB model during init so it's ready when user taps
+    if (config.modelUrl) {
+      try {
+        console.log("[WebXR] Pre-loading model:", config.modelUrl);
+        this.preloadedModel = await this.preloadModel(config.modelUrl);
+        console.log("[WebXR] Model pre-loaded successfully");
+      } catch (err) {
+        console.warn("[WebXR] Model pre-load failed, will use placeholder:", err);
+        this.preloadedModel = null;
+      }
+    }
   }
 
   async start(): Promise<void> {
@@ -84,9 +99,13 @@ export class WebXREngine implements IAREngine {
     const { container, onStateChange, onError } = this.config;
 
     try {
-      // Renderer
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setPixelRatio(window.devicePixelRatio);
+      // Renderer — use lower pixel ratio on mobile for performance
+      const renderer = new THREE.WebGLRenderer({
+        antialias: false, // disable on mobile for perf
+        alpha: true,
+        powerPreference: "high-performance",
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.xr.enabled = true;
       container.appendChild(renderer.domElement);
@@ -100,8 +119,8 @@ export class WebXREngine implements IAREngine {
       const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
       this.camera = camera;
 
-      // Lighting
-      scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+      // Lighting — keep it simple for mobile perf
+      scene.add(new THREE.AmbientLight(0xffffff, 1.2));
       const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
       dirLight.position.set(0, 5, 5);
       scene.add(dirLight);
@@ -112,23 +131,44 @@ export class WebXREngine implements IAREngine {
       this.reticle = reticle;
 
       // Request XR session
+      console.log("[WebXR] Requesting immersive-ar session...");
       const session = await (navigator as any).xr.requestSession("immersive-ar", {
         requiredFeatures: ["hit-test"],
-        optionalFeatures: ["dom-overlay"],
+        optionalFeatures: ["dom-overlay", "local-floor"],
         domOverlay: { root: container },
       });
       this.session = session;
+      console.log("[WebXR] Session obtained");
 
-      renderer.xr.setReferenceSpaceType("local");
-      await renderer.xr.setSession(session);
+      // Try local-floor first (better surface detection on Android), fallback to local
+      let refSpaceType: XRReferenceSpaceType = "local-floor";
+      try {
+        renderer.xr.setReferenceSpaceType("local-floor");
+        await renderer.xr.setSession(session);
+        const refSpace = await session.requestReferenceSpace("local-floor");
+        this.referenceSpace = refSpace;
+        console.log("[WebXR] Using local-floor reference space");
+      } catch {
+        console.log("[WebXR] local-floor not available, falling back to local");
+        refSpaceType = "local";
+        renderer.xr.setReferenceSpaceType("local");
+        await renderer.xr.setSession(session);
+        const refSpace = await session.requestReferenceSpace("local");
+        this.referenceSpace = refSpace;
+      }
 
-      // Reference spaces
-      const refSpace = await session.requestReferenceSpace("local");
-      this.referenceSpace = refSpace;
-
-      const viewerSpace = await session.requestReferenceSpace("viewer");
-      const hitTestSource = await session.requestHitTestSource({ space: viewerSpace });
-      this.hitTestSource = hitTestSource;
+      // Hit-test source
+      try {
+        const viewerSpace = await session.requestReferenceSpace("viewer");
+        const hitTestSource = await session.requestHitTestSource!({ space: viewerSpace });
+        this.hitTestSource = hitTestSource;
+        console.log("[WebXR] Hit-test source created");
+      } catch (err) {
+        console.error("[WebXR] Failed to create hit-test source:", err);
+        onError?.("Hit-test is not supported on this device. Try updating Chrome.");
+        this.setState("error");
+        return;
+      }
 
       // Tap-to-place
       session.addEventListener("select", () => this.onSelect());
@@ -140,6 +180,7 @@ export class WebXREngine implements IAREngine {
       this.attachGestureListeners(container);
 
       this.setState("scanning");
+      console.log("[WebXR] AR session started, scanning for surfaces...");
 
       // Render loop
       renderer.setAnimationLoop((_timestamp: number, frame?: XRFrame) => {
@@ -148,7 +189,7 @@ export class WebXREngine implements IAREngine {
         renderer.render(scene, camera);
       });
     } catch (err: any) {
-      console.error("WebXR AR session error:", err);
+      console.error("[WebXR] AR session error:", err);
       onError?.(err.message || "Failed to start AR session");
       this.setState("error");
     }
@@ -188,14 +229,6 @@ export class WebXREngine implements IAREngine {
     this.config?.onStateChange?.(state);
   }
 
-  // private createReticle(): THREE.Mesh {
-  //   const geo = new THREE.RingGeometry(0.08, 0.1, 32).rotateX(-Math.PI / 2);
-  //   const mat = new THREE.MeshBasicMaterial({ color: 0x4355db, side: THREE.DoubleSide });
-  //   const mesh = new THREE.Mesh(geo, mat);
-  //   mesh.matrixAutoUpdate = false;
-  //   mesh.visible = false;
-  //   return mesh;
-  // }
   private createReticle(): THREE.Mesh {
     const geo = new THREE.RingGeometry(0.28, 0.35, 64)
       .rotateX(-Math.PI / 2);
@@ -235,6 +268,7 @@ export class WebXREngine implements IAREngine {
         this.lastHitPose = { position: pos, quaternion: quat };
 
         if (this.currentState === "scanning") {
+          console.log("[WebXR] Surface detected! Ready to place.");
           this.setState("ready");
         }
       }
@@ -250,12 +284,48 @@ export class WebXREngine implements IAREngine {
   private onSelect(): void {
     if (this.currentState !== "ready" || !this.lastHitPose) return;
 
+    console.log("[WebXR] Tap detected — placing model at:", this.lastHitPose.position.toArray());
     if (this.reticle) this.reticle.visible = false;
-    this.loadModel(this.lastHitPose);
+    this.placeModel(this.lastHitPose);
     this.setState("placed");
   }
 
-  private loadModel(pose: { position: THREE.Vector3; quaternion: THREE.Quaternion }): void {
+  /** Place model using pre-loaded GLB or fallback to placeholder */
+  private placeModel(pose: { position: THREE.Vector3; quaternion: THREE.Quaternion }): void {
+    if (!this.scene) return;
+
+    if (this.preloadedModel) {
+      console.log("[WebXR] Using pre-loaded model");
+      const model = this.preloadedModel.clone();
+      model.position.copy(pose.position);
+      model.quaternion.copy(pose.quaternion);
+      this.scene.add(model);
+      this.placedModel = model;
+    } else {
+      console.log("[WebXR] No pre-loaded model, trying live load...");
+      this.loadModelLive(pose);
+    }
+  }
+
+  /** Pre-load a GLB model and return the scene group */
+  private preloadModel(url: string): Promise<THREE.Group> {
+    return new Promise((resolve, reject) => {
+      const loader = new GLTFLoader();
+      loader.load(
+        url,
+        (gltf) => resolve(gltf.scene as unknown as THREE.Group),
+        (progress) => {
+          if (progress.total > 0) {
+            console.log(`[WebXR] Model loading: ${Math.round((progress.loaded / progress.total) * 100)}%`);
+          }
+        },
+        (err) => reject(err)
+      );
+    });
+  }
+
+  /** Live-load model (fallback if pre-load failed) */
+  private loadModelLive(pose: { position: THREE.Vector3; quaternion: THREE.Quaternion }): void {
     if (!this.scene) return;
     const modelUrl = this.config?.modelUrl;
 
@@ -264,6 +334,7 @@ export class WebXREngine implements IAREngine {
       loader.load(
         modelUrl,
         (gltf) => {
+          console.log("[WebXR] Live model loaded successfully");
           const model = gltf.scene;
           model.position.copy(pose.position);
           model.quaternion.copy(pose.quaternion);
@@ -272,11 +343,12 @@ export class WebXREngine implements IAREngine {
         },
         undefined,
         (err) => {
-          console.warn("GLB load failed, using placeholder:", err);
+          console.warn("[WebXR] GLB load failed, using placeholder:", err);
           this.placePlaceholder(pose);
         }
       );
     } else {
+      console.log("[WebXR] No model URL, using placeholder");
       this.placePlaceholder(pose);
     }
   }
@@ -421,6 +493,21 @@ export class WebXREngine implements IAREngine {
       this.renderer.dispose();
       this.renderer = null;
     }
+
+    // Dispose pre-loaded model
+    if (this.preloadedModel) {
+      this.preloadedModel.traverse((child) => {
+        const mesh = child as THREE.Mesh;
+        if (mesh.geometry) mesh.geometry.dispose();
+        if (mesh.material) {
+          const mat = mesh.material;
+          if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
+          else mat.dispose();
+        }
+      });
+      this.preloadedModel = null;
+    }
+
     this.scene = null;
     this.camera = null;
     this.session = null;
