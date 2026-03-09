@@ -111,14 +111,43 @@ const Billing = () => {
         {/* Invoice history */}
         <div>
           <p className="text-sm font-medium text-foreground mb-2">{t("profile.invoiceHistory")}</p>
-          <div className="p-4 bg-secondary/40 rounded-xl border border-border/30 text-center text-sm text-muted-foreground">
-            {t("profile.noInvoices")}
+          <div className="rounded-xl border border-border/30 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-secondary/40 text-muted-foreground text-xs">
+                  <th className="text-left px-4 py-2.5 font-medium">{t("billing.invoiceDate") || "Date"}</th>
+                  <th className="text-left px-4 py-2.5 font-medium">{t("billing.invoicePlan") || "Plan"}</th>
+                  <th className="text-left px-4 py-2.5 font-medium">{t("billing.invoiceCredits") || "Credits"}</th>
+                  <th className="text-right px-4 py-2.5 font-medium">{t("billing.invoiceAmount") || "Amount"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoiceHistory.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="text-center py-6 text-muted-foreground text-xs">
+                      {t("profile.noInvoices")}
+                    </td>
+                  </tr>
+                ) : (
+                  invoiceHistory.map((inv, i) => (
+                    <tr key={i} className="border-t border-border/20 hover:bg-secondary/10 transition-colors">
+                      <td className="px-4 py-2.5 text-foreground">{inv.date}</td>
+                      <td className="px-4 py-2.5">
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">{inv.plan}</span>
+                      </td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{inv.credits}</td>
+                      <td className="px-4 py-2.5 text-right font-medium text-foreground">{inv.amount}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex">
           <Button variant="hero" size="sm" className="w-full sm:w-auto" onClick={() => navigate("/pricing")}>
-            {creditsRemaining < 5 ? (t("billing.buyMore") || "Buy More Credits") : (t("billing.upgrade") || "Upgrade Plan")}
+            {t("billing.upgrade") || "Update Plan"}
           </Button>
         </div>
       </motion.div>
