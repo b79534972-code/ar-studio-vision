@@ -43,6 +43,9 @@ const Pricing = () => {
     setProcessing(true);
     await new Promise((r) => setTimeout(r, 1500));
     subscriptionStore.upgradePlan(confirmPlan);
+    if (confirmPlan !== "free") {
+      creditBatchStore.addBatch(confirmPlan as Exclude<SubscriptionPlan, "free">);
+    }
     setProcessing(false);
     setConfirmPlan(null);
 
