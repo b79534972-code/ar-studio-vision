@@ -37,6 +37,13 @@ const Billing = () => {
       description: `Your ${PLAN_CONFIG[packPlan].name} credit pack is now active.`,
     });
   };
+  // Mock invoice history — will be replaced by real Stripe data
+  const invoiceHistory = user.subscriptionPlan !== "free"
+    ? [
+        { date: "2026-03-01", plan: plan.name, credits: String(plan.limits.aiCredits ?? 0), amount: formatPrice(user.subscriptionPlan, currency) },
+        { date: "2026-02-01", plan: plan.name, credits: String(plan.limits.aiCredits ?? 0), amount: formatPrice(user.subscriptionPlan, currency) },
+      ]
+    : [];
 
   const creditsRemaining = usage.aiCreditsTotal - usage.aiCreditsUsed;
   const creditPercentage = usage.aiCreditsTotal > 0
