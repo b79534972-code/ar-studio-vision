@@ -118,13 +118,8 @@ const Billing = () => {
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Button variant="hero" size="sm" className="w-full sm:w-auto" onClick={() => navigate("/pricing")}>
-            {t("billing.upgrade")}
+            {creditsRemaining < 5 ? (t("billing.buyMore") || "Buy More Credits") : (t("billing.upgrade") || "Upgrade Plan")}
           </Button>
-          {user.subscriptionPlan !== "free" && (
-            <Button variant="destructive" size="sm" className="w-full sm:w-auto">
-              {t("billing.cancel")}
-            </Button>
-          )}
         </div>
       </motion.div>
     </div>
