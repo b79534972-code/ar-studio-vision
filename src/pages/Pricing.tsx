@@ -68,7 +68,13 @@ const Pricing = () => {
       {/* Nav */}
       <nav className="border-b border-border/30 bg-card/60 backdrop-blur-xl">
         <div className="container mx-auto flex items-center justify-between h-14 px-6">
-          <button onClick={() => navigate(currentPlan !== "free" ? "/dashboard" : "/")} className="font-display text-lg font-bold text-foreground tracking-tight">
+          <button
+            onClick={() => {
+              const hasSession = Boolean(localStorage.getItem("subscription-plan") && localStorage.getItem("subscription-plan") !== "free") || Boolean(localStorage.getItem("credit-batches"));
+              navigate(hasSession ? "/dashboard" : "/");
+            }}
+            className="font-display text-lg font-bold text-foreground tracking-tight"
+          >
             InteriorAR<span className="text-primary">.</span>
           </button>
           <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
