@@ -1,5 +1,5 @@
 /**
- * useSubscription — Mock subscription state
+ * useSubscription — Mock subscription state with FIFO credit batches
  *
  * When backend is connected, this will be replaced with
  * real auth + DB queries. For now, provides mock data with localStorage persistence.
@@ -7,8 +7,9 @@
 
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSyncExternalStore } from "react";
-import { PLAN_CONFIG, type User, type UserUsage, type SubscriptionPlan, type Currency } from "@/types/subscription";
+import { PLAN_CONFIG, type User, type UserUsage, type SubscriptionPlan, type Currency, type CreditBatch } from "@/types/subscription";
 import { subscriptionStore } from "@/stores/subscriptionStore";
+import { creditBatchStore } from "@/stores/creditBatchStore";
 
 const MOCK_USER_BASE: Omit<User, "subscriptionPlan"> = {
   id: "usr_demo_001",
@@ -20,68 +21,58 @@ const MOCK_USER_BASE: Omit<User, "subscriptionPlan"> = {
   createdAt: "2026-02-01T00:00:00Z",
 };
 
-const MOCK_USAGE: UserUsage = {
-  userId: "usr_demo_001",
-  modelsCount: 3,
-  layoutsCount: 2,
-  arSessionsCount: 7,
-  aiRequestsCount: 0,
-  aiCreditsUsed: 0,
-  aiCreditsTotal: 5,
-};
-
 export function useSubscription() {
   const currentPlan = useSyncExternalStore(subscriptionStore.subscribe, subscriptionStore.getPlan);
+  const creditBatches = useSyncExternalStore(creditBatchStore.subscribe, creditBatchStore.getBatches);
+  const totalCreditsRemaining = useSyncExternalStore(creditBatchStore.subscribe, creditBatchStore.getTotalRemaining);
 
   const user: User = useMemo(() => ({
     ...MOCK_USER_BASE,
     subscriptionPlan: currentPlan,
   }), [currentPlan]);
 
-  const [usage, setUsage] = useState<UserUsage>(() => {
+  const [aiRequestsCount, setAiRequestsCount] = useState(() => {
     try {
-      const stored = localStorage.getItem("user-usage");
-      if (stored) return JSON.parse(stored) as UserUsage;
+      const stored = localStorage.getItem("ai-requests-count");
+      if (stored) return parseInt(stored, 10);
     } catch { /* ignore */ }
-    return {
-      ...MOCK_USAGE,
-      aiCreditsTotal: PLAN_CONFIG[currentPlan].limits.aiCredits ?? 5,
-    };
+    return 0;
   });
+
+  // Persist AI requests count
+  useEffect(() => {
+    try { localStorage.setItem("ai-requests-count", String(aiRequestsCount)); } catch { /* ignore */ }
+  }, [aiRequestsCount]);
+
+  // Compute usage from credit batches
+  const totalCreditsPurchased = creditBatches.reduce((sum, b) => sum + b.creditsPurchased, 0);
+  const totalCreditsUsed = totalCreditsPurchased - totalCreditsRemaining;
+
+  const usage: UserUsage = useMemo(() => ({
+    userId: "usr_demo_001",
+    modelsCount: 3,
+    layoutsCount: 2,
+    arSessionsCount: 7,
+    aiRequestsCount,
+    aiCreditsUsed: totalCreditsUsed,
+    aiCreditsTotal: totalCreditsPurchased,
+  }), [aiRequestsCount, totalCreditsUsed, totalCreditsPurchased]);
+
   const [currency, setCurrency] = useState<Currency>("USD");
   const [isAuthenticated, setIsAuthenticated] = useState(true);
 
-  // Persist usage to localStorage whenever it changes
-  useEffect(() => {
-    try { localStorage.setItem("user-usage", JSON.stringify(usage)); } catch { /* ignore */ }
-  }, [usage]);
-
   const upgradePlan = useCallback((plan: SubscriptionPlan) => {
     subscriptionStore.upgradePlan(plan);
-    const newPlanCredits = PLAN_CONFIG[plan].limits.aiCredits ?? 5;
-    setUsage((prev) => {
-      const remaining = prev.aiCreditsTotal - prev.aiCreditsUsed;
-      // Cộng dồn: credit còn lại + credit gói mới
-      return {
-        ...prev,
-        aiCreditsTotal: remaining + newPlanCredits,
-        aiCreditsUsed: 0,
-      };
-    });
+    if (plan !== "free") {
+      creditBatchStore.addBatch(plan as Exclude<SubscriptionPlan, "free">);
+    }
   }, []);
 
   const useCredit = useCallback((amount: number = 1): boolean => {
-    let success = false;
-    setUsage((prev) => {
-      const remaining = prev.aiCreditsTotal - prev.aiCreditsUsed;
-      if (remaining < amount) return prev;
-      success = true;
-      return {
-        ...prev,
-        aiCreditsUsed: prev.aiCreditsUsed + amount,
-        aiRequestsCount: prev.aiRequestsCount + 1,
-      };
-    });
+    const success = creditBatchStore.consumeCredits(amount);
+    if (success) {
+      setAiRequestsCount((prev) => prev + 1);
+    }
     return success;
   }, []);
 
@@ -98,7 +89,9 @@ export function useSubscription() {
     upgradePlan,
     logout,
     setUser: () => {},
-    setUsage,
+    setUsage: () => {},
     useCredit,
+    creditBatches,
+    totalCreditsRemaining,
   };
 }
