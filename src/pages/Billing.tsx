@@ -1,9 +1,11 @@
-import { motion } from "framer-motion";
-import { CreditCard, Sparkles, Zap } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CreditCard, Sparkles, Zap, ShoppingCart, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { PLAN_CONFIG, formatPrice, type User, type UserUsage, type Currency } from "@/types/subscription";
+import { PLAN_CONFIG, formatPrice, formatPerCredit, type User, type UserUsage, type Currency, type SubscriptionPlan } from "@/types/subscription";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { toast } from "sonner";
 
 interface DashboardContext {
   user: User;
