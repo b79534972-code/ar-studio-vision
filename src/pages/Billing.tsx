@@ -1,42 +1,21 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { CreditCard, Sparkles, Zap, ShoppingCart, Check, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { CreditCard, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { PLAN_CONFIG, formatPrice, formatPerCredit, type User, type UserUsage, type Currency, type SubscriptionPlan } from "@/types/subscription";
+import { PLAN_CONFIG, formatPrice, type User, type UserUsage, type Currency } from "@/types/subscription";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { toast } from "sonner";
 
 interface DashboardContext {
   user: User;
   usage: UserUsage;
   currency: Currency;
-  upgradePlan: (plan: SubscriptionPlan) => void;
 }
 
-const TOP_UP_PACKS: { plan: Exclude<SubscriptionPlan, "free">; credits: number }[] = [
-  { plan: "basic", credits: 20 },
-  { plan: "advanced", credits: 50 },
-  { plan: "pro", credits: 120 },
-];
-
 const Billing = () => {
-  const { user, usage, currency, upgradePlan } = useOutletContext<DashboardContext>();
+  const { user, usage, currency } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
   const plan = PLAN_CONFIG[user.subscriptionPlan];
   const { t } = useLanguage();
-  const [buyingPlan, setBuyingPlan] = useState<string | null>(null);
-
-  const handleTopUp = async (packPlan: Exclude<SubscriptionPlan, "free">) => {
-    setBuyingPlan(packPlan);
-    // Mock payment delay — will be replaced by Stripe
-    await new Promise((r) => setTimeout(r, 1500));
-    upgradePlan(packPlan);
-    setBuyingPlan(null);
-    toast.success(`${PLAN_CONFIG[packPlan].aiCredits} credits added!`, {
-      description: `Your ${PLAN_CONFIG[packPlan].name} credit pack is now active.`,
-    });
-  };
   // Mock invoice history — will be replaced by real Stripe data
   const invoiceHistory = user.subscriptionPlan !== "free"
     ? [
@@ -124,57 +103,6 @@ const Billing = () => {
               <p className="font-display text-lg font-bold text-foreground">{creditsRemaining}</p>
               <p className="text-[10px] text-muted-foreground">{t("billing.remaining") || "Remaining"}</p>
             </div>
-          </div>
-        </div>
-
-        {/* Top Up Credits */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <ShoppingCart className="w-4 h-4 text-primary" />
-            <p className="text-sm font-medium text-foreground">Top Up Credits</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {TOP_UP_PACKS.map(({ plan: packPlan, credits }) => {
-              const packConfig = PLAN_CONFIG[packPlan];
-              const isLoading = buyingPlan === packPlan;
-              return (
-                <motion.button
-                  key={packPlan}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  disabled={!!buyingPlan}
-                  onClick={() => handleTopUp(packPlan)}
-                  className={`relative p-4 rounded-xl border text-left transition-all ${
-                    packConfig.highlighted
-                      ? "border-primary/40 bg-primary/5 shadow-sm"
-                      : "border-border/30 bg-secondary/20 hover:bg-secondary/40"
-                  } ${buyingPlan ? "opacity-60 cursor-not-allowed" : ""}`}
-                >
-                  {packConfig.highlighted && (
-                    <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full text-[9px] font-bold bg-primary text-primary-foreground">
-                      Best Value
-                    </span>
-                  )}
-                  <p className="font-display text-2xl font-bold text-foreground">{credits}</p>
-                  <p className="text-[10px] text-muted-foreground mb-2">AI credits</p>
-                  <div className="flex items-center justify-between">
-                    <span className="font-display text-sm font-bold text-primary">
-                      {formatPrice(packPlan, currency)}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">
-                      {formatPerCredit(packPlan, currency)}/credit
-                    </span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium">
-                    {isLoading ? (
-                      <><Loader2 className="w-3 h-3 animate-spin" /> Processing...</>
-                    ) : (
-                      <><Zap className="w-3 h-3" /> Buy Now</>
-                    )}
-                  </div>
-                </motion.button>
-              );
-            })}
           </div>
         </div>
 
