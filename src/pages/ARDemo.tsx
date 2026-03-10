@@ -88,18 +88,18 @@ const ARDemo = () => {
 
   const isDesktop = platform === "desktop";
   const isWebXR = platform === "webxr";
-  const showDesktopQR = isDesktop && !isTouchDevice;
 
   const handleStartSession = async () => {
-    if (showDesktopQR) {
-      return;
-    }
-
     await startEngine();
     setSessionStarted(true);
   };
 
   const handleEndSession = () => {
+    disposeEngine();
+    setSessionStarted(false);
+  };
+
+  const handleGoBack = () => {
     disposeEngine();
     navigate(-1);
   };
