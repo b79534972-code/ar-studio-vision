@@ -7,21 +7,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-<<<<<<< HEAD
 import { Smartphone, Ruler, Camera, QrCode, Eye, ExternalLink, Monitor, AlertTriangle, X } from "lucide-react";
-=======
-import { Smartphone, Ruler, Camera, QrCode, Eye, ExternalLink, Monitor, AlertTriangle } from "lucide-react";
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
 import type { FurnitureItem } from "@/types/editor";
 import { useIsTouchDevice } from "@/hooks/use-touch-device";
 import { detectPlatform } from "@/ar/ARModeManager";
 import { useState, useEffect } from "react";
 import type { ARPlatform } from "@/ar/types";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
 import { encodeSharePayload } from "@/lib/arShare";
-=======
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
 
 interface FurnitureARModalProps {
   open: boolean;
@@ -50,20 +43,14 @@ function buildARUrl(item: FurnitureItem): string {
 const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
   const isTouchDevice = useIsTouchDevice();
   const [platform, setPlatform] = useState<ARPlatform>("desktop");
-<<<<<<< HEAD
   const [qrExpanded, setQrExpanded] = useState(false);
-=======
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
   const navigate = useNavigate();
 
   useEffect(() => {
     if (open) {
       detectPlatform().then((result) => setPlatform(result.platform));
-<<<<<<< HEAD
     } else {
       setQrExpanded(false);
-=======
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
     }
   }, [open]);
 
@@ -72,7 +59,6 @@ const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
   const arUrl = buildARUrl(item);
   const isIOS = platform === "quicklook";
   const isWebXR = platform === "webxr";
-<<<<<<< HEAD
   const hasDirectARSupport = (isIOS && !!item.usdzUrl) || isWebXR;
   const showDualTouchActions = isTouchDevice && hasDirectARSupport;
 
@@ -85,9 +71,6 @@ const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
     modelUrl: item.modelUrl,
     usdzUrl: item.usdzUrl,
   }));
-=======
-  const hasARSupport = isIOS || isWebXR;
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
 
   /** Mobile/Tablet: launch AR directly */
   const handleOpenAR = () => {
@@ -103,7 +86,6 @@ const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
       document.body.appendChild(a);
       a.click();
       setTimeout(() => document.body.removeChild(a), 100);
-<<<<<<< HEAD
       onClose();
       return;
     }
@@ -111,31 +93,12 @@ const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
     // Android WebXR or iOS fallback without USDZ: route through ARDemo
     onClose();
     navigate(`/ar-demo?model=${encodedModelPayload}&mode=ar`);
-=======
-    } else if (isWebXR) {
-      // Android WebXR: navigate to AR demo page
-      onClose();
-      navigate(`/ar-demo?model=${btoa(JSON.stringify({
-        name: item.name, color: item.color, category: item.category,
-        material: item.material, dimensions: item.dimensions,
-        modelUrl: item.modelUrl, usdzUrl: item.usdzUrl,
-      }))}`);
-    }
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
   };
 
   /** Desktop: open 3D viewer page */
   const handleOpen3DViewer = () => {
     onClose();
-<<<<<<< HEAD
     navigate(`/ar-demo?model=${encodedModelPayload}&mode=viewer`);
-=======
-    navigate(`/ar-demo?model=${btoa(JSON.stringify({
-      name: item.name, color: item.color, category: item.category,
-      material: item.material, dimensions: item.dimensions,
-      modelUrl: item.modelUrl, usdzUrl: item.usdzUrl,
-    }))}`);
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
   };
 
   return (
@@ -154,7 +117,6 @@ const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
 
         <div className="flex flex-col items-center gap-5 py-4">
           {/* ===== QR Code — Always visible on all devices ===== */}
-<<<<<<< HEAD
           <button
             type="button"
             onClick={() => setQrExpanded(true)}
@@ -190,35 +152,6 @@ const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
                 </span>
               </div>
             ))}
-=======
-          <div className="p-4 bg-white rounded-2xl shadow-soft border border-border/30">
-            <QRCodeSVG
-              value={arUrl}
-              size={180}
-              level="M"
-              includeMargin={false}
-              bgColor="#ffffff"
-              fgColor="hsl(235, 60%, 52%)"
-            />
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
-          </div>
-
-          <div className="w-full space-y-2">
-            {[
-              { icon: Camera, text: "Open camera on your phone" },
-              { icon: QrCode, text: "Scan the QR code above" },
-              { icon: Eye, text: "View furniture in your space" },
-            ].map((s, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm">
-                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <s.icon className="w-3.5 h-3.5 text-primary" />
-                </div>
-                <span className="text-muted-foreground">
-                  <span className="font-semibold text-foreground mr-1">{i + 1}.</span>
-                  {s.text}
-                </span>
-              </div>
-            ))}
           </div>
 
           {/* Furniture info */}
@@ -233,7 +166,6 @@ const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
           </div>
 
           {/* ===== Action Buttons ===== */}
-<<<<<<< HEAD
           <div className="w-full flex gap-3 max-[420px]:flex-col">
             {isTouchDevice ? (
               showDualTouchActions ? (
@@ -271,62 +203,12 @@ const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
                 <Button
                   variant="outline"
                   className="flex-1 h-11 gap-2 rounded-xl text-[13px] px-3"
-=======
-          <div className="w-full flex gap-3">
-            {isTouchDevice && hasARSupport ? (
-              /* Mobile/Tablet with AR support: Open AR directly */
-              <>
-                <Button
-                  variant="outline"
-                  className="flex-1 gap-2"
-                  onClick={handleOpen3DViewer}
-                >
-                  <Monitor className="w-4 h-4" />
-                  Open 3D Viewer
-                </Button>
-                <Button
-                  className="flex-1 gap-2"
-                  onClick={handleOpenAR}
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  {isIOS ? "Open AR" : "Open AR"}
-                </Button>
-              </>
-            ) : isTouchDevice && !hasARSupport ? (
-              /* Mobile/Tablet without AR support: fallback */
-              <>
-                <Button
-                  variant="outline"
-                  className="flex-1 gap-2"
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
                   onClick={onClose}
                 >
                   Back
                 </Button>
                 <Button
-<<<<<<< HEAD
                   className="flex-1 h-11 gap-2 rounded-xl text-[13px] px-3 whitespace-nowrap"
-=======
-                  className="flex-1 gap-2"
-                  onClick={handleOpen3DViewer}
-                >
-                  <Monitor className="w-4 h-4" />
-                  Open 3D Viewer
-                </Button>
-              </>
-            ) : (
-              /* Desktop: Open 3D viewer */
-              <>
-                <Button
-                  variant="outline"
-                  className="flex-1 gap-2"
-                  onClick={onClose}
-                >
-                  Back
-                </Button>
-                <Button
-                  className="flex-1 gap-2"
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
                   onClick={handleOpen3DViewer}
                 >
                   <Monitor className="w-4 h-4" />
@@ -337,17 +219,10 @@ const FurnitureARModal = ({ open, onClose, item }: FurnitureARModalProps) => {
           </div>
 
           {/* No AR support warning on touch devices */}
-<<<<<<< HEAD
           {isTouchDevice && isIOS && !item.usdzUrl && (
             <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400 rounded-lg px-3 py-2 w-full">
               <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
               <span>USDZ link is missing. iPhone will fall back to the web 3D/AR viewer instead of native Quick Look.</span>
-=======
-          {isTouchDevice && !hasARSupport && (
-            <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400 rounded-lg px-3 py-2 w-full">
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-              <span>Your device doesn't support AR. You can still view the model in 3D.</span>
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
             </div>
           )}
 

@@ -12,11 +12,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
-<<<<<<< HEAD
 import { ArrowLeft, Smartphone, Loader2, Ruler, Palette, Monitor, X, Eye, EyeOff } from "lucide-react";
-=======
-import { ArrowLeft, Smartphone, Loader2, Ruler, Palette, Monitor } from "lucide-react";
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
 import { QRCodeSVG } from "qrcode.react";
 import { useAREngine } from "@/ar";
 import ARSessionHUD from "@/components/ar/ARSessionHUD";
@@ -106,7 +102,6 @@ const ARDemo = () => {
 
   const isDesktop = platform === "desktop";
   const isWebXR = platform === "webxr";
-<<<<<<< HEAD
   const qrSize = isTouchDevice
     ? (isForcedViewerMode ? 132 : 144)
     : (isForcedViewerMode ? 164 : 180);
@@ -116,8 +111,6 @@ const ARDemo = () => {
   const subtitleText = isDesktop
     ? "Inspect the model in a desktop-style 3D scene with grid and orbit controls."
     : "Place this furniture in your space using your device camera.";
-=======
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
 
   const handleStartSession = async () => {
     await startEngine();
@@ -128,18 +121,12 @@ const ARDemo = () => {
   const handleEndSession = () => {
     disposeEngine();
     setSessionStarted(false);
-<<<<<<< HEAD
     setQrExpanded(false);
-=======
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
   };
 
   const handleGoBack = () => {
     disposeEngine();
-<<<<<<< HEAD
     setQrExpanded(false);
-=======
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
     navigate(-1);
   };
 
@@ -153,7 +140,6 @@ const ARDemo = () => {
     <div ref={containerRef} className="fixed inset-0 bg-foreground/95 select-none">
       {/* ========== Pre-session start screen ========== */}
       {showPreSession && (
-<<<<<<< HEAD
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center px-4 sm:px-6 py-4 sm:py-6 overflow-hidden">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -163,23 +149,11 @@ const ARDemo = () => {
             <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-full gradient-primary flex items-center justify-center shadow-elevated max-[760px]:w-12 max-[760px]:h-12">
               {isDesktop ? (
                 <Monitor className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground max-[760px]:w-5 max-[760px]:h-5" />
-=======
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 px-6 overflow-y-auto py-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center gap-6 text-center max-w-sm w-full"
-          >
-            <div className="w-20 h-20 rounded-full gradient-primary flex items-center justify-center">
-              {isDesktop ? (
-                <Monitor className="w-9 h-9 text-primary-foreground" />
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
               ) : (
                 <Smartphone className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground max-[760px]:w-5 max-[760px]:h-5" />
               )}
             </div>
 
-<<<<<<< HEAD
             <div className="inline-flex items-center gap-2 rounded-full border border-border/30 bg-card/20 px-3 py-1 text-[11px] text-primary-foreground/85 backdrop-blur-md">
               <span className="w-1.5 h-1.5 rounded-full bg-primary" />
               {isForcedViewerMode ? "Viewer Mode" : isForcedARMode ? "AR Mode" : "Auto Mode"}
@@ -187,19 +161,11 @@ const ARDemo = () => {
 
             <h2 className="font-display text-[28px] leading-tight font-bold text-primary-foreground max-[760px]:text-[24px]">
               {titleText}
-=======
-            <h2 className="font-display text-2xl font-bold text-primary-foreground">
-              {isDesktop ? "3D Viewer & AR" : "AR Experience"}
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
             </h2>
 
             {/* Show model info if custom model data was passed */}
             {isCustomModel && (
-<<<<<<< HEAD
               <div className="bg-card/20 backdrop-blur-md border border-border/30 rounded-2xl px-4 py-2.5 space-y-1 w-full">
-=======
-              <div className="bg-card/10 backdrop-blur-md border border-border/20 rounded-xl px-5 py-3 space-y-1.5 w-full">
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
                 <p className="font-display font-semibold text-primary-foreground text-sm">{modelData.name}</p>
                 <div className="flex items-center justify-center gap-3 text-[11px] text-primary-foreground/75 max-[760px]:text-[10px]">
                   <span className="flex items-center gap-1">
@@ -215,15 +181,8 @@ const ARDemo = () => {
               </div>
             )}
 
-<<<<<<< HEAD
             <p className="text-primary-foreground/75 max-w-xs text-sm leading-relaxed max-[760px]:text-xs">
               {subtitleText}
-=======
-            <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
-              {isDesktop
-                ? "View this furniture in an interactive 3D viewer. Scan the QR code below with a phone to launch AR."
-                : "Place this furniture in your space using your device camera and WebXR Hit-Test."}
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
             </p>
 
             {detecting && (
@@ -241,7 +200,6 @@ const ARDemo = () => {
 
             {/* QR Code — shown on desktop for mobile AR scanning */}
             {!detecting && isDesktop && (
-<<<<<<< HEAD
               <div className="rounded-2xl p-3 border border-white/12 bg-slate-900/34 backdrop-blur-md shadow-[0_14px_36px_rgba(2,6,23,0.34)] space-y-2.5 w-full">
                 <button
                   type="button"
@@ -262,47 +220,25 @@ const ARDemo = () => {
                 </button>
                 <p className="text-xs text-primary-foreground/75 leading-relaxed max-[760px]:text-[11px]">
                   Scan with another phone/tablet to open AR mode instantly.
-=======
-              <div className="bg-card rounded-2xl p-4 shadow-elevated border border-border/50 space-y-4 w-full">
-                <div className="bg-white rounded-xl p-4 inline-block border border-border/30">
-                  <QRCodeSVG
-                    value={mobileARUrl}
-                    size={180}
-                    level="M"
-                    bgColor="#ffffff"
-                    fgColor="hsl(var(--foreground))"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Scan with phone or tablet for mobile AR experience
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
                 </p>
               </div>
             )}
 
             {/* Action button — always shown */}
             {!detecting && (
-<<<<<<< HEAD
               <Button
                 variant="hero"
                 size="lg"
                 className="w-auto min-w-[220px] px-6 h-11 max-[760px]:h-10 whitespace-nowrap"
                 onClick={handleStartSession}
               >
-=======
-              <Button variant="hero" size="lg" className="w-full" onClick={handleStartSession}>
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
                 {isDesktop ? "Open 3D Viewer" : "Start AR Session"}
               </Button>
             )}
 
             <Button
               variant="ghost"
-<<<<<<< HEAD
               className="text-muted-foreground h-9"
-=======
-              className="text-muted-foreground"
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
               onClick={handleGoBack}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -314,7 +250,6 @@ const ARDemo = () => {
 
       {/* ========== Desktop 3D viewer — back button overlay ========== */}
       {showDesktopViewer && (
-<<<<<<< HEAD
         <>
           <div className="absolute top-4 left-4 z-20">
             <Button
@@ -370,19 +305,6 @@ const ARDemo = () => {
             </div>
           )}
         </>
-=======
-        <div className="absolute top-4 left-4 z-20">
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 bg-card/80 backdrop-blur-sm"
-            onClick={handleEndSession}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Button>
-        </div>
->>>>>>> a93783387677c98379d47214b58d5647e53ffeb6
       )}
 
       {/* ========== Error overlay ========== */}
