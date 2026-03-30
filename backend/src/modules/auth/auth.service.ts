@@ -51,10 +51,10 @@ export class AuthService {
 
   async login(identifier: string, password: string): Promise<{ user: UserEntity; token: string }> {
     const user = await this.userRepo.findByLoginIdentifier(identifier);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) throw new UnauthorizedException('Incorrect username or password');
 
     const valid = await bcrypt.compare(password, user.passwordHash);
-    if (!valid) throw new UnauthorizedException('Invalid credentials');
+    if (!valid) throw new UnauthorizedException('Incorrect username or password');
 
     const token = this.jwtService.sign({ sub: user.id, role: user.role });
     return { user, token };

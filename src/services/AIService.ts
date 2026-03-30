@@ -9,8 +9,7 @@
 import { FeatureService } from "./FeatureService";
 import type { User } from "@/types/subscription";
 import { getFeatureCost, type AIFeatureId } from "@/config/aiCreditCosts";
-
-const API_URL = import.meta.env.VITE_API_URL || "";
+import { fetchWithTimeout, getApiAttemptTimeoutMs, getApiBaseCandidates } from "@/lib/api";
 
 export interface AIResult<T = unknown> {
   success: boolean;
@@ -117,6 +116,9 @@ async function callAI<T>(
   body: Record<string, unknown>,
   token?: string
 ): Promise<AIResult<T>> {
+  const bases = getApiBaseCandidates();
+  const candidates = bases.length > 0 ? bases : [""];
+
   try {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -125,40 +127,63 @@ async function callAI<T>(
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_URL}/api/ai/${endpoint}`, {
-      method: "POST",
-      headers,
-      credentials: "include",
-      body: JSON.stringify(body),
-    });
+    for (let i = 0; i < candidates.length; i += 1) {
+      const base = candidates[i];
+      const isLastAttempt = i === candidates.length - 1;
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-
-      // Handle specific error codes
-      if (response.status === 403) {
-        const code = errorData?.code;
-        if (code === "CREDITS_EXHAUSTED") {
-          return {
-            success: false,
-            error: `Không đủ credits. Cần ${errorData.required} credits, còn ${errorData.remaining}.`,
-          };
+      let response: Response;
+      try {
+        response = await fetchWithTimeout(`${base}/api/ai/${endpoint}`, {
+          method: "POST",
+          headers,
+          credentials: "include",
+          body: JSON.stringify(body),
+        }, getApiAttemptTimeoutMs(i));
+      } catch (networkError) {
+        if (!isLastAttempt) {
+          continue;
         }
-        if (code === "FEATURE_RESTRICTED") {
-          return {
-            success: false,
-            error: `Tính năng yêu cầu gói ${errorData.requiredPlan}+.`,
-          };
-        }
+        throw networkError;
       }
 
-      return {
-        success: false,
-        error: errorData?.message || errorData?.error || `Lỗi server (${response.status})`,
-      };
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+
+        // Handle specific error codes
+        if (response.status === 403) {
+          const code = errorData?.code;
+          if (code === "CREDITS_EXHAUSTED") {
+            return {
+              success: false,
+              error: `Không đủ credits. Cần ${errorData.required} credits, còn ${errorData.remaining}.`,
+            };
+          }
+          if (code === "FEATURE_RESTRICTED") {
+            return {
+              success: false,
+              error: `Tính năng yêu cầu gói ${errorData.requiredPlan}+.`,
+            };
+          }
+        }
+
+        // Retry the next backend only for transient server-side failures.
+        if (!isLastAttempt && (response.status >= 500 || response.status === 429)) {
+          continue;
+        }
+
+        return {
+          success: false,
+          error: errorData?.message || errorData?.error || `Lỗi server (${response.status})`,
+        };
+      }
+
+      return await response.json();
     }
 
-    return await response.json();
+    return {
+      success: false,
+      error: "Không thể kết nối đến server",
+    };
   } catch (error) {
     console.error(`AI request failed [${endpoint}]:`, error);
     return {

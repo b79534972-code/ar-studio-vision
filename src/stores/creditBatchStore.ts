@@ -14,9 +14,9 @@ let currentScope = getAuthStorageScope();
 
 // Validity durations in months per plan
 const VALIDITY_MONTHS: Record<Exclude<SubscriptionPlan, "free">, number> = {
-  basic: 3,
-  advanced: 6,
-  pro: 12,
+  basic: 1,
+  advanced: 2,
+  pro: 3,
 };
 
 function loadBatches(scope = currentScope): CreditBatch[] {

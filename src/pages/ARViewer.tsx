@@ -4,7 +4,7 @@
  * Falls back to 3D viewer on desktop / unsupported devices.
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment } from "@react-three/drei";
@@ -14,11 +14,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { useIsTouchDevice } from "@/hooks/use-touch-device";
 import { decodeSharePayload } from "@/lib/arShare";
+import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 interface LayoutObject {
   id: string;
   n: string;
   c: string;
+  m?: string;
+  u?: string;
   p: [number, number, number];
   r: [number, number, number];
   s: [number, number, number];
@@ -31,20 +35,90 @@ interface LayoutData {
   objects: LayoutObject[];
 }
 
-// Simple furniture shape renderer
 function FurnitureBlock({ obj }: { obj: LayoutObject }) {
   const dims = obj.d;
+
+  const [modelScene, setModelScene] = useState<THREE.Object3D | null>(null);
+  const [modelFailed, setModelFailed] = useState(false);
+
+  useEffect(() => {
+    if (!obj.m) {
+      setModelScene(null);
+      setModelFailed(false);
+      return;
+    }
+
+    let cancelled = false;
+    const loader = new GLTFLoader();
+
+    setModelFailed(false);
+    loader.load(
+      obj.m,
+      (gltf) => {
+        if (cancelled) return;
+        setModelScene(gltf.scene.clone(true));
+      },
+      undefined,
+      () => {
+        if (cancelled) return;
+        setModelScene(null);
+        setModelFailed(true);
+      }
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [obj.m]);
+
+  const modelTransform = useMemo(() => {
+    if (!modelScene) {
+      return {
+        scale: 1,
+        position: [0, 0, 0] as [number, number, number],
+      };
+    }
+
+    const box = new THREE.Box3().setFromObject(modelScene);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+
+    const safeW = size.x || 1;
+    const safeH = size.y || 1;
+    const safeD = size.z || 1;
+    const fitScale = Math.min(dims.width / safeW, dims.height / safeH, dims.depth / safeD);
+
+    return {
+      scale: fitScale,
+      position: [
+        -center.x * fitScale,
+        -box.min.y * fitScale,
+        -center.z * fitScale,
+      ] as [number, number, number],
+    };
+  }, [modelScene, dims.width, dims.height, dims.depth]);
+
+  const showFallbackGeometry = !modelScene || modelFailed;
+
   return (
-    <mesh
-      position={obj.p}
-      rotation={obj.r}
-      scale={obj.s}
-      castShadow
-      receiveShadow
-    >
-      <boxGeometry args={[dims.width, dims.height, dims.depth]} />
-      <meshStandardMaterial color={obj.cl} roughness={0.5} metalness={0.1} />
-    </mesh>
+    <group position={obj.p} rotation={obj.r} scale={obj.s}>
+      {modelScene && !modelFailed && (
+        <primitive
+          object={modelScene}
+          position={modelTransform.position}
+          scale={modelTransform.scale}
+        />
+      )}
+
+      {showFallbackGeometry && (
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[dims.width, dims.height, dims.depth]} />
+          <meshStandardMaterial color={obj.cl} roughness={0.5} metalness={0.1} />
+        </mesh>
+      )}
+    </group>
   );
 }
 

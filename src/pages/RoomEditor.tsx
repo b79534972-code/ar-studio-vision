@@ -11,6 +11,8 @@ import ARPreviewModal from "@/components/editor/ARPreviewModal";
 import AIOptimizePanel from "@/components/editor/AIOptimizePanel";
 import OutOfCreditsModal from "@/components/dashboard/OutOfCreditsModal";
 import { roomStore } from "@/stores/roomStore";
+import { customFurnitureStore } from "@/stores/customFurnitureStore";
+import { FURNITURE_CATALOG } from "@/data/furnitureCatalog";
 import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 import type { PlacedObject, RoomConfig, FurnitureItem } from "@/types/editor";
@@ -55,6 +57,22 @@ const RoomEditor = () => {
 
   const [editingName, setEditingName] = useState(false);
 
+  const hydrateObjectModels = useCallback((list: PlacedObject[]) => {
+    const catalog = [...FURNITURE_CATALOG, ...customFurnitureStore.getItems()];
+    const byFurnitureId = new Map(catalog.map((item) => [item.id, item]));
+
+    return list.map((obj) => {
+      if (obj.modelUrl || obj.usdzUrl) return obj;
+      const item = byFurnitureId.get(obj.furnitureId);
+      if (!item || (!item.modelUrl && !item.usdzUrl)) return obj;
+      return {
+        ...obj,
+        modelUrl: item.modelUrl,
+        usdzUrl: item.usdzUrl,
+      };
+    });
+  }, []);
+
   // ─── Load existing room / layout ───
   useEffect(() => {
     if (roomId) {
@@ -68,7 +86,7 @@ const RoomEditor = () => {
       // Load specific layout or the latest one for this room
       if (layoutId) {
         const layout = roomStore.getLayouts().find((l) => l.id === layoutId);
-        if (layout) setObjects(layout.objects);
+        if (layout) setObjects(hydrateObjectModels(layout.objects));
       } else {
         const roomLayouts = roomStore.getLayoutsForRoom(roomId);
         if (roomLayouts.length > 0) {
@@ -76,11 +94,11 @@ const RoomEditor = () => {
           const latest = roomLayouts.sort((a, b) =>
             new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
           )[0];
-          setObjects(latest.objects);
+          setObjects(hydrateObjectModels(latest.objects));
         }
       }
     }
-  }, [roomId, layoutId]);
+  }, [roomId, layoutId, hydrateObjectModels]);
 
   // ─── Undo / Redo ───
   const historyRef = useRef<PlacedObject[][]>([[]]);
@@ -153,6 +171,8 @@ const RoomEditor = () => {
       furnitureId: item.id,
       name: item.name,
       category: item.category,
+      modelUrl: item.modelUrl,
+      usdzUrl: item.usdzUrl,
       position: [
         (Math.random() - 0.5) * (roomConfig.width * 0.5),
         0,

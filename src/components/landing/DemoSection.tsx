@@ -24,7 +24,7 @@ const DemoSection = () => {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(8px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: false, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center mb-8 md:mb-12"
         >
@@ -39,7 +39,7 @@ const DemoSection = () => {
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: false, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden border border-border/50 group cursor-pointer transition-all duration-500 hover:border-primary/20"
           style={{
@@ -80,14 +80,12 @@ const DemoSection = () => {
               onClick={handlePlay}
               className="absolute inset-0 flex items-center justify-center bg-foreground/10 hover:bg-foreground/20 transition-all duration-300"
             >
-              <motion.div
+              <div
                 className="w-16 h-16 md:w-20 md:h-20 rounded-full gradient-cta flex items-center justify-center hover:scale-110 transition-transform"
                 style={{ boxShadow: "0 0 30px hsl(235 60% 60% / 0.3)" }}
-                animate={{ boxShadow: ["0 0 20px hsl(235 60% 60% / 0.2)", "0 0 40px hsl(235 60% 60% / 0.35)", "0 0 20px hsl(235 60% 60% / 0.2)"] }}
-                transition={{ duration: 2, repeat: Infinity }}
               >
                 <Play className="w-8 h-8 text-primary-foreground ml-1" />
-              </motion.div>
+              </div>
             </div>
           )}
 

@@ -7,7 +7,7 @@
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:push": "prisma db push --schema prisma/schema.prisma --skip-generate --accept-data-loss",
     "db:fix-duplicate-usernames": "node scripts/fix-duplicate-usernames.js",
-    "prestart": "npm run prisma:generate && npm run db:fix-duplicate-usernames && npm run prisma:push",
+    "prestart": "npm run prisma:generate && npm run prisma:push && npm run db:fix-duplicate-usernames",
     "start": "node dist/main.js",
     "start:dev": "npm run start",
     "build": "tsc -p tsconfig.json"

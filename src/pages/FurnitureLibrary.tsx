@@ -12,6 +12,292 @@ import { cn } from "@/lib/utils";
 import { useCustomFurniture } from "@/hooks/useCustomFurniture";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const normalized = hex.trim().replace("#", "");
+  if (!/^[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(normalized)) return null;
+  const full = normalized.length === 3
+    ? normalized.split("").map((c) => c + c).join("")
+    : normalized;
+
+  const parsed = Number.parseInt(full, 16);
+  return {
+    r: (parsed >> 16) & 255,
+    g: (parsed >> 8) & 255,
+    b: parsed & 255,
+  };
+}
+
+function tintColor(hex: string, delta: number): string {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  const mix = (channel: number) => clamp(Math.round(channel + (255 - channel) * delta), 0, 255);
+  return `rgb(${mix(rgb.r)}, ${mix(rgb.g)}, ${mix(rgb.b)})`;
+}
+
+const FurnitureModelVisual = ({ item, compact = false }: { item: FurnitureItem; compact?: boolean }) => {
+  if (item.thumbnail) {
+    return <img src={item.thumbnail} alt={item.name} className="w-full h-full object-cover" />;
+  }
+
+  const { width, height, depth } = item.dimensions;
+  const maxDim = Math.max(width, height, depth, 0.001);
+  const nw = width / maxDim;
+  const nh = height / maxDim;
+  const nd = depth / maxDim;
+
+  const frontW = compact ? clamp(14 + nw * 24, 14, 34) : clamp(56 + nw * 86, 56, 128);
+  const frontH = compact ? clamp(10 + nh * 26, 10, 34) : clamp(32 + nh * 86, 32, 124);
+  const depthX = compact ? clamp(4 + nd * 6, 4, 11) : clamp(10 + nd * 18, 10, 24);
+  const depthY = compact ? clamp(2 + nd * 4, 2, 8) : clamp(6 + nd * 10, 6, 14);
+
+  const baseColor = item.color;
+  const topColor = tintColor(baseColor, 0.18);
+  const sideColor = tintColor(baseColor, -0.16);
+
+  if (item.category === "lamp") {
+    const stemHeightPct = compact ? clamp(34 + nh * 28, 34, 62) : clamp(36 + nh * 34, 36, 74);
+    const shadeWidthPct = compact ? clamp(28 + nw * 18, 28, 46) : clamp(26 + nw * 22, 26, 52);
+    const shadeHeightPct = compact ? 14 : 16;
+    const baseSizePct = compact ? clamp(16 + nd * 12, 16, 28) : clamp(14 + nd * 10, 14, 26);
+    return (
+      <div className="relative w-full h-full">
+        <div
+          className="absolute left-1/2 -translate-x-1/2 rounded-full"
+          style={{
+            width: `${baseSizePct}%`,
+            height: compact ? "10%" : "9%",
+            bottom: compact ? "8%" : "10%",
+            backgroundColor: sideColor,
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.34)",
+          }}
+        />
+        <div
+          className="absolute left-1/2 -translate-x-1/2 rounded-full"
+          style={{
+            width: compact ? "3.5%" : "3%",
+            height: `${stemHeightPct}%`,
+            bottom: compact ? "16%" : "18%",
+            backgroundColor: baseColor,
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.22)",
+          }}
+        />
+        <div
+          className="absolute left-1/2 -translate-x-1/2 rounded-full"
+          style={{
+            width: `${shadeWidthPct}%`,
+            height: `${shadeHeightPct}%`,
+            bottom: compact ? "44%" : "56%",
+            backgroundColor: topColor,
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.34)",
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (item.category === "sofa") {
+    const seatW = compact ? clamp(58 + nw * 18, 58, 86) : clamp(52 + nw * 26, 52, 84);
+    const seatH = compact ? clamp(20 + nh * 10, 20, 34) : clamp(18 + nh * 14, 18, 36);
+    const backH = compact ? clamp(26 + nh * 12, 26, 44) : clamp(24 + nh * 18, 24, 44);
+    const baseBottom = compact ? 16 : 18;
+    return (
+      <div className="relative w-full h-full">
+        <div
+          className="absolute left-1/2 -translate-x-1/2 rounded-full blur-md"
+          style={{
+            width: `${seatW * 0.98}%`,
+            height: compact ? "9%" : "10%",
+            bottom: compact ? "8%" : "9%",
+            background: "rgba(0,0,0,0.16)",
+          }}
+        />
+        <div
+          className="absolute left-1/2 -translate-x-1/2 rounded-md"
+          style={{
+            width: `${seatW}%`,
+            height: `${seatH}%`,
+            bottom: `${baseBottom}%`,
+            backgroundColor: baseColor,
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.26)",
+          }}
+        />
+        <div
+          className="absolute left-1/2 -translate-x-1/2 rounded-md"
+          style={{
+            width: `${seatW * 0.96}%`,
+            height: `${backH}%`,
+            bottom: `${baseBottom + seatH - (compact ? 3 : 5)}%`,
+            backgroundColor: topColor,
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.26)",
+          }}
+        />
+        <div
+          className="absolute rounded-md"
+          style={{
+            width: compact ? "7%" : "8%",
+            height: `${seatH + (compact ? 8 : 10)}%`,
+            bottom: `${baseBottom}%`,
+            left: `calc(50% - ${seatW / 2}%)`,
+            backgroundColor: sideColor,
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.18)",
+          }}
+        />
+        <div
+          className="absolute rounded-md"
+          style={{
+            width: compact ? "7%" : "8%",
+            height: `${seatH + (compact ? 8 : 10)}%`,
+            bottom: `${baseBottom}%`,
+            left: `calc(50% + ${seatW / 2 - (compact ? 7 : 8)}%)`,
+            backgroundColor: sideColor,
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.18)",
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (item.category === "chair") {
+    const seatW = compact ? clamp(12 + nw * 10, 12, 22) : clamp(42 + nw * 44, 42, 92);
+    const seatH = compact ? clamp(5 + nh * 5, 5, 11) : clamp(16 + nh * 20, 16, 42);
+    const backH = compact ? clamp(8 + nh * 10, 8, 18) : clamp(28 + nh * 40, 28, 68);
+    return (
+      <div className="relative w-full h-full">
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-full blur-md" style={{ width: seatW * 1.15, height: compact ? 4 : 12, bottom: compact ? 1 : 6, background: "rgba(0,0,0,0.15)" }} />
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-md" style={{ width: seatW, height: seatH, bottom: compact ? 5 : 14, backgroundColor: baseColor }} />
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-md" style={{ width: seatW * 0.78, height: backH, bottom: (compact ? 5 : 14) + seatH - (compact ? 2 : 4), backgroundColor: topColor }} />
+        <div className="absolute rounded-sm" style={{ width: compact ? 1 : 4, height: compact ? 5 : 14, bottom: compact ? 1 : 4, left: `calc(50% - ${seatW / 2}px)`, backgroundColor: sideColor }} />
+        <div className="absolute rounded-sm" style={{ width: compact ? 1 : 4, height: compact ? 5 : 14, bottom: compact ? 1 : 4, left: `calc(50% + ${seatW / 2 - (compact ? 1 : 4)}px)`, backgroundColor: sideColor }} />
+      </div>
+    );
+  }
+
+  if (item.category === "table") {
+    const topW = compact ? clamp(14 + nw * 16, 14, 30) : clamp(54 + nw * 64, 54, 132);
+    const topD = compact ? clamp(8 + nd * 8, 8, 16) : clamp(24 + nd * 34, 24, 60);
+    const legH = compact ? clamp(8 + nh * 10, 8, 18) : clamp(28 + nh * 46, 28, 76);
+    return (
+      <div className="relative w-full h-full">
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-full blur-md" style={{ width: topW * 1.05, height: compact ? 4 : 12, bottom: compact ? 1 : 6, background: "rgba(0,0,0,0.14)" }} />
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-md" style={{ width: topW, height: compact ? 3 : 8, bottom: legH + (compact ? 6 : 12), backgroundColor: topColor }} />
+        <div className="absolute left-1/2 -translate-x-1/2" style={{ width: topW, height: topD, bottom: legH + (compact ? 6 : 8), transform: "skewX(-20deg)", backgroundColor: tintColor(baseColor, 0.08), opacity: 0.55 }} />
+        <div className="absolute rounded-sm" style={{ width: compact ? 1 : 4, height: legH, bottom: compact ? 2 : 6, left: `calc(50% - ${topW / 2}px)`, backgroundColor: sideColor }} />
+        <div className="absolute rounded-sm" style={{ width: compact ? 1 : 4, height: legH, bottom: compact ? 2 : 6, left: `calc(50% + ${topW / 2 - (compact ? 1 : 4)}px)`, backgroundColor: sideColor }} />
+      </div>
+    );
+  }
+
+  if (item.category === "bed") {
+    const frameW = compact ? clamp(16 + nw * 16, 16, 32) : clamp(64 + nw * 64, 64, 140);
+    const frameH = compact ? clamp(7 + nh * 8, 7, 14) : clamp(20 + nh * 24, 20, 44);
+    return (
+      <div className="relative w-full h-full">
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-full blur-md" style={{ width: frameW * 1.1, height: compact ? 4 : 14, bottom: compact ? 1 : 6, background: "rgba(0,0,0,0.16)" }} />
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-md" style={{ width: frameW, height: frameH, bottom: compact ? 4 : 12, backgroundColor: baseColor }} />
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-md border border-white/40" style={{ width: frameW * 0.92, height: frameH * 0.62, bottom: (compact ? 4 : 12) + frameH * 0.22, backgroundColor: tintColor(baseColor, 0.28) }} />
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-md" style={{ width: frameW * 0.96, height: compact ? 4 : 12, bottom: (compact ? 4 : 12) + frameH - (compact ? 1 : 3), backgroundColor: sideColor }} />
+      </div>
+    );
+  }
+
+  if (item.category === "shelf" || item.category === "storage") {
+    const bodyW = compact ? clamp(10 + nw * 10, 10, 20) : clamp(40 + nw * 44, 40, 94);
+    const bodyH = compact ? clamp(12 + nh * 16, 12, 30) : clamp(40 + nh * 70, 40, 130);
+    return (
+      <div className="relative w-full h-full">
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-full blur-md" style={{ width: bodyW * 1.18, height: compact ? 4 : 12, bottom: compact ? 1 : 5, background: "rgba(0,0,0,0.14)" }} />
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-md border border-white/30" style={{ width: bodyW, height: bodyH, bottom: compact ? 4 : 12, backgroundColor: baseColor }} />
+        {[0.25, 0.5, 0.75].map((row) => (
+          <div
+            key={row}
+            className="absolute left-1/2 -translate-x-1/2"
+            style={{
+              width: bodyW * 0.9,
+              height: compact ? 1 : 3,
+              bottom: (compact ? 4 : 12) + bodyH * row,
+              backgroundColor: topColor,
+              opacity: 0.9,
+            }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (item.category === "rug") {
+    const rugW = compact ? clamp(15 + nw * 16, 15, 34) : clamp(62 + nw * 66, 62, 140);
+    const rugH = compact ? clamp(2 + nh * 2, 2, 5) : clamp(4 + nh * 8, 4, 12);
+    return (
+      <div className="relative w-full h-full">
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-full blur-md" style={{ width: rugW * 0.95, height: compact ? 3 : 10, bottom: compact ? 1 : 8, background: "rgba(0,0,0,0.12)" }} />
+        <div className="absolute left-1/2 -translate-x-1/2 rounded-md border border-white/40" style={{ width: rugW, height: rugH, bottom: compact ? 5 : 14, backgroundColor: baseColor }} />
+      </div>
+    );
+  }
+
+  if (item.category === "plant") {
+    return (
+      <div className="relative w-full h-full">
+        <div className={cn("absolute left-1/2 -translate-x-1/2 rounded-full", compact ? "w-5 h-3 bottom-3" : "w-16 h-10 bottom-14")} style={{ backgroundColor: "#2f8f52" }} />
+        <div className={cn("absolute left-1/2 -translate-x-1/2 rounded-full", compact ? "w-4 h-4 bottom-6" : "w-12 h-12 bottom-22")} style={{ backgroundColor: "#49a96b" }} />
+        <div className={cn("absolute left-1/2 -translate-x-1/2 rounded-b-xl", compact ? "w-3 h-2 bottom-1.5" : "w-10 h-8 bottom-6")} style={{ backgroundColor: sideColor }} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full flex items-end justify-center">
+      <div
+        className="absolute rounded-full blur-md"
+        style={{
+          width: compact ? frontW * 1.05 : frontW * 1.18,
+          height: compact ? 6 : 16,
+          bottom: compact ? 1 : 6,
+          background: "rgba(0,0,0,0.16)",
+        }}
+      />
+
+      <div
+        className="absolute"
+        style={{
+          width: frontW,
+          height: frontH,
+          bottom: compact ? 4 : 14,
+          transform: `translateX(${-depthX / 2}px)`,
+        }}
+      >
+        <div className="absolute inset-0 rounded-md" style={{ backgroundColor: baseColor }} />
+        <div
+          className="absolute rounded-md"
+          style={{
+            top: -depthY,
+            left: depthX,
+            width: frontW,
+            height: depthY,
+            backgroundColor: topColor,
+            clipPath: "polygon(0 100%, 100% 100%, calc(100% - var(--dx)) 0, var(--dx) 0)",
+            ["--dx" as string]: `${depthX}px`,
+          }}
+        />
+        <div
+          className="absolute rounded-md"
+          style={{
+            top: 0,
+            right: -depthX,
+            width: depthX,
+            height: frontH,
+            backgroundColor: sideColor,
+            clipPath: "polygon(0 0, 100% var(--dy), 100% calc(100% + var(--dy)), 0 100%)",
+            ["--dy" as string]: `${depthY}px`,
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 const FurnitureLibrary = () => {
   const { t } = useLanguage();
   const { customItems } = useCustomFurniture();
@@ -159,17 +445,9 @@ const FurnitureCard = ({ item, index, isFav, onToggleFav, onARPreview }: {
     {/* Preview */}
     <div className="aspect-square relative flex items-center justify-center"
       style={{ backgroundColor: item.color + "15" }}>
-      <div
-        className="rounded-lg group-hover:scale-110 transition-transform duration-500"
-        style={{
-          width: `${Math.min(80, item.dimensions.width * 40)}%`,
-          height: `${Math.min(80, item.dimensions.depth * 40)}%`,
-          backgroundColor: item.color,
-          opacity: 0.7,
-          minWidth: 40,
-          minHeight: 40,
-        }}
-      />
+      <div className="absolute inset-0 p-4 group-hover:scale-[1.03] transition-transform duration-500">
+        <FurnitureModelVisual item={item} />
+      </div>
       <button
         onClick={(e) => { e.stopPropagation(); onToggleFav(item.id); }}
         className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"
@@ -214,7 +492,7 @@ const FurnitureListItem = ({ item, index, isFav, onToggleFav, onARPreview }: {
   >
     <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
       style={{ backgroundColor: item.color + "20" }}>
-      <div className="w-6 h-6 rounded-sm" style={{ backgroundColor: item.color, opacity: 0.7 }} />
+      <FurnitureModelVisual item={item} compact />
     </div>
     <div className="flex-1 min-w-0">
       <p className="text-sm font-medium text-foreground truncate">{item.name}</p>

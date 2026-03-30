@@ -24,6 +24,8 @@ export interface PlacedObject {
   furnitureId: string;
   name: string;
   category: FurnitureItem["category"];
+  modelUrl?: string;
+  usdzUrl?: string;
   position: [number, number, number];
   rotation: [number, number, number];
   scale: [number, number, number];

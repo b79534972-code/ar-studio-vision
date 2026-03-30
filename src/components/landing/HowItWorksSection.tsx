@@ -26,7 +26,7 @@ const HowItWorksSection = () => {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(8px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: false, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center mb-10 md:mb-16"
         >
@@ -49,14 +49,7 @@ const HowItWorksSection = () => {
           />
 
           {steps.map((step, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 50, scale: 0.95, filter: "blur(6px)" }}
-              whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.15 }}
-              className="relative text-center"
-            >
+            <div key={i} className="relative text-center">
               <motion.div
                 className="w-14 h-14 md:w-16 md:h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4 md:mb-6 relative z-10"
                 style={{ boxShadow: "var(--shadow-soft), 0 0 20px hsl(235 60% 60% / 0.12)" }}
@@ -74,7 +67,7 @@ const HowItWorksSection = () => {
               <p className="text-xs md:text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
                 {step.desc}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

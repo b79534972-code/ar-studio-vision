@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthService } from "@/services/AuthService";
-import { useToast } from "@/hooks/use-toast";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -17,8 +16,8 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
+  const [authError, setAuthError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   const validate = () => {
     const newErrors: typeof errors = {};
@@ -31,16 +30,13 @@ const SignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    setAuthError("");
     setLoading(true);
     try {
       await AuthService.login(identifier.trim(), password);
       navigate(redirect === "ar" ? "/ar-demo" : "/dashboard");
     } catch (error) {
-      toast({
-        title: "Sign in failed",
-        description: error instanceof Error ? error.message : "Invalid username/email or password",
-        variant: "destructive",
-      });
+      setAuthError(error instanceof Error ? error.message : "Invalid username/email or password");
     } finally {
       setLoading(false);
     }
@@ -76,7 +72,11 @@ const SignIn = () => {
                 type="text"
                 placeholder="username or you@example.com"
                 value={identifier}
-                onChange={(e) => { setIdentifier(e.target.value); setErrors((p) => ({ ...p, identifier: undefined })); }}
+                onChange={(e) => {
+                  setIdentifier(e.target.value);
+                  setErrors((p) => ({ ...p, identifier: undefined }));
+                  setAuthError("");
+                }}
                 className={errors.identifier ? "border-destructive" : ""}
               />
               {errors.identifier && <p className="text-xs text-destructive">{errors.identifier}</p>}
@@ -90,7 +90,11 @@ const SignIn = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value); setErrors((p) => ({ ...p, password: undefined })); }}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrors((p) => ({ ...p, password: undefined }));
+                    setAuthError("");
+                  }}
                   className={errors.password ? "border-destructive pr-10" : "pr-10"}
                 />
                 <button
@@ -107,6 +111,12 @@ const SignIn = () => {
             <Button variant="hero" size="lg" className="w-full" type="submit" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
+
+            {authError && (
+              <p className="text-sm text-destructive text-center" role="alert">
+                {authError}
+              </p>
+            )}
           </form>
 
           <div className="relative my-6">

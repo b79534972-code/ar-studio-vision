@@ -14,31 +14,41 @@ export interface DetectionResult {
     reason: string;
 }
 
+let detectionPromise: Promise<DetectionResult> | null = null;
+
 /**
  * Detect the best AR platform for the current device.
- * Uses feature detection first, UA-sniffing only for iOS fallback.
+ * Uses feature detection first, then iOS fallback.
  */
 export async function detectPlatform(): Promise<DetectionResult> {
-    // 1. Try WebXR feature detection
-    if ("xr" in navigator) {
-        try {
-            const xr = (navigator as Navigator & { xr: XRSystem }).xr;
-            const supported = await xr.isSessionSupported("immersive-ar");
-            if (supported) {
-                return { platform: "webxr", reason: "WebXR immersive-ar supported" };
+    if (detectionPromise) {
+        return detectionPromise;
+    }
+
+    detectionPromise = (async () => {
+        // Try WebXR feature detection first.
+        // Some newer iOS/WebKit builds can expose immersive-ar support.
+        if ("xr" in navigator) {
+            try {
+                const xr = (navigator as Navigator & { xr: XRSystem }).xr;
+                const supported = await xr.isSessionSupported("immersive-ar");
+                if (supported) {
+                    return { platform: "webxr", reason: "WebXR immersive-ar supported" };
+                }
+            } catch {
+                // WebXR API exists but session not supported — continue
             }
-        } catch {
-            // WebXR API exists but session not supported — continue
         }
-    }
 
-    // 2. iOS detection for AR Quick Look fallback
-    if (isIOS()) {
-        return { platform: "quicklook", reason: "iOS detected — using AR Quick Look" };
-    }
+        // iOS fallback: use native Quick Look when immersive WebXR is unavailable.
+        if (isIOS()) {
+            return { platform: "quicklook", reason: "iOS fallback — using AR Quick Look" };
+        }
 
-    // 3. Desktop / unsupported fallback
-    return { platform: "desktop", reason: "No AR support — using 3D viewer" };
+        return { platform: "desktop", reason: "No AR support — using 3D viewer" };
+    })();
+
+    return detectionPromise;
 }
 
 /**

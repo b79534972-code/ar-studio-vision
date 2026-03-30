@@ -1,4 +1,4 @@
-import { Trash2, Copy, RotateCw } from "lucide-react";
+import { Trash2, Copy, RotateCw, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -150,32 +150,65 @@ const EditorPropertiesPanel = ({
 
         <Separator />
 
-        {/* Scale */}
-        <div className="space-y-2">
-          <Label className="text-xs font-medium">Scale</Label>
-          <Slider
-            value={[obj.scale[0]]}
-            min={0.5}
-            max={2}
-            step={0.1}
-            onValueChange={([v]) => {
-              onUpdateObject(obj.id, { scale: [v, v, v] });
-            }}
-          />
-          <p className="text-[10px] text-muted-foreground">{(obj.scale[0] * 100).toFixed(0)}%</p>
-        </div>
+        {/* Size & Proportions */}
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <Label className="text-xs font-medium">Size</Label>
+            <div className="flex items-center gap-2">
+              <Slider
+                value={[obj.scale[0] * 100]}
+                min={20}
+                max={200}
+                step={5}
+                onValueChange={([v]) => {
+                  const ratio = v / 100;
+                  onUpdateObject(obj.id, { scale: [ratio, ratio, ratio] });
+                }}
+                className="flex-1"
+              />
+              <span className="text-[10px] text-muted-foreground w-10 text-right">{(obj.scale[0] * 100).toFixed(0)}%</span>
+            </div>
+          </div>
 
-        <Separator />
-
-        {/* Color */}
-        <div className="space-y-2">
-          <Label className="text-xs font-medium">Color</Label>
-          <input
-            type="color"
-            value={obj.color}
-            onChange={(e) => onUpdateObject(obj.id, { color: e.target.value })}
-            className="w-full h-8 rounded-lg cursor-pointer border border-border/40"
-          />
+          <div className="space-y-2">
+            <Label className="text-xs font-medium">Proportions</Label>
+            <div className="space-y-2 text-[10px]">
+              {/* Width : Height ratio */}
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground w-12">W:H</span>
+                <Slider
+                  value={[obj.scale[0] / obj.scale[1]]}
+                  min={0.3}
+                  max={3}
+                  step={0.1}
+                  onValueChange={([ratio]) => {
+                    const s = [...obj.scale] as [number, number, number];
+                    s[0] = s[1] * ratio;
+                    onUpdateObject(obj.id, { scale: s });
+                  }}
+                  className="flex-1"
+                />
+                <span className="text-muted-foreground w-10 text-right">{(obj.scale[0] / obj.scale[1]).toFixed(2)}</span>
+              </div>
+              {/* Depth : Height ratio */}
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground w-12">D:H</span>
+                <Slider
+                  value={[obj.scale[2] / obj.scale[1]]}
+                  min={0.3}
+                  max={3}
+                  step={0.1}
+                  onValueChange={([ratio]) => {
+                    const s = [...obj.scale] as [number, number, number];
+                    s[2] = s[1] * ratio;
+                    onUpdateObject(obj.id, { scale: s });
+                  }}
+                  className="flex-1"
+                />
+                <span className="text-muted-foreground w-10 text-right">{(obj.scale[2] / obj.scale[1]).toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <Separator />
@@ -215,6 +248,16 @@ const EditorPropertiesPanel = ({
             <RotateCw className="w-3 h-3" /> Rotate
           </Button>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full gap-1.5 text-xs h-8"
+          onClick={() => {
+            onUpdateObject(obj.id, { position: [0, 0, 0], rotation: [0, 0, 0], scale: [1, 1, 1] });
+          }}
+        >
+          <Zap className="w-3 h-3" /> Reset
+        </Button>
         <Button
           variant="destructive"
           size="sm"

@@ -39,9 +39,11 @@ export interface UseAREngineReturn {
 export function useAREngine(options: {
   glb?: string;
   usdz?: string;
+  forcePlatform?: ARPlatform;
 }): UseAREngineReturn {
   const containerRef = useRef<HTMLDivElement>(null!);
   const engineRef = useRef<IAREngine | null>(null);
+  const prewarmedEngineRef = useRef<Promise<IAREngine> | null>(null);
 
   const [platform, setPlatform] = useState<ARPlatform | null>(null);
   const [detectionReason, setDetectionReason] = useState<string | null>(null);
@@ -52,6 +54,14 @@ export function useAREngine(options: {
   // Detect platform on mount
   useEffect(() => {
     let cancelled = false;
+
+    if (options.forcePlatform) {
+      setPlatform(options.forcePlatform);
+      setDetectionReason(`Forced mode: ${options.forcePlatform}`);
+      setDetecting(false);
+      return () => { cancelled = true; };
+    }
+
     detectPlatform().then((result: DetectionResult) => {
       if (cancelled) return;
       setPlatform(result.platform);
@@ -59,14 +69,24 @@ export function useAREngine(options: {
       setDetecting(false);
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [options.forcePlatform]);
+
+  // Prewarm dynamic engine import so Start button feels more responsive.
+  useEffect(() => {
+    if (!platform || prewarmedEngineRef.current) return;
+
+    prewarmedEngineRef.current = loadEngine(platform);
+  }, [platform]);
 
   const startEngine = useCallback(async () => {
     if (!platform || !containerRef.current) return;
 
     try {
       setError(null);
-      const engine = await loadEngine(platform);
+      const engine = prewarmedEngineRef.current
+        ? await prewarmedEngineRef.current
+        : await loadEngine(platform);
+      prewarmedEngineRef.current = null;
       engineRef.current = engine;
 
       await engine.init({
@@ -83,11 +103,12 @@ export function useAREngine(options: {
       setError(errorMessage);
       setEngineState("error");
     }
-  }, [platform]);
+  }, [platform, options.glb, options.usdz]);
 
   const disposeEngine = useCallback(() => {
     engineRef.current?.dispose();
     engineRef.current = null;
+    prewarmedEngineRef.current = null;
     setEngineState("idle");
     setError(null);
   }, []);
@@ -101,6 +122,7 @@ export function useAREngine(options: {
     return () => {
       engineRef.current?.dispose();
       engineRef.current = null;
+      prewarmedEngineRef.current = null;
     };
   }, []);
 

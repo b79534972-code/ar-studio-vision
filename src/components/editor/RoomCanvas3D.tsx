@@ -1,57 +1,245 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { Canvas, useThree, useFrame, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Grid, Environment, ContactShadows, Html } from "@react-three/drei";
 import type { PlacedObject, RoomConfig } from "@/types/editor";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+/* ─── Wall detection helper ─── */
+type WallPlane = 'floor' | 'front' | 'back' | 'left' | 'right';
+
+const clampPositionToRoom = (
+  position: [number, number, number],
+  dimensions: { width: number; height: number; depth: number },
+  scale: [number, number, number],
+  roomConfig: RoomConfig,
+  wallType: WallPlane
+): [number, number, number] => {
+  const scaledW = dimensions.width * scale[0];
+  const scaledH = dimensions.height * scale[1];
+  const scaledD = dimensions.depth * scale[2];
+  const [x, y, z] = position;
+  
+  let newX = x, newY = y, newZ = z;
+  
+  if (wallType === 'floor') {
+    // Clamp to room bounds (with half-width/depth margin)
+    newX = Math.max(-roomConfig.width / 2 + scaledW / 2, Math.min(roomConfig.width / 2 - scaledW / 2, x));
+    newZ = Math.max(-roomConfig.depth / 2 + scaledD / 2, Math.min(roomConfig.depth / 2 - scaledD / 2, z));
+    newY = 0; // Always on floor
+  } else if (wallType === 'front' || wallType === 'back') {
+    // Lock Z to wall, allow X height variation
+    newZ = wallType === 'front' ? -roomConfig.depth / 2 + scaledD / 2 : roomConfig.depth / 2 - scaledD / 2;
+    newX = Math.max(-roomConfig.width / 2 + scaledW / 2, Math.min(roomConfig.width / 2 - scaledW / 2, x));
+    newY = Math.max(scaledH / 2, Math.min(roomConfig.height - scaledH / 2, y));
+  } else if (wallType === 'left' || wallType === 'right') {
+    // Lock X to wall, allow Z height variation
+    newX = wallType === 'left' ? -roomConfig.width / 2 + scaledW / 2 : roomConfig.width / 2 - scaledW / 2;
+    newZ = Math.max(-roomConfig.depth / 2 + scaledD / 2, Math.min(roomConfig.depth / 2 - scaledD / 2, z));
+    newY = Math.max(scaledH / 2, Math.min(roomConfig.height - scaledH / 2, y));
+  }
+  
+  return [newX, newY, newZ];
+};
+
+const getActivePlane = (position: [number, number, number], roomConfig: RoomConfig): { plane: THREE.Plane; type: WallPlane } => {
+  const x = position[0];
+  const z = position[2];
+  const yTol = 0.3;
+  const xTol = 0.3;
+  const zTol = 0.3;
+  
+  const distToFront = Math.abs(z + roomConfig.depth / 2);
+  const distToBack = Math.abs(z - roomConfig.depth / 2);
+  const distToLeft = Math.abs(x + roomConfig.width / 2);
+  const distToRight = Math.abs(x - roomConfig.width / 2);
+  const distToFloor = position[1];
+  
+  const distances = [
+    { dist: distToFront, type: 'front' as WallPlane, plane: new THREE.Plane(new THREE.Vector3(0, 0, 1), -roomConfig.depth / 2) },
+    { dist: distToBack, type: 'back' as WallPlane, plane: new THREE.Plane(new THREE.Vector3(0, 0, -1), -roomConfig.depth / 2) },
+    { dist: distToLeft, type: 'left' as WallPlane, plane: new THREE.Plane(new THREE.Vector3(1, 0, 0), -roomConfig.width / 2) },
+    { dist: distToRight, type: 'right' as WallPlane, plane: new THREE.Plane(new THREE.Vector3(-1, 0, 0), -roomConfig.width / 2) },
+  ];
+  
+  distances.sort((a, b) => a.dist - b.dist);
+  if (distances[0].dist < 0.36) {
+    return { type: distances[0].type, plane: distances[0].plane };
+  }
+  
+  return { type: 'floor', plane: new THREE.Plane(new THREE.Vector3(0, 1, 0), 0) };
+};
 
 /* ─── Draggable Furniture mesh ─── */
-const FurnitureMesh = ({ obj, selected, onSelect, onDrag }: {
+const FurnitureMesh = ({ obj, selected, onSelect, onDrag, roomConfig }: {
   obj: PlacedObject;
   selected: boolean;
   onSelect: (id: string) => void;
   onDrag: (id: string, position: [number, number, number]) => void;
+  roomConfig: RoomConfig;
 }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const floorPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0));
-  const dragOffset = useRef(new THREE.Vector3());
+  const [modelScene, setModelScene] = useState<THREE.Object3D | null>(null);
+  const [modelFailed, setModelFailed] = useState(false);
+  const dragPlane = useRef<THREE.Plane>(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0));
+  const dragPlaneType = useRef<WallPlane>('floor');
+  const dragOffset = useRef<THREE.Vector3>(new THREE.Vector3());
 
   const { width, height, depth } = obj.dimensions;
   const scaledW = width * obj.scale[0];
   const scaledH = height * obj.scale[1];
   const scaledD = depth * obj.scale[2];
 
+  useEffect(() => {
+    if (!obj.modelUrl) {
+      setModelScene(null);
+      setModelFailed(false);
+      return;
+    }
+
+    let cancelled = false;
+    const loader = new GLTFLoader();
+
+    setModelFailed(false);
+    loader.load(
+      obj.modelUrl,
+      (gltf) => {
+        if (cancelled) return;
+        setModelScene(gltf.scene.clone(true));
+      },
+      undefined,
+      () => {
+        if (cancelled) return;
+        setModelScene(null);
+        setModelFailed(true);
+      }
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [obj.modelUrl]);
+
+  const modelTransform = useMemo(() => {
+    if (!modelScene) {
+      return {
+        scale: 1,
+        position: [0, 0, 0] as [number, number, number],
+      };
+    }
+
+    const box = new THREE.Box3().setFromObject(modelScene);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+
+    const safeW = size.x || 1;
+    const safeH = size.y || 1;
+    const safeD = size.z || 1;
+    const fitScale = Math.min(scaledW / safeW, scaledH / safeH, scaledD / safeD);
+
+    return {
+      scale: fitScale,
+      position: [
+        -center.x * fitScale,
+        -box.min.y * fitScale,
+        -center.z * fitScale,
+      ] as [number, number, number],
+    };
+  }, [modelScene, scaledW, scaledH, scaledD]);
+
+  const showFallbackGeometry = !modelScene || modelFailed;
+
   const handlePointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     onSelect(obj.id);
 
+    // Detect wall or floor
+    const { plane, type } = getActivePlane(obj.position, roomConfig);
+    dragPlane.current = plane;
+    dragPlaneType.current = type;
+
     // Calculate drag offset
     const intersect = new THREE.Vector3();
-    e.ray.intersectPlane(floorPlane.current, intersect);
-    dragOffset.current.set(
-      intersect.x - obj.position[0],
-      0,
-      intersect.z - obj.position[2]
-    );
+    e.ray.intersectPlane(plane, intersect);
+    
+    if (type === 'floor') {
+      dragOffset.current.set(
+        intersect.x - obj.position[0],
+        0,
+        intersect.z - obj.position[2]
+      );
+    } else if (type === 'front' || type === 'back') {
+      dragOffset.current.set(
+        intersect.x - obj.position[0],
+        intersect.y - obj.position[1],
+        0
+      );
+    } else if (type === 'left' || type === 'right') {
+      dragOffset.current.set(
+        0,
+        intersect.y - obj.position[1],
+        intersect.z - obj.position[2]
+      );
+    }
 
     setDragging(true);
     (e.target as HTMLElement)?.setPointerCapture?.(e.pointerId);
     document.body.style.cursor = "grabbing";
-  }, [obj.id, obj.position, onSelect]);
+  }, [obj.id, obj.position, onSelect, roomConfig]);
 
   const handlePointerMove = useCallback((e: ThreeEvent<PointerEvent>) => {
     if (!dragging) return;
     e.stopPropagation();
 
     const intersect = new THREE.Vector3();
-    e.ray.intersectPlane(floorPlane.current, intersect);
+    e.ray.intersectPlane(dragPlane.current, intersect);
 
-    const newX = intersect.x - dragOffset.current.x;
-    const newZ = intersect.z - dragOffset.current.z;
+    let newPos: [number, number, number] = [...obj.position];
 
-    onDrag(obj.id, [newX, obj.position[1], newZ]);
-  }, [dragging, obj.id, obj.position, onDrag]);
+    // When on wall, check if dragging down should switch to floor
+    if (dragPlaneType.current !== 'floor') {
+      const intendedY = intersect.y - dragOffset.current.y;
+      
+      // If dragging down below drawable height, switch to floor plane
+      if (intendedY < scaledH / 2 + 0.1) {
+        dragPlaneType.current = 'floor';
+        dragPlane.current = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        
+        // Re-intersect with floor plane to get valid X, Z
+        e.ray.intersectPlane(dragPlane.current, intersect);
+        dragOffset.current.set(
+          intersect.x - obj.position[0],
+          0,
+          intersect.z - obj.position[2]
+        );
+        
+        // Re-intersect to get new position
+        e.ray.intersectPlane(dragPlane.current, intersect);
+        newPos[0] = intersect.x - dragOffset.current.x;
+        newPos[1] = 0; // Floor level
+        newPos[2] = intersect.z - dragOffset.current.z;
+      } else if (dragPlaneType.current === 'front' || dragPlaneType.current === 'back') {
+        newPos[0] = intersect.x - dragOffset.current.x;
+        newPos[1] = intendedY; // Allow free Y movement
+      } else if (dragPlaneType.current === 'left' || dragPlaneType.current === 'right') {
+        newPos[2] = intersect.z - dragOffset.current.z;
+        newPos[1] = intendedY; // Allow free Y movement
+      }
+    } else {
+      // On floor plane
+      newPos[0] = intersect.x - dragOffset.current.x;
+      newPos[2] = intersect.z - dragOffset.current.z;
+      newPos[1] = 0;
+    }
+
+    // Clamp to room bounds
+    const clamped = clampPositionToRoom(newPos, obj.dimensions, obj.scale, roomConfig, dragPlaneType.current);
+    onDrag(obj.id, clamped);
+  }, [dragging, obj.id, obj.position, obj.dimensions, obj.scale, onDrag, roomConfig, scaledH]);
 
   const handlePointerUp = useCallback((e: ThreeEvent<PointerEvent>) => {
     if (!dragging) return;
@@ -64,6 +252,11 @@ const FurnitureMesh = ({ obj, selected, onSelect, onDrag }: {
     <group
       position={obj.position}
       rotation={obj.rotation.map((r) => (r * Math.PI) / 180) as [number, number, number]}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerOver={(e) => { e.stopPropagation(); setHovered(true); document.body.style.cursor = dragging ? "grabbing" : "grab"; }}
+      onPointerOut={() => { if (!dragging) { setHovered(false); document.body.style.cursor = "default"; } }}
     >
       <mesh
         ref={meshRef}
@@ -76,29 +269,35 @@ const FurnitureMesh = ({ obj, selected, onSelect, onDrag }: {
         castShadow
         receiveShadow
       >
-        {obj.category === "lamp" ? (
-          <cylinderGeometry args={[scaledW * 0.15, scaledW * 0.3, scaledH, 8]} />
-        ) : obj.category === "plant" ? (
-          <cylinderGeometry args={[scaledW * 0.3, scaledW * 0.4, scaledH, 12]} />
-        ) : obj.category === "rug" ? (
-          <boxGeometry args={[scaledW, 0.02, scaledD]} />
-        ) : (
-          <boxGeometry args={[scaledW, scaledH, scaledD]} />
-        )}
-        <meshStandardMaterial
-          color={obj.color}
-          transparent={hovered || selected}
-          opacity={hovered || selected ? 0.85 : 1}
-          roughness={0.6}
-          metalness={0.1}
-        />
+        {/* Hidden geometry for interaction only */}
       </mesh>
 
-      {/* Selection outline */}
-      {selected && (
-        <mesh position={[0, scaledH / 2, 0]}>
-          <boxGeometry args={[scaledW + 0.04, scaledH + 0.04, scaledD + 0.04]} />
-          <meshBasicMaterial color="#4F46E5" wireframe transparent opacity={0.5} />
+      {modelScene && !modelFailed && (
+        <primitive
+          object={modelScene}
+          position={modelTransform.position}
+          scale={modelTransform.scale}
+        />
+      )}
+
+      {showFallbackGeometry && (
+        <mesh position={[0, scaledH / 2, 0]} castShadow receiveShadow>
+          {obj.category === "lamp" ? (
+            <cylinderGeometry args={[scaledW * 0.15, scaledW * 0.3, scaledH, 8]} />
+          ) : obj.category === "plant" ? (
+            <cylinderGeometry args={[scaledW * 0.3, scaledW * 0.4, scaledH, 12]} />
+          ) : obj.category === "rug" ? (
+            <boxGeometry args={[scaledW, 0.02, scaledD]} />
+          ) : (
+            <boxGeometry args={[scaledW, scaledH, scaledD]} />
+          )}
+          <meshStandardMaterial
+            color={obj.color}
+            transparent={hovered || selected}
+            opacity={hovered || selected ? 0.85 : 1}
+            roughness={0.6}
+            metalness={0.1}
+          />
         </mesh>
       )}
 
@@ -240,6 +439,7 @@ const RoomCanvas3D = ({ objects, roomConfig, selectedId, onSelectObject, onUpdat
             selected={selectedId === obj.id}
             onSelect={onSelectObject}
             onDrag={handleDrag}
+            roomConfig={roomConfig}
           />
         ))}
 

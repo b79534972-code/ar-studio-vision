@@ -24,7 +24,7 @@ const FinalCTASection = () => {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(8px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: false, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center max-w-3xl mx-auto"
         >
@@ -43,19 +43,9 @@ const FinalCTASection = () => {
             {tips.map((tip, index) => {
               const Icon = tip.icon;
               return (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: false, amount: 0.3 }}
-                  transition={{ duration: 0.5, ease: "easeOut", delay: index * 0.15 }}
-                  whileHover={{
-                    y: -6,
-                    scale: 1.03,
-                    boxShadow: "var(--shadow-elevated), 0 0 28px hsl(235 60% 60% / 0.14)",
-                    borderColor: "hsl(235 60% 52% / 0.25)",
-                  }}
-                  className="flex items-center gap-3 border border-primary/10 rounded-xl px-4 py-4 transition-all duration-300"
+                  className="flex items-center gap-3 border border-primary/10 rounded-xl px-4 py-4 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-primary/25"
                   style={{
                     background: "hsl(var(--background) / 0.6)",
                     backdropFilter: "blur(12px)",
@@ -63,7 +53,7 @@ const FinalCTASection = () => {
                 >
                   <Icon className="w-5 h-5 text-primary" />
                   <span className="text-sm text-muted-foreground">{tip.text}</span>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -71,7 +61,7 @@ const FinalCTASection = () => {
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
           >
             <Button

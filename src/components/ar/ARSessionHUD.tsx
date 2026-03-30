@@ -13,7 +13,7 @@ interface ARSessionHUDProps {
 }
 
 const stateLabel: Record<string, string> = {
-  scanning: "Scanning surfaces…",
+  scanning: "Move phone slowly toward floor/table to detect a surface",
   ready: "Tap to place furniture",
   placed: "Object placed — pinch & rotate to adjust",
 };

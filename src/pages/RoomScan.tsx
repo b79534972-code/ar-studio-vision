@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/hooks/use-toast";
 import {
   Upload,
   Camera,
@@ -21,46 +22,16 @@ import {
   Box,
   Ruler,
 } from "lucide-react";
+import { ModelGenerationService, type RoomScanResult } from "@/services/ModelGenerationService";
 
 type ScanPhase = "upload" | "processing" | "result";
 
-interface DetectedRoom {
-  width: number;
-  depth: number;
-  height: number;
-  wallColor: string;
-  floorColor: string;
-  confidence: number;
-  walls: { id: string; from: [number, number]; to: [number, number] }[];
-}
-
-// Mock AI analysis that produces a room config
-function mockAnalyzeRoom(): Promise<DetectedRoom> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const w = +(3 + Math.random() * 5).toFixed(1);
-      const d = +(3 + Math.random() * 4).toFixed(1);
-      resolve({
-        width: w,
-        depth: d,
-        height: 2.7,
-        wallColor: "#F5F5F4",
-        floorColor: "#D6D3D1",
-        confidence: +(75 + Math.random() * 20).toFixed(0),
-        walls: [
-          { id: "w1", from: [0, 0], to: [w, 0] },
-          { id: "w2", from: [w, 0], to: [w, d] },
-          { id: "w3", from: [w, d], to: [0, d] },
-          { id: "w4", from: [0, d], to: [0, 0] },
-        ],
-      });
-    }, 3500);
-  });
-}
+type DetectedRoom = RoomScanResult;
 
 const RoomScan = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState<ScanPhase>("upload");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -71,28 +42,41 @@ const RoomScan = () => {
     const reader = new FileReader();
     reader.onload = (e) => {
       setImagePreview(e.target?.result as string);
-      startProcessing();
+      void startProcessing(file);
     };
     reader.readAsDataURL(file);
   }, []);
 
-  const startProcessing = useCallback(async () => {
+  const startProcessing = useCallback(async (file: File) => {
     setPhase("processing");
     setProgress(0);
 
-    // Animate progress
-    const steps = [12, 28, 45, 62, 78, 88, 95];
-    for (const step of steps) {
-      await new Promise((r) => setTimeout(r, 400 + Math.random() * 200));
-      setProgress(step);
-    }
+    try {
+      const animation = (async () => {
+        const steps = [10, 22, 38, 51, 66, 79, 90];
+        for (const step of steps) {
+          await new Promise((r) => setTimeout(r, 350));
+          setProgress((current) => (current < step ? step : current));
+        }
+      })();
 
-    const result = await mockAnalyzeRoom();
-    setProgress(100);
-    await new Promise((r) => setTimeout(r, 400));
-    setDetectedRoom(result);
-    setPhase("result");
-  }, []);
+      const result = await ModelGenerationService.scanRoom(file);
+      await animation;
+
+      setProgress(100);
+      await new Promise((r) => setTimeout(r, 250));
+      setDetectedRoom(result);
+      setPhase("result");
+    } catch (error) {
+      setPhase("upload");
+      setProgress(0);
+      toast({
+        title: "Room scan failed",
+        description: error instanceof Error ? error.message : "Could not analyze this room image.",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
 
   const handleUseLayout = () => {
     if (!detectedRoom) return;

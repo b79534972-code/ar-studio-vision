@@ -19,9 +19,9 @@ const PLAN_PRICE_IDS: Record<Exclude<SubscriptionPlan, 'free'>, string> = {
 };
 
 const PLAN_CREDIT_CONFIG: Record<Exclude<SubscriptionPlan, 'free'>, { credits: number; validityMonths: number; priceVND: number; priceUSD: number }> = {
-  basic: { credits: 20, validityMonths: 3, priceVND: 49000, priceUSD: 2 },
-  advanced: { credits: 50, validityMonths: 6, priceVND: 99000, priceUSD: 4 },
-  pro: { credits: 120, validityMonths: 12, priceVND: 199000, priceUSD: 8 },
+  basic: { credits: 30, validityMonths: 1, priceVND: 59000, priceUSD: 2 },
+  advanced: { credits: 60, validityMonths: 2, priceVND: 119000, priceUSD: 4 },
+  pro: { credits: 120, validityMonths: 3, priceVND: 219000, priceUSD: 8 },
 };
 
 @Injectable()

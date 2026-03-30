@@ -21,12 +21,15 @@ import type { IAREngine, AREngineConfig, ARPlatform, AREngineState } from "../ty
 interface GestureState {
   isDragging: boolean;
   initialPinchDistance: number | null;
+  lastPinchDistance: number | null;
   initialRotationAngle: number | null;
   lastRotationAngle: number | null;
 }
 
 export class WebXREngine implements IAREngine {
   readonly platform: ARPlatform = "webxr";
+
+  private static webXRSupportPromise: Promise<boolean> | null = null;
 
   private config: AREngineConfig | null = null;
 
@@ -49,10 +52,21 @@ export class WebXREngine implements IAREngine {
   private gesture: GestureState = {
     isDragging: false,
     initialPinchDistance: null,
+    lastPinchDistance: null,
     initialRotationAngle: null,
     lastRotationAngle: null,
   };
   private raycaster = new THREE.Raycaster();
+  private dragPlane = new THREE.Plane();
+  private dragOffset = new THREE.Vector3();
+  private dragIntersection = new THREE.Vector3();
+  private gestureTarget: HTMLElement | null = null;
+
+  // Hit-test stability
+  private smoothedHitPose: { position: THREE.Vector3; quaternion: THREE.Quaternion } | null = null;
+  private lastSurfaceSeenAt = 0;
+  private readonly hitSmoothingFactor = 0.35;
+  private readonly hitGracePeriodMs = 450;
 
   // State
   private currentState: AREngineState = "idle";
@@ -61,9 +75,11 @@ export class WebXREngine implements IAREngine {
   private boundOnTouchStart: ((e: TouchEvent) => void) | null = null;
   private boundOnTouchMove: ((e: TouchEvent) => void) | null = null;
   private boundOnTouchEnd: ((e: TouchEvent) => void) | null = null;
+  private boundOnTouchCancel: ((e: TouchEvent) => void) | null = null;
 
   // Model preloading
   private preloadedModel: THREE.Group | null = null;
+  private preloadedModelPromise: Promise<THREE.Group | null> | null = null;
 
   // ─── IAREngine interface ───────────────────────────────
 
@@ -75,22 +91,36 @@ export class WebXREngine implements IAREngine {
       throw new Error("WebXR is not available in this browser.");
     }
 
-    const supported = await (navigator as any).xr.isSessionSupported("immersive-ar");
+    const supported = await this.isImmersiveARSupported();
     if (!supported) {
       throw new Error("WebXR immersive-ar sessions are not supported on this device.");
     }
 
-    // Pre-load GLB model during init so it's ready when user taps
+    // Start model preload in background so Start AR is not blocked by GLB download.
     if (config.modelUrl) {
-      try {
-        console.log("[WebXR] Pre-loading model:", config.modelUrl);
-        this.preloadedModel = await this.preloadModel(config.modelUrl);
-        console.log("[WebXR] Model pre-loaded successfully");
-      } catch (err) {
-        console.warn("[WebXR] Model pre-load failed, will use placeholder:", err);
-        this.preloadedModel = null;
+      if (!this.preloadedModelPromise) {
+        console.log("[WebXR] Pre-loading model in background:", config.modelUrl);
+        this.preloadedModelPromise = this.preloadModel(config.modelUrl)
+          .then((model) => {
+            this.preloadedModel = model;
+            console.log("[WebXR] Background model pre-load completed");
+            return model;
+          })
+          .catch((err) => {
+            console.warn("[WebXR] Background pre-load failed, will use live load/placeholder:", err);
+            this.preloadedModel = null;
+            return null;
+          });
       }
     }
+  }
+
+  private async isImmersiveARSupported(): Promise<boolean> {
+    if (!WebXREngine.webXRSupportPromise) {
+      const xr = (navigator as Navigator & { xr: XRSystem }).xr;
+      WebXREngine.webXRSupportPromise = xr.isSessionSupported("immersive-ar").catch(() => false);
+    }
+    return WebXREngine.webXRSupportPromise;
   }
 
   async start(): Promise<void> {
@@ -108,7 +138,10 @@ export class WebXREngine implements IAREngine {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.xr.enabled = true;
+      renderer.domElement.style.touchAction = "none";
+      renderer.domElement.style.webkitUserSelect = "none";
       container.appendChild(renderer.domElement);
+      container.style.touchAction = "none";
       this.renderer = renderer;
 
       // Scene
@@ -132,7 +165,7 @@ export class WebXREngine implements IAREngine {
 
       // Request XR session
       console.log("[WebXR] Requesting immersive-ar session...");
-      const session = await (navigator as any).xr.requestSession("immersive-ar", {
+      const session = await (navigator as Navigator & { xr: XRSystem }).xr.requestSession("immersive-ar", {
         requiredFeatures: ["hit-test"],
         optionalFeatures: ["dom-overlay", "local-floor"],
         domOverlay: { root: container },
@@ -188,9 +221,10 @@ export class WebXREngine implements IAREngine {
         this.onFrame(frame);
         renderer.render(scene, camera);
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to start AR session";
       console.error("[WebXR] AR session error:", err);
-      onError?.(err.message || "Failed to start AR session");
+      onError?.(errorMessage);
       this.setState("error");
     }
   }
@@ -219,6 +253,8 @@ export class WebXREngine implements IAREngine {
 
     if (this.reticle) this.reticle.visible = false;
     this.lastHitPose = null;
+    this.smoothedHitPose = null;
+    this.lastSurfaceSeenAt = 0;
     this.setState("scanning");
   }
 
@@ -253,19 +289,40 @@ export class WebXREngine implements IAREngine {
     if (!hitTestSource || !referenceSpace || !reticle) return;
 
     const results = frame.getHitTestResults(hitTestSource);
+    const now = performance.now();
 
     if (results.length > 0) {
       const pose = results[0].getPose(referenceSpace);
       if (pose) {
-        reticle.visible = true;
-        reticle.matrix.fromArray(pose.transform.matrix);
-
-        // Decompose for placement
-        const pos = new THREE.Vector3();
-        const quat = new THREE.Quaternion();
+        const rawPos = new THREE.Vector3();
+        const rawQuat = new THREE.Quaternion();
         const scale = new THREE.Vector3();
-        new THREE.Matrix4().fromArray(pose.transform.matrix).decompose(pos, quat, scale);
-        this.lastHitPose = { position: pos, quaternion: quat };
+        new THREE.Matrix4().fromArray(pose.transform.matrix).decompose(rawPos, rawQuat, scale);
+
+        if (!this.smoothedHitPose) {
+          this.smoothedHitPose = {
+            position: rawPos.clone(),
+            quaternion: rawQuat.clone(),
+          };
+        } else {
+          this.smoothedHitPose.position.lerp(rawPos, this.hitSmoothingFactor);
+          this.smoothedHitPose.quaternion.slerp(rawQuat, this.hitSmoothingFactor);
+        }
+
+        const hitMatrix = new THREE.Matrix4().compose(
+          this.smoothedHitPose.position,
+          this.smoothedHitPose.quaternion,
+          new THREE.Vector3(1, 1, 1)
+        );
+
+        reticle.visible = this.currentState !== "placed" && !this.gesture.isDragging;
+        reticle.matrix.copy(hitMatrix);
+
+        this.lastHitPose = {
+          position: this.smoothedHitPose.position.clone(),
+          quaternion: this.smoothedHitPose.quaternion.clone(),
+        };
+        this.lastSurfaceSeenAt = now;
 
         if (this.currentState === "scanning") {
           console.log("[WebXR] Surface detected! Ready to place.");
@@ -273,11 +330,24 @@ export class WebXREngine implements IAREngine {
         }
       }
     } else {
-      reticle.visible = false;
-      if (this.currentState === "ready") {
-        this.setState("scanning");
+      const recentlyTracked = now - this.lastSurfaceSeenAt <= this.hitGracePeriodMs;
+      if (recentlyTracked && this.lastHitPose) {
+        const holdMatrix = new THREE.Matrix4().compose(
+          this.lastHitPose.position,
+          this.lastHitPose.quaternion,
+          new THREE.Vector3(1, 1, 1)
+        );
+        reticle.visible = this.currentState !== "placed" && !this.gesture.isDragging;
+        reticle.matrix.copy(holdMatrix);
+      } else {
+        reticle.visible = false;
+        this.lastHitPose = null;
+        this.smoothedHitPose = null;
+
+        if (this.currentState === "ready") {
+          this.setState("scanning");
+        }
       }
-      this.lastHitPose = null;
     }
   }
 
@@ -387,44 +457,74 @@ export class WebXREngine implements IAREngine {
     this.boundOnTouchStart = (e) => this.onTouchStart(e);
     this.boundOnTouchMove = (e) => this.onTouchMove(e);
     this.boundOnTouchEnd = (e) => this.onTouchEnd(e);
+    this.boundOnTouchCancel = (e) => this.onTouchEnd(e);
 
-    container.addEventListener("touchstart", this.boundOnTouchStart, { passive: true });
-    container.addEventListener("touchmove", this.boundOnTouchMove, { passive: true });
-    container.addEventListener("touchend", this.boundOnTouchEnd, { passive: true });
+    const target = this.renderer?.domElement ?? container;
+    this.gestureTarget = target;
+
+    target.addEventListener("touchstart", this.boundOnTouchStart, { passive: false });
+    target.addEventListener("touchmove", this.boundOnTouchMove, { passive: false });
+    target.addEventListener("touchend", this.boundOnTouchEnd, { passive: true });
+    target.addEventListener("touchcancel", this.boundOnTouchCancel, { passive: true });
   }
 
   private detachGestureListeners(): void {
-    const container = this.config?.container;
-    if (!container) return;
+    const target = this.gestureTarget;
+    if (!target) return;
 
-    if (this.boundOnTouchStart) container.removeEventListener("touchstart", this.boundOnTouchStart);
-    if (this.boundOnTouchMove) container.removeEventListener("touchmove", this.boundOnTouchMove);
-    if (this.boundOnTouchEnd) container.removeEventListener("touchend", this.boundOnTouchEnd);
+    if (this.boundOnTouchStart) target.removeEventListener("touchstart", this.boundOnTouchStart);
+    if (this.boundOnTouchMove) target.removeEventListener("touchmove", this.boundOnTouchMove);
+    if (this.boundOnTouchEnd) target.removeEventListener("touchend", this.boundOnTouchEnd);
+    if (this.boundOnTouchCancel) target.removeEventListener("touchcancel", this.boundOnTouchCancel);
 
     this.boundOnTouchStart = null;
     this.boundOnTouchMove = null;
     this.boundOnTouchEnd = null;
+    this.boundOnTouchCancel = null;
+    this.gestureTarget = null;
+  }
+
+  private touchToNdc(touch: Touch): THREE.Vector2 {
+    const rect = this.renderer?.domElement.getBoundingClientRect();
+    const width = rect?.width ?? window.innerWidth;
+    const height = rect?.height ?? window.innerHeight;
+    const offsetX = rect?.left ?? 0;
+    const offsetY = rect?.top ?? 0;
+
+    return new THREE.Vector2(
+      ((touch.clientX - offsetX) / Math.max(width, 1)) * 2 - 1,
+      -((touch.clientY - offsetY) / Math.max(height, 1)) * 2 + 1
+    );
   }
 
   private onTouchStart(e: TouchEvent): void {
     if (this.currentState !== "placed" || !this.placedModel) return;
 
+    e.preventDefault();
+
     if (e.touches.length === 1) {
       const touch = e.touches[0];
       if (!this.camera || !this.renderer) return;
 
-      const coords = new THREE.Vector2(
-        (touch.clientX / window.innerWidth) * 2 - 1,
-        -(touch.clientY / window.innerHeight) * 2 + 1
-      );
+      const coords = this.touchToNdc(touch);
       this.raycaster.setFromCamera(coords, this.camera);
-      const intersects = this.raycaster.intersectObject(this.placedModel, true);
-      if (intersects.length > 0) {
+
+      // Move on a horizontal plane at the model's current height.
+      this.dragPlane.setFromNormalAndCoplanarPoint(
+        new THREE.Vector3(0, 1, 0),
+        this.placedModel.position
+      );
+
+      if (this.raycaster.ray.intersectPlane(this.dragPlane, this.dragIntersection)) {
+        this.dragOffset.copy(this.placedModel.position).sub(this.dragIntersection);
         this.gesture.isDragging = true;
+      } else {
+        this.gesture.isDragging = false;
       }
     } else if (e.touches.length === 2) {
       this.gesture.isDragging = false;
       this.gesture.initialPinchDistance = this.getTouchDistance(e.touches[0], e.touches[1]);
+      this.gesture.lastPinchDistance = this.gesture.initialPinchDistance;
       this.gesture.initialRotationAngle = this.getTouchAngle(e.touches[0], e.touches[1]);
       this.gesture.lastRotationAngle = this.gesture.initialRotationAngle;
     }
@@ -433,25 +533,40 @@ export class WebXREngine implements IAREngine {
   private onTouchMove(e: TouchEvent): void {
     if (this.currentState !== "placed" || !this.placedModel) return;
 
+    e.preventDefault();
+
     if (e.touches.length === 1 && this.gesture.isDragging) {
-      if (this.lastHitPose) {
-        this.placedModel.position.copy(this.lastHitPose.position);
+      if (!this.camera) return;
+
+      const touch = e.touches[0];
+      const coords = this.touchToNdc(touch);
+
+      this.raycaster.setFromCamera(coords, this.camera);
+      if (this.raycaster.ray.intersectPlane(this.dragPlane, this.dragIntersection)) {
+        this.placedModel.position.copy(this.dragIntersection.add(this.dragOffset));
       }
     } else if (e.touches.length === 2) {
       const model = this.placedModel;
 
-      // Pinch to scale
-      if (this.gesture.initialPinchDistance !== null) {
+      // Pinch to scale (incremental ratio improves control on iOS touch screens)
+      if (this.gesture.initialPinchDistance !== null && this.gesture.lastPinchDistance !== null) {
         const newDist = this.getTouchDistance(e.touches[0], e.touches[1]);
-        const scaleFactor = newDist / this.gesture.initialPinchDistance;
-        model.scale.setScalar(Math.max(0.3, Math.min(3.0, scaleFactor)));
+        const pinchDelta = newDist - this.gesture.lastPinchDistance;
+        if (Math.abs(pinchDelta) > 2) {
+          const scaleFactor = newDist / this.gesture.lastPinchDistance;
+          const nextScale = model.scale.x * scaleFactor;
+          model.scale.setScalar(Math.max(0.2, Math.min(4.5, nextScale)));
+        }
+        this.gesture.lastPinchDistance = newDist;
       }
 
-      // Two-finger rotate
+      // Two-finger rotate — screen-rotation direction matches model-rotation direction
       if (this.gesture.lastRotationAngle !== null) {
         const newAngle = this.getTouchAngle(e.touches[0], e.touches[1]);
-        const delta = newAngle - this.gesture.lastRotationAngle;
-        model.rotation.y += delta;
+        const delta = this.normalizeAngleDelta(newAngle - this.gesture.lastRotationAngle);
+        if (Math.abs(delta) > 0.01) {
+          model.rotation.y -= delta; // Flip sign for intuitive screen→model mapping
+        }
         this.gesture.lastRotationAngle = newAngle;
       }
     }
@@ -460,10 +575,11 @@ export class WebXREngine implements IAREngine {
   private onTouchEnd(e: TouchEvent): void {
     if (e.touches.length < 2) {
       this.gesture.initialPinchDistance = null;
+      this.gesture.lastPinchDistance = null;
       this.gesture.initialRotationAngle = null;
       this.gesture.lastRotationAngle = null;
     }
-    if (e.touches.length === 0) {
+    if (e.touches.length <= 1) {
       this.gesture.isDragging = false;
     }
   }
@@ -476,6 +592,12 @@ export class WebXREngine implements IAREngine {
 
   private getTouchAngle(t1: Touch, t2: Touch): number {
     return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
+  }
+
+  private normalizeAngleDelta(delta: number): number {
+    if (delta > Math.PI) return delta - Math.PI * 2;
+    if (delta < -Math.PI) return delta + Math.PI * 2;
+    return delta;
   }
 
   // ─── Cleanup ───────────────────────────────────────────

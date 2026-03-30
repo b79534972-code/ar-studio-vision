@@ -46,7 +46,7 @@ const AIOptimizePanel = ({
   objects,
   roomConfig,
   creditsRemaining,
-  useCredit,
+  useCredit: consumeCredit,
   onApplySuggestion,
   onOutOfCredits,
 }: AIOptimizePanelProps) => {
@@ -131,7 +131,7 @@ const AIOptimizePanel = ({
       onOutOfCredits?.();
       return;
     }
-    if (!useCredit(CREDIT_COST)) return;
+    if (!consumeCredit(CREDIT_COST)) return;
 
     setStep("analyzing");
     setProgress(0);

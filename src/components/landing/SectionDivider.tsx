@@ -6,7 +6,7 @@ const SectionDivider = () => {
       className="relative h-px mx-auto max-w-xs"
       initial={{ opacity: 0, scaleX: 0 }}
       whileInView={{ opacity: 1, scaleX: 1 }}
-      viewport={{ once: false, amount: 0.5 }}
+      viewport={{ once: true, amount: 0.5 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
     >
       <div

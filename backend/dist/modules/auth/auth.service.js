@@ -51,10 +51,10 @@ let AuthService = class AuthService {
     async login(identifier, password) {
         const user = await this.userRepo.findByLoginIdentifier(identifier);
         if (!user)
-            throw new common_1.UnauthorizedException('Invalid credentials');
+            throw new common_1.UnauthorizedException('Incorrect username or password');
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid)
-            throw new common_1.UnauthorizedException('Invalid credentials');
+            throw new common_1.UnauthorizedException('Incorrect username or password');
         const token = this.jwtService.sign({ sub: user.id, role: user.role });
         return { user, token };
     }

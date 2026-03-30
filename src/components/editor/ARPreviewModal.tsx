@@ -28,6 +28,8 @@ const ARPreviewModal = ({ open, onClose, objects, roomConfig }: ARPreviewModalPr
       id: o.furnitureId,
       n: o.name,
       c: o.category,
+      m: o.modelUrl,
+      u: o.usdzUrl,
       p: o.position,
       r: o.rotation,
       s: o.scale,

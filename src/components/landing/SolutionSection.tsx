@@ -17,7 +17,7 @@ const SolutionSection = () => {
           <motion.div
             initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ once: false, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-3 md:mb-4 tracking-tight">
@@ -31,25 +31,18 @@ const SolutionSection = () => {
             </p>
             <div className="space-y-2 md:space-y-3">
               {features.map((f, i) => (
-                <motion.div
+                <div
                   key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: false, amount: 0.3 }}
-                  transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.1 }}
-                  whileHover={{
-                    x: 4,
-                    scale: 1.02,
-                    backgroundColor: "hsl(var(--accent) / 0.5)",
-                    boxShadow: "var(--shadow-soft), 0 0 16px hsl(235 60% 52% / 0.06)",
+                  className="flex items-center gap-3 p-2.5 md:p-3 rounded-lg transition-all duration-300 cursor-default hover:translate-x-1 hover:scale-[1.01]"
+                  style={{
+                    background: "transparent",
                   }}
-                  className="flex items-center gap-3 p-2.5 md:p-3 rounded-lg transition-all duration-300 cursor-default"
                 >
                   <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg gradient-primary flex items-center justify-center shrink-0 shadow-soft">
                     <f.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary-foreground" />
                   </div>
                   <span className="text-xs md:text-sm font-medium text-foreground">{f.text}</span>
-                </motion.div>
+                </div>
               ))}
             </div>
           </motion.div>
@@ -57,7 +50,7 @@ const SolutionSection = () => {
           <motion.div
             initial={{ opacity: 0, x: 30, filter: "blur(6px)" }}
             whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-            viewport={{ once: false, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
           >
             <div

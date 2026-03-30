@@ -113,7 +113,7 @@ const OutOfCreditsModal = ({ open, onClose, currentPlan, currency = "VND", onBuy
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {t("credits.getBasicDesc") || `Starting from ${formatPrice("basic", currency)} for 20 AI credits`}
+                        {t("credits.getBasicDesc") || `Starting from ${formatPrice("basic", currency)} for ${PLAN_CONFIG.basic.aiCredits} AI credits`}
                       </p>
                     </div>
                   </div>

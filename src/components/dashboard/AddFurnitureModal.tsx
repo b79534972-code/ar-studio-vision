@@ -11,6 +11,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import FurnitureARStep from "./FurnitureARStep";
 import { customFurnitureStore } from "@/stores/customFurnitureStore";
 import type { FurnitureItem } from "@/types/editor";
+import { ModelGenerationService, type FurnitureGenerationJob } from "@/services/ModelGenerationService";
 
 const FurniturePreview3D = lazy(() => import("./FurniturePreview3D"));
 
@@ -58,6 +59,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
     shape: "Auto (from image)", material: "",
   });
   const [savedItem, setSavedItem] = useState<FurnitureItem | null>(null);
+  const [generatedJob, setGeneratedJob] = useState<FurnitureGenerationJob | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -68,6 +70,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
     setImagePreview(null);
     setGenerateProgress(0);
     setSavedItem(null);
+    setGeneratedJob(null);
     setUnit("cm");
     setForm({ name: "", category: "", width: "", height: "", depth: "", shape: "Auto (from image)", material: "" });
   };
@@ -104,23 +107,58 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
 
   const canGenerate = form.name && form.category && form.width && form.height && form.depth;
 
-  const handleGenerate = useCallback(() => {
-    if (!canGenerate) return;
+  const handleGenerate = useCallback(async () => {
+    if (!canGenerate || !imageFile) return;
     setStep("generating");
     setGenerateProgress(0);
 
-    // Simulate phased progress
-    const phases = [
-      { target: 25, delay: 300, label: "Analyzing image…" },
-      { target: 55, delay: 800, label: "Detecting shape…" },
-      { target: 80, delay: 1400, label: "Generating mesh…" },
-      { target: 100, delay: 2000, label: "Finalizing…" },
-    ];
-    phases.forEach(({ target, delay }) => {
-      setTimeout(() => setGenerateProgress(target), delay);
-    });
-    setTimeout(() => setStep("preview3d"), 2600);
-  }, [canGenerate]);
+    try {
+      const started = await ModelGenerationService.startFurnitureGeneration({
+        image: imageFile,
+        name: form.name,
+        category: form.category,
+        width: toCm(form.width) / 100,
+        height: toCm(form.height) / 100,
+        depth: toCm(form.depth) / 100,
+        material: form.material || undefined,
+        color: MATERIAL_COLORS[form.material] || undefined,
+      });
+
+      let done = false;
+      const startedAt = Date.now();
+
+      while (!done) {
+        const job = await ModelGenerationService.getFurnitureJob(started.jobId);
+        setGeneratedJob(job);
+        setGenerateProgress(job.progress);
+
+        if (job.status === "completed") {
+          setGenerateProgress(100);
+          setStep("preview3d");
+          done = true;
+          continue;
+        }
+
+        if (job.status === "failed") {
+          throw new Error(job.error || "Model generation failed.");
+        }
+
+        if (Date.now() - startedAt > 120000) {
+          throw new Error("Generation timed out. Please try again.");
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 1200));
+      }
+    } catch (error) {
+      setStep("details");
+      setGenerateProgress(0);
+      toast({
+        title: "Generation failed",
+        description: error instanceof Error ? error.message : "Could not generate 3D model from this image.",
+        variant: "destructive",
+      });
+    }
+  }, [canGenerate, imageFile, form, toast, unit]);
 
   const toCm = (val: string) => {
     const n = parseFloat(val);
@@ -144,9 +182,11 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
       },
       tags: ["custom", "uploaded"],
       favorited: false,
-      thumbnail: imagePreview || undefined,
+      thumbnail: generatedJob?.result?.cleanedImageUrl || imagePreview || undefined,
+      modelUrl: generatedJob?.result?.modelUrl,
+      usdzUrl: generatedJob?.result?.usdzUrl,
     };
-  }, [form, imagePreview, unit]);
+  }, [form, generatedJob, imagePreview, unit]);
 
   const handleSaveToLibrary = useCallback(() => {
     const item = buildFurnitureItem();
@@ -297,10 +337,7 @@ const AddFurnitureModal = ({ open, onClose }: AddFurnitureModalProps) => {
               </div>
               <div className="text-center space-y-1">
                 <p className="text-sm font-medium text-foreground">
-                  {generateProgress < 30 && "Analyzing image…"}
-                  {generateProgress >= 30 && generateProgress < 60 && "Detecting shape…"}
-                  {generateProgress >= 60 && generateProgress < 85 && "Generating mesh…"}
-                  {generateProgress >= 85 && "Finalizing model…"}
+                  {generatedJob?.message || "Processing image..."}
                 </p>
                 <p className="text-xs text-muted-foreground">{form.name} · {form.width} × {form.height} × {form.depth} {unit}</p>
               </div>

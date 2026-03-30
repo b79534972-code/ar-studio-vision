@@ -10,6 +10,7 @@ import { DatabaseModule } from './infrastructure/database/database.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
 import { JobsModule } from './infrastructure/jobs/jobs.module';
 import { RateLimitMiddleware } from './common/middleware/rate-limit.middleware';
+import { ModelGenerationModule } from './modules/model-generation/model-generation.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RateLimitMiddleware } from './common/middleware/rate-limit.middleware';
     AuthModule,
     StripeModule,
     AIModule,
+    ModelGenerationModule,
     StorageModule,
     JobsModule,
   ],
