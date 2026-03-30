@@ -7,7 +7,7 @@ import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { join } from 'path';
 import { mkdirSync } from 'fs';
-import express from 'express';
+import * as express from 'express';
 
 function parseAllowedOrigins(): string[] {
   const defaults = ['http://localhost:5173', 'http://127.0.0.1:5173'];
