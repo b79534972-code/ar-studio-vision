@@ -58,11 +58,162 @@ export interface RoomScanResult {
   walls: { id: string; from: [number, number]; to: [number, number] }[];
 }
 
+type MeshyTaskUrls = {
+  modelUrl: string;
+  usdzUrl?: string;
+};
+
 @Injectable()
 export class ModelGenerationService {
   private readonly logger = new Logger(ModelGenerationService.name);
   private readonly jobs = new Map<string, GenerationJob>();
   private readonly generatedRoot = join(process.cwd(), 'generated');
+
+  private getModel3DProvider(): 'local' | 'meshy' {
+    const provider = (process.env.MODEL3D_PROVIDER || 'local').trim().toLowerCase();
+    return provider === 'meshy' ? 'meshy' : 'local';
+  }
+
+  private getMeshyApiBaseUrl(): string {
+    return (process.env.MESHY_API_BASE_URL || 'https://api.meshy.ai/openapi/v2').trim().replace(/\/$/, '');
+  }
+
+  private isMeshyEnabled(): boolean {
+    return this.getModel3DProvider() === 'meshy' && !!process.env.MESHY_API_KEY;
+  }
+
+  private parseNumber(input: string | undefined, fallback: number): number {
+    const value = Number(input);
+    return Number.isFinite(value) && value > 0 ? value : fallback;
+  }
+
+  private readNestedString(record: unknown, paths: string[]): string | undefined {
+    for (const path of paths) {
+      const parts = path.split('.');
+      let current: unknown = record;
+      for (const part of parts) {
+        if (!current || typeof current !== 'object' || !(part in current)) {
+          current = undefined;
+          break;
+        }
+        current = (current as Record<string, unknown>)[part];
+      }
+      if (typeof current === 'string' && current.trim()) {
+        return current;
+      }
+    }
+    return undefined;
+  }
+
+  private async createMeshyTask(cleanedImageUrl: string, request: FurnitureGenerationRequest): Promise<string> {
+    const apiKey = process.env.MESHY_API_KEY;
+    if (!apiKey) {
+      throw new Error('MESHY_API_KEY is missing');
+    }
+
+    const prompt = `${request.name}, ${request.category}, ${request.material || 'generic material'}, clean studio lighting, object centered`;
+
+    const response = await fetch(`${this.getMeshyApiBaseUrl()}/image-to-3d`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        image_url: cleanedImageUrl,
+        prompt,
+        texture_prompt: `${request.material || 'neutral material'} furniture texture`,
+      }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Meshy task creation failed (${response.status}): ${text}`);
+    }
+
+    const payload = (await response.json()) as unknown;
+    const taskId = this.readNestedString(payload, ['result', 'id', 'task_id', 'taskId']);
+    if (!taskId) {
+      throw new Error('Meshy did not return a task ID');
+    }
+
+    return taskId;
+  }
+
+  private parseMeshyUrls(payload: unknown): MeshyTaskUrls | null {
+    const modelUrl = this.readNestedString(payload, [
+      'model_urls.glb',
+      'result.model_urls.glb',
+      'output.model_urls.glb',
+      'model_urls.gltf',
+      'result.model_urls.gltf',
+      'output.model_urls.gltf',
+    ]);
+
+    if (!modelUrl) {
+      return null;
+    }
+
+    const usdzUrl = this.readNestedString(payload, [
+      'model_urls.usdz',
+      'result.model_urls.usdz',
+      'output.model_urls.usdz',
+    ]);
+
+    return { modelUrl, usdzUrl };
+  }
+
+  private async pollMeshyTask(taskId: string, jobId: string): Promise<MeshyTaskUrls> {
+    const apiKey = process.env.MESHY_API_KEY;
+    if (!apiKey) {
+      throw new Error('MESHY_API_KEY is missing');
+    }
+
+    const pollIntervalMs = this.parseNumber(process.env.MESHY_POLL_INTERVAL_MS, 2500);
+    const timeoutMs = this.parseNumber(process.env.MESHY_TIMEOUT_MS, 240000);
+    const startedAt = Date.now();
+
+    while (Date.now() - startedAt < timeoutMs) {
+      const response = await fetch(`${this.getMeshyApiBaseUrl()}/image-to-3d/${taskId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+        },
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Meshy polling failed (${response.status}): ${text}`);
+      }
+
+      const payload = (await response.json()) as Record<string, unknown>;
+      const status = String(payload.status || payload.state || '').toLowerCase();
+      const progressRaw = payload.progress;
+      const progress = typeof progressRaw === 'number' ? Math.max(0, Math.min(100, progressRaw)) : undefined;
+
+      if (status === 'failed' || status === 'error') {
+        const reason = this.readNestedString(payload, ['message', 'error', 'result.error', 'output.error']) || 'unknown provider error';
+        throw new Error(`Meshy generation failed: ${reason}`);
+      }
+
+      if (status === 'succeeded' || status === 'success' || status === 'completed' || status === 'done') {
+        const urls = this.parseMeshyUrls(payload);
+        if (!urls) {
+          throw new Error('Meshy task completed without model URLs');
+        }
+        return urls;
+      }
+
+      this.updateJob(jobId, {
+        progress: progress !== undefined ? 75 + Math.round(progress * 0.2) : 82,
+        message: 'Generating 3D mesh with AI provider',
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+    }
+
+    throw new Error('Meshy generation timed out');
+  }
 
   private parseImageDimensions(buffer: Buffer): { width?: number; height?: number } {
     // PNG IHDR width/height
@@ -319,6 +470,34 @@ export class ModelGenerationService {
       const cleanedPath = join(imageDir, cleanedFilename);
       await writeFile(cleanedPath, cleaned.buffer);
 
+      const baseUrl = this.getPublicBaseUrl();
+      const cleanedImageUrl = `${baseUrl}/generated/${request.userId}/images/${cleanedFilename}`;
+
+      if (this.isMeshyEnabled()) {
+        this.updateJob(jobId, { progress: 62, message: 'Submitting image to AI 3D provider' });
+        try {
+          const taskId = await this.createMeshyTask(cleanedImageUrl, request);
+          this.updateJob(jobId, { progress: 72, message: `Provider task created (${taskId.slice(0, 8)}...)` });
+          const providerResult = await this.pollMeshyTask(taskId, jobId);
+
+          this.updateJob(jobId, {
+            status: 'completed',
+            progress: 100,
+            message: '3D model generated successfully',
+            result: {
+              cleanedImageUrl,
+              modelUrl: providerResult.modelUrl,
+              usdzUrl: providerResult.usdzUrl,
+            },
+          });
+          return;
+        } catch (providerError) {
+          this.logger.warn(
+            `Provider generation failed for job ${jobId}, falling back to local silhouette: ${providerError instanceof Error ? providerError.message : 'unknown error'}`,
+          );
+        }
+      }
+
       this.updateJob(jobId, { progress: 70, message: 'Building 3D mesh from image silhouette' });
 
       const gltf = this.buildBillboardGltf(cleaned.buffer, cleaned.mimeType);
@@ -326,16 +505,15 @@ export class ModelGenerationService {
       const modelPath = join(modelDir, modelFilename);
       await writeFile(modelPath, gltf, 'utf8');
 
-      const baseUrl = this.getPublicBaseUrl();
       const result: FurnitureGenerationResult = {
-        cleanedImageUrl: `${baseUrl}/generated/${request.userId}/images/${cleanedFilename}`,
+        cleanedImageUrl,
         modelUrl: `${baseUrl}/generated/${request.userId}/models/${modelFilename}`,
       };
 
       this.updateJob(jobId, {
         status: 'completed',
         progress: 100,
-        message: '3D model is ready',
+        message: this.isMeshyEnabled() ? 'Provider unavailable, local 3D silhouette generated' : 'Local 3D silhouette generated',
         result,
       });
     } catch (error) {
