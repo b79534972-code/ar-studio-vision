@@ -21,7 +21,6 @@
         "./src/*"
       ]
     },
-    "baseUrl": ".",
     "skipLibCheck": true,
     "strict": false,
     "target": "ES2020",
