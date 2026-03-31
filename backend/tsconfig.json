@@ -22,6 +22,21 @@
       "@/*": ["src/*"] 
     }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "src/**/*.tsx"]
+  "include": [
+    "src/main.ts",
+    "src/app.module.ts",
+    "src/common/**/*.ts",
+    "src/domain/**/*.ts",
+    "src/infrastructure/**/*.ts",
+    "src/modules/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.tsx",
+    "src/ar/**",
+    "src/hooks/**",
+    "src/lib/**",
+    "src/test/**"
+  ]
 }
